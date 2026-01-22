@@ -1,0 +1,48 @@
+#:kivy 2.3.1
+
+
+
+<CozenGoz>:
+    canvas.before:
+        Color:
+            rgba:(1,1,1,1)
+        Rectangle:
+            pos:self.pos
+            size:self.size
+    
+    Widget:
+        id:solAlan
+        size_hint:.2,1
+        pos_hint:{'x':0,'y':0}
+        canvas.before:
+            Color:
+                rgba:(.4,.4,.4,1)
+            Rectangle:
+                pos:self.pos
+                size:self.size
+    
+    AnchorLayout:
+        id:sagAlan
+
+        anchor_x:'center'
+        anchor_y:'center'
+        size_hint:.7,1
+        pos_hint:{'right':1,'y':0}
+        canvas.before:
+            Color:
+                rgba:(0,0,0,1)
+            Rectangle:
+                pos:self.pos
+                size:self.size
+        
+        Widget:
+            id:yarisAlaniWidget
+            size_hint:.9,.9
+            pos_hint:{'center_x':.5,'center_y':.5}
+            canvas.before:
+                Color:
+                    rgba:(.2,.2,.2,1)
+                Rectangle:
+                    pos:self.pos
+                    size:self.size
+    

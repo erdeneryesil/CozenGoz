@@ -1,0 +1,243 @@
+normal:288x317 - 330x330
+patla:560x394  - 563x563
+
+--------------------------------
+import os
+from PIL import Image
+
+def toplu_boyutlandir_recursive(input_root, output_root, target_size=(563, 563)):
+    # Desteklenen dosya uzantıları
+    valid_extensions = (".png", ".PNG")
+
+    # Tüm alt dizinleri ve dosyaları tara
+    for root, dirs, files in os.walk(input_root):
+        for filename in files:
+            if filename.endswith(valid_extensions):
+                # Mevcut dosyanın tam yolu
+                img_path = os.path.join(root, filename)
+
+                # Hedef klasör yapısını belirle
+                # Giriş dizini ile dosya arasındaki göreceli yolu alır (örn: goz1/alt/bekle)
+                relative_path = os.path.relpath(root, input_root)
+                target_dir = os.path.join(output_root, relative_path)
+
+                # Hedef alt klasör yoksa oluştur
+                if not os.path.exists(target_dir):
+                    os.makedirs(target_dir)
+
+                # İşleme başla
+                try:
+                    with Image.open(img_path) as img:
+                        old_width, old_height = img.size
+
+                        # Yeni şeffaf tuval (RGBA)
+                        new_img = Image.new("RGBA", target_size, (0, 0, 0, 0))
+
+                        # Ortalamak için koordinat hesapla
+                        x_offset = (target_size[0] - old_width) // 2
+                        y_offset = (target_size[1] - old_height) // 2
+
+                        # Orijinal görseli yapıştır
+                        new_img.paste(img, (x_offset, y_offset))
+
+                        # Hedef yolu oluştur ve kaydet
+                        save_path = os.path.join(target_dir, filename)
+                        new_img.save(save_path)
+                        print(f"Başarılı: {save_path}")
+
+                except Exception as e:
+                    print(f"Hata oluştu ({img_path}): {e}")
+
+# Klasör yolları
+giris_dizini = "orijinal_resimler"
+cikis_dizini = "kare_resimler"
+
+toplu_boyutlandir_recursive(giris_dizini, cikis_dizini)
+
+-----------
+from PIL import Image
+import os
+
+# Ayarlar
+input_files = [f"goz/goz1/alt/sola-don/alt-sola-don-{i}.png" for i in range(12)]
+angles = [0, 10, 20, 30, 40, 45, -45, -40, -30, -20, -10, 0]
+
+def process_image(filename, angle):
+    if not os.path.exists(filename):
+        print(f"Dosya bulunamadı: {filename}")
+        return
+
+    # Görseli aç (RGBA modunda olduğundan emin ol)
+    with Image.open(filename).convert("RGBA") as img:
+        orig_w, orig_h = img.size
+
+        # 1. İçeriğin sınırlarını (bounding box) bul
+        # Bu işlem şeffaf olmayan en dış pikselleri tespit eder
+        bbox = img.getbbox()
+        if not bbox:
+            print(f"Hata: {filename} içeriği boş.")
+            return
+
+        # 2. Sadece içeriği kırp
+        #content = img.crop(bbox)
+        content=img
+
+        # 3. Kırpılan içeriği döndür
+        # expand=True içeriğin dönme esnasında kesilmemesini sağlar
+        rotated_content = content.rotate(angle, resample=Image.BICUBIC, expand=True)
+
+        # 4. Orijinal boyutta yeni, tamamen şeffaf bir tuval oluştur
+        new_canvas = Image.new("RGBA", (orig_w, orig_h), (0, 0, 0, 0))
+
+        # 5. Döndürülmüş içeriğin merkezini, tuvalin merkezine hesapla
+        rot_w, rot_h = rotated_content.size
+
+        # Yapıştırma koordinatları (Merkezi hizalama)
+        paste_x = (orig_w - rot_w) // 2
+        paste_y = (orig_h - rot_h) // 2
+
+        # 6. İçeriği yeni tuvale yapıştır
+        new_canvas.paste(rotated_content, (paste_x, paste_y), rotated_content)
+
+        # Sonucu kaydet
+        output_name = f"centered_{filename}"
+        new_canvas.save(output_name)
+        print(f"İşlendi: {filename} -> {output_name} ({angle} derece, ortalandı)")
+
+# Tüm görselleri döngü ile işle
+for i in range(len(input_files)):
+    process_image(input_files[i], angles[i])
+
+print("\nİşlem tamamlandı. Tüm görseller içerik bazlı ortalandı.")
+----------------
+
+import os
+from pathlib import Path
+import re
+
+for i in range(1, 5):
+    base_path = Path(f"goz{i}")
+
+    if not base_path.exists():
+        continue
+
+    # gozX içindeki her bir yön dizini için (alt, sag, sol, ust)
+    for direction in base_path.iterdir():
+
+        if direction.is_dir():
+
+
+            # Yön dizini içindeki her bir eylem dizini için (bekle, git, patla)
+            for action in direction.iterdir():
+                if action.is_dir():
+
+
+
+                    # Eylem dizini içindeki .png dosyalarını bul
+                    sayac=0
+                    for img in action.glob("*"):
+                        # Eğer dosya ismi zaten yön ismiyle başlamıyorsa (tekrar çalıştırılırsa hata olmasın)
+                        '''if not img.name.startswith(f"{direction.name}-"):
+                            new_name = f"{direction.name}-{img.name}"
+                            img.rename(img.with_name(new_name))
+                            print(f"Yeniden adlandırıldı: {img.name} -> {new_name}")'''
+
+                        number = (int)(re.findall(r'\d+', img.name)[0])-1
+
+
+
+                        old_name_without_number=f"{direction.name}-{action.name}"
+                        print(old_name_without_number)
+                        new_name = f"{direction.name}-{action.name}-{number}.png"
+                        #print(img.name," - ",new_name)
+
+
+                        img.rename(img.with_name(new_name))
+
+                        #print(f"Yeniden adlandırıldı: {img.name} -> {new_name}")
+
+print("İşlem tamamlandı.")
+---------
+
+python3 -m kivy.atlas goz1 4096 */*/*.png
+python3 -m kivy.atlas goz2 4096 */*/*.png
+python3 -m kivy.atlas goz3 4096 */*/*.png
+python3 -m kivy.atlas goz4 4096 */*/*.png
+
+python3 -m kivy.atlas reseptor 2048 *.png
+
+----------
+Ebat : 563x396
+----------
+kırmızı-beyaz
+    alt
+        boş             20
+        hareket         6
+        öl              9
+    sağ
+        boş             20
+        hareket         6
+        öl              11
+    sol
+        boş             20
+        hareket         6
+        öl              11
+    üst
+        boş             20
+        hareket         6
+        öl              9
+----------
+kırmızı-mor
+    alt
+        boş             20
+        hareket         6
+        öl              9
+    sağ
+        boş             20
+        hareket         6
+        öl              11
+    sol
+        boş             20
+        hareket         6
+        öl              11
+    üst
+        boş             20
+        hareket         6
+        öl              9
+----------
+kırmızı-sarı
+    alt
+        boş             20
+        hareket         6
+        öl              9
+    sağ
+        boş             20
+        hareket         6
+        öl              11
+    sol
+        boş             20
+        hareket         6
+        öl              11
+    üst
+        boş             20
+        hareket         6
+        öl              9
+----------
+pembe-beyaz
+    alt
+        boş             20
+        hareket         6
+        öl              9
+    sağ
+        boş             20
+        hareket         6
+        öl              11
+    sol
+        boş             20
+        hareket         6
+        öl              11
+    üst
+        boş             20
+        hareket         6
+        öl              9
+----------
