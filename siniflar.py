@@ -98,165 +98,6 @@ class ReseptorAksiyon(IntEnum):
     DUVAR_ACIK=1
     DUVAR_KAPALI=2
 
-class ReseptorImaj(Image):
-    __dizin="assets/reseptor"
-    __atlasDosya="reseptor.atlas"
-
-    __kareAd={ReseptorAksiyon.ARANIYOR:"reseptor-beyaz-",ReseptorAksiyon.DUVAR_ACIK:"reseptor-yesil-",ReseptorAksiyon.DUVAR_KAPALI:"reseptor-kirmizi"}
-    __kareSayi=13
-    __kare={ReseptorAksiyon.ARANIYOR:[],ReseptorAksiyon.DUVAR_ACIK:[],ReseptorAksiyon.DUVAR_KAPALI:[]}
-            
-    __gecikme={ReseptorAksiyon.ARANIYOR:5/60,ReseptorAksiyon.DUVAR_ACIK:5/60,ReseptorAksiyon.DUVAR_KAPALI:5/60}
-
-    __orijinalBoyut=340
-    __boyutOran=1#hücre genişliğine oranı
-    __atlasYuklendi=False # atlas dosyasının yüklenip yüklenmediğini kontrol edeceğimiz değişken. Yüklendiğine True olacak
-    __animasyonTekrar={ReseptorAksiyon.ARANIYOR:1,ReseptorAksiyon.DUVAR_ACIK:1,ReseptorAksiyon.DUVAR_KAPALI:1} # Animasyon kaç kere çalışacak
-
-    @staticmethod
-    def dizin():
-        return ReseptorImaj.__dizin
-    @staticmethod
-    def atlasDosya():
-        return ReseptorImaj.__atlasDosya
-    @staticmethod
-    def kareSayi():
-        return ReseptorImaj.__kareSayi
-    @staticmethod
-    def kareAd(reseptorAksiyon):
-        Denetle.TurHata(reseptorAksiyon,ReseptorAksiyon)
-        return ReseptorImaj.__kareAd[reseptorAksiyon]
-    @staticmethod
-    def kare(reseptorAksiyon,numara):
-        Denetle.TurHata(reseptorAksiyon,ReseptorAksiyon)
-        return ReseptorImaj.__kare[reseptorAksiyon][numara]
-    @staticmethod
-    def kareEkle(reseptorAksiyon,kare):
-        Denetle.TurHata(reseptorAksiyon,ReseptorAksiyon)
-        return ReseptorImaj.__kare[reseptorAksiyon].append(kare)
-    @staticmethod
-    def gecikme(reseptorAksiyon):
-        Denetle.TurHata(reseptorAksiyon,ReseptorAksiyon)
-        return ReseptorImaj.__gecikme[reseptorAksiyon]
-    @staticmethod
-    def orijinalBoyut():
-        return ReseptorImaj.__orijinalBoyut
-    @staticmethod
-    def boyutOran():
-        return ReseptorImaj.__boyutOran
-    @staticmethod
-    def atlasYuklendi():
-        return ReseptorImaj.__atlasYuklendi
-    @staticmethod
-    def atlasYuklendiGuncelle(deger):
-        ReseptorImaj.__atlasYuklendi=deger
-    @staticmethod
-    def animasyonTekrar(reseptorAksiyon):
-        Denetle.TurHata(reseptorAksiyon,ReseptorAksiyon)
-        return ReseptorImaj.__animasyonTekrar[reseptorAksiyon]
-
-    def __init__(self,**kwargs):
-        super().__init__(**kwargs)
-        self.__reseptorAksiyon=None
-        self.__kareSayac=0
-        self.__animasyonSaat=None
-        #self.__aksiyonBitti=False
-
-        #self.allow_stretch=True
-        #self.fit_mode='contain'
-        self.size_hint=(None,None)
-    
-    #@property
-    #def reseptorAksiyon(self):
-        #return self.__reseptorAksiyon
-
-    #@property
-    #def aksiyonBitti(self):
-        #return self.__aksiyonBitti
-    
-    #def aksiyonBittiSifirla(self):
-       #self.__aksiyonBitti=False 
-
-    def __reseptorAksiyonDegistir(self,reseptorAksiyon):
-        self.__reseptorAksiyon=reseptorAksiyon
-        self.__animasyonHazirlik()
-    
-    def __animasyonHazirlik(self):
-        self.texture=ReseptorImaj.kare(self.__reseptorAksiyon,0).texture#yeni reseptorAksiyonun, ilk karesi alınıyor. Aksiyon geçişinde, önceki durumun karesi kalmasın diye 
-        self.__kareSayac=0
-        if self.__animasyonSaat:
-            self.__animasyonSaat.cancel()
-        self.__animasyonSaat=Clock.schedule_interval(self.animasyonTikTak,ReseptorImaj.gecikme(self.__reseptorAksiyon))
-
-
-        '''self.texture=Nine.kare[self.durum][0].texture#yeni durumun, ilk karesi alınıyor. Durum geçişinde, önceki durumun karesi kalmasın diye 
-        self.BoyutAyarla()
-        self.KonumAyarla()
-
-        if self.durum=='tokmakla':
-            self.tokmakVurdu=False
-        elif self.durum=='ateş et':
-            self.mermiAdet-=1
-            self.silahGosterge.MermiAdetDegistir(self.mermiAdet)
-            if self.mermiAdet==0:
-                self.tufekVar=False
-                self.silahGosterge.DurumDegistir('tokmak')
-        elif self.durum.split('-')[0]=='zıpla':#eğer durum, zıpla-tüfekli ya da zıpla-tüfeksiz ise
-            self.ziplaHiz=self.ziplaHizOrijinal[self.durum]
-
-
-        self.kareSayac=0
-        if self.animasyonSaat:
-            self.animasyonSaat.cancel()
-        self.animasyonSaat=Clock.schedule_interval(self.animasyonTikTak,Nine.gecikme[self.durum])'''
-    
-    def animasyonTikTak(self,dt):
-        self.texture=ReseptorImaj.kare(self.__reseptorAksiyon,self.__kareSayac%(ReseptorImaj.kareSayi())).texture
-        self.__kareSayac+=1
-
-        if self.__reseptorAksiyon==GozAksiyon.GIT:
-            dx,dy=self.__gitAdim[self.__yon]
-            self.x+=dx#0.7 denemek için. GIT aksiyonu bittiğinde, tam hücreniin ortasına konumlandırılsın.
-            self.y+=dy
-
-        if self.__kareSayac>=ReseptorImaj.kareSayi(self.__yon,self.__reseptorAksiyon)*ReseptorImaj.animasyonTekrar(self.__reseptorAksiyon):
-            self.__kareSayac=0
-            #self.__aksiyonBitti=True
-            if self.__reseptorAksiyon==GozAksiyon.GIT:
-                pass
-            elif self.__reseptorAksiyon==GozAksiyon.SOLA_DON or self.__reseptorAksiyon==GozAksiyon.SAGA_DON:
-                self.__yon=self.__yeniYon
-                
-            self.__reseptorAksiyon=GozAksiyon.BEKLE
-            self.__animasyonHazirlik()
-
-
-        '''if self.durum!='gidiş':
-            self.texture=Mermi.kare[self.durum][self.kareSayac].texture
-            self.kareSayac+=1
-        if Mermi.kareSayisi[self.durum]>1 and self.kareSayac+1==Mermi.kareSayisi[self.durum]: #'gidiş' gibi tek resimli durumlarda animasyonun bigozTip bitmediğini kontrol etmeye gerek yok 
-            if self.durum=='patlama':
-                self.DurumDegistir('gidiş')
-            elif self.durum=='vurma':
-                self.sil=True
-                self.animasyonSaat.cancel()'''
-
-    def guncelleOlculer(self,hucreX,hucreY,hucreBoyut):#canvas içerisine çizilecek labirentin genişlik, yükseklik, x, y vs değerleri hesaplanıyor
-        self.width=hucreBoyut*GozImaj.genislikOran()
-        self.height=self.width*GozImaj.orijinalYukseklik()/GozImaj.orijinalGenislik()
-        self.konumla(hucreX,hucreY,hucreBoyut)
-
-        gitAdimSag=(int)(hucreBoyut/(GozImaj.kareSayi(Yon.SAG,GozAksiyon.GIT)*GozImaj.animasyonTekrar(GozAksiyon.GIT)))
-        gitAdimSol=(int)(hucreBoyut/(GozImaj.kareSayi(Yon.SOL,GozAksiyon.GIT)*GozImaj.animasyonTekrar(GozAksiyon.GIT)))
-        gitAdimUst=(int)(hucreBoyut/(GozImaj.kareSayi(Yon.UST,GozAksiyon.GIT)*GozImaj.animasyonTekrar(GozAksiyon.GIT)))
-        gitAdimAlt=(int)(hucreBoyut/(GozImaj.kareSayi(Yon.ALT,GozAksiyon.GIT)*GozImaj.animasyonTekrar(GozAksiyon.GIT)))
-
-        self.__gitAdim={Yon.SAG: (gitAdimSag, 0),Yon.SOL: (-gitAdimSol, 0),Yon.UST: (0, gitAdimUst),Yon.ALT: (0, -gitAdimAlt)}
-    
-    def konumla(self,hucreX,hucreY,hucreBoyut):
-        self.center_x=hucreX+hucreBoyut/2
-        self.center_y=hucreY+hucreBoyut/2
-
 
 #Robotun bulunduğu konum
 class Konum:
@@ -368,29 +209,41 @@ class OnHucre(Hucre):
 
 class Yukle:
     @staticmethod
-    def AtlasDosya(Sinif,gozTip=None):
-        Denetle.TurHata(gozTip,GozTip)
-        if gozTip:
-            atlasDosyaAd=Sinif.dizin()+'/'+Sinif.atlasDosya(gozTip)
-            atlasDosya=Atlas(atlasDosyaAd)
-        else:
-            pass
- 
-        if gozTip:Sinif.atlasYuklendiGuncelle(gozTip,False)
-        #else:Sinif.atlasYuklendiGuncelle=False
+    def AtlasDosya(ImajSinif,AksiyonSinif,TipSinif=None,YonSinif=None):
+        ImajSinif.atlasYuklendiGuncelle(False)
+    
+        # Başlangıçta durum tespiti yaparak döngü içindeki 'if' yükünü azaltıyoruz
+        tipler = TipSinif if TipSinif else [None]
+        yonler = YonSinif if YonSinif else [None]
+        dizin = ImajSinif.dizin()
 
-        if gozTip:
-            for yon in Yon:
-                for aksiyon in GozAksiyon:
-                    kareAdNumarasiz=Sinif.kareAd(yon,aksiyon)
-                    for kareNumara in range(Sinif.kareSayi(yon,aksiyon)):
-                        kareAd=kareAdNumarasiz+str(kareNumara)
-                        hamKare=CoreImage(atlasDosya[kareAd])#.atlas dosyası içindeki, resimler teker teker ele alınıyor
-                        Sinif.kareEkle(gozTip,yon,aksiyon,hamKare)
-        else:pass
+        for tip in tipler:
+            atlasAd = ImajSinif.atlasDosya(tip)
+            atlas = Atlas(f"{dizin}/{atlasAd}")
 
-        if gozTip:Sinif.atlasYuklendiGuncelle(gozTip,True)
-        #else:Sinif.atlasYuklendi=True
+            for yon in yonler:
+                for aksiyon in AksiyonSinif:
+                    # Parametre yapısına göre metod seçimi
+                    if YonSinif:
+                        kareAdNumarasiz = ImajSinif.kareAd(aksiyon,yon)
+                        kareSayisi = ImajSinif.kareSayi(aksiyon,yon)
+                    else:
+                        kareAdNumarasiz = ImajSinif.kareAd(aksiyon)
+                        kareSayisi = ImajSinif.kareSayi(aksiyon)
+
+                    for kareNumara in range(kareSayisi):
+                        kareAd = f"{kareAdNumarasiz}{kareNumara}"
+                        
+                        # Atlas içinden resmi çek ve dönüştür
+                        hamKare = CoreImage(atlas[kareAd])
+                        
+                        # Ekleme işlemini duruma göre yap
+                        if TipSinif and YonSinif:
+                            ImajSinif.kareEkle(aksiyon,hamKare,tip, yon)
+                        else:
+                            ImajSinif.kareEkle(aksiyon,hamKare)
+
+        ImajSinif.atlasYuklendiGuncelle(True)
         
 class GozTip(IntEnum):
     GOZ1=1
@@ -405,29 +258,198 @@ class GozAksiyon(IntEnum):
     SOLA_DON=3
     SAGA_DON=4
 
+class Imaj(Image):
+    _dizin = None
+    _atlasDosya = None
+    _kareAd = None
+    _kareSayi = None
+    _kare = None
+    _gecikme = None
+    _orijinalBoyut = None
+    _boyutOran = None
+    _animasyonTekrar = None
+    _atlasYuklendi = False
 
-class GozImaj(Image):#animasyon ve çizim işlemlerinin yürütüleceğin sınıf
-    __dizin="assets/goz"
+    @classmethod
+    def dizin(cls):
+        return cls._dizin
+    @classmethod
+    def atlasDosya(cls, tip=None):#eğer tip yoksa (örneğin GozImaj'ın tipi var ama ReseptorImaj'ın yok), 0 indisli atlas dosya
+        return cls._atlasDosya if tip is None else cls._atlasDosya[tip]
+    @classmethod
+    def atlasYuklendi(cls):
+        return cls._atlasYuklendi
+    @classmethod
+    def atlasYuklendiGuncelle(cls, deger):
+        cls._atlasYuklendi = deger
+    @classmethod
+    def orijinalBoyut(cls):
+        return cls._orijinalBoyut
+    @classmethod
+    def boyutOran(cls):
+        return cls._boyutOran
+    @classmethod
+    def gecikme(cls, aksiyon):
+        return cls._gecikme[aksiyon]
+    @classmethod
+    def animasyonTekrar(cls, aksiyon):
+        return cls._animasyonTekrar[aksiyon]
+    @classmethod
+    def kareAd(cls,aksiyon,yon=None):
+        return cls._kareAd[aksiyon] if yon is None else cls._kareAd[yon][aksiyon]
+    @classmethod
+    def kareSayi(cls,aksiyon,yon=None):
+        return cls._kareSayi[aksiyon] if yon is None else cls._kareSayi[yon][aksiyon]
+    @classmethod
+    def kare(cls,aksiyon,numara,tip=None,yon=None):
+        return cls._kare[aksiyon][numara] if tip is None and yon is None else cls._kare[tip][yon][aksiyon][numara]
+    @classmethod
+    def kareEkle(cls,aksiyon,hamKare,tip=None,yon=None):
+        cls._kare[aksiyon].append(hamKare) if tip is None and yon is None else cls._kare[tip][yon][aksiyon].append(hamKare)
+    
+    def __init__(self,**kwargs):
+        super().__init__(**kwargs)
+        
 
-    __atlasDosya={
-        GozTip.GOZ1:"goz1.atlas",
-        GozTip.GOZ2:"goz2.atlas",
-        GozTip.GOZ3:"goz3.atlas",
-        GozTip.GOZ4:"goz4.atlas"
-    }
-    __kareAd={
+class ReseptorImaj(Imaj):
+    _dizin="assets/reseptor"
+    _atlasDosya="reseptor.atlas"
+
+    _kareAd={ReseptorAksiyon.ARANIYOR:"reseptor-beyaz-",ReseptorAksiyon.DUVAR_ACIK:"reseptor-yesil-",ReseptorAksiyon.DUVAR_KAPALI:"reseptor-kirmizi-"}
+    _kareSayi={ReseptorAksiyon.ARANIYOR:13,ReseptorAksiyon.DUVAR_ACIK:13,ReseptorAksiyon.DUVAR_KAPALI:13}
+    _kare={ReseptorAksiyon.ARANIYOR:[],ReseptorAksiyon.DUVAR_ACIK:[],ReseptorAksiyon.DUVAR_KAPALI:[]}
+            
+    _gecikme={ReseptorAksiyon.ARANIYOR:5/60,ReseptorAksiyon.DUVAR_ACIK:5/60,ReseptorAksiyon.DUVAR_KAPALI:5/60}
+
+    _orijinalBoyut=340
+    _boyutOran=1#hücre genişliğine oranı
+    _atlasYuklendi=False # atlas dosyasının yüklenip yüklenmediğini kontrol edeceğimiz değişken. Yüklendiğine True olacak
+    _animasyonTekrar={ReseptorAksiyon.ARANIYOR:1,ReseptorAksiyon.DUVAR_ACIK:1,ReseptorAksiyon.DUVAR_KAPALI:1} # Animasyon kaç kere çalışacak
+
+
+
+    def __init__(self,**kwargs):
+        super().__init__(**kwargs)
+        self._aksiyon=None
+        self._kareSayac=0
+        self._animasyonSaat=None
+        #self.__aksiyonBitti=False
+
+        #self.allow_stretch=True
+        #self.fit_mode='contain'
+        self.size_hint=(None,None)
+    
+    #@property
+    #def reseptorAksiyon(self):
+        #return self._aksiyon
+
+    #@property
+    #def aksiyonBitti(self):
+        #return self.__aksiyonBitti
+    
+    #def aksiyonBittiSifirla(self):
+       #self.__aksiyonBitti=False 
+
+    def __reseptorAksiyonDegistir(self,aksiyon):
+        self._aksiyon=aksiyon
+        self.__animasyonHazirlik()
+    
+    def __animasyonHazirlik(self):
+        self.texture=ReseptorImaj.kare(self._aksiyon,0).texture#yeni reseptorAksiyonun, ilk karesi alınıyor. Aksiyon geçişinde, önceki durumun karesi kalmasın diye 
+        self._kareSayac=0
+        if self._animasyonSaat:
+            self._animasyonSaat.cancel()
+        self._animasyonSaat=Clock.schedule_interval(self.animasyonTikTak,ReseptorImaj.gecikme(self._aksiyon))
+
+
+        '''self.texture=Nine.kare[self.durum][0].texture#yeni durumun, ilk karesi alınıyor. Durum geçişinde, önceki durumun karesi kalmasın diye 
+        self.BoyutAyarla()
+        self.KonumAyarla()
+
+        if self.durum=='tokmakla':
+            self.tokmakVurdu=False
+        elif self.durum=='ateş et':
+            self.mermiAdet-=1
+            self.silahGosterge.MermiAdetDegistir(self.mermiAdet)
+            if self.mermiAdet==0:
+                self.tufekVar=False
+                self.silahGosterge.DurumDegistir('tokmak')
+        elif self.durum.split('-')[0]=='zıpla':#eğer durum, zıpla-tüfekli ya da zıpla-tüfeksiz ise
+            self.ziplaHiz=self.ziplaHizOrijinal[self.durum]
+
+
+        self.kareSayac=0
+        if self.animasyonSaat:
+            self.animasyonSaat.cancel()
+        self.animasyonSaat=Clock.schedule_interval(self.animasyonTikTak,Nine.gecikme[self.durum])'''
+    
+    def animasyonTikTak(self,dt):
+        pass
+        '''self.texture=ReseptorImaj.kare(self._aksiyon,self._kareSayac%(ReseptorImaj.kareSayi())).texture
+        self._kareSayac+=1
+
+        if self._aksiyon==GozAksiyon.GIT:
+            dx,dy=self.__gitAdim[self.__yon]
+            self.x+=dx#0.7 denemek için. GIT aksiyonu bittiğinde, tam hücreniin ortasına konumlandırılsın.
+            self.y+=dy
+
+        if self._kareSayac>=ReseptorImaj.kareSayi(self.__yon,self._aksiyon)*ReseptorImaj.animasyonTekrar(self._aksiyon):
+            self._kareSayac=0
+            #self.__aksiyonBitti=True
+            if self._aksiyon==GozAksiyon.GIT:
+                pass
+            elif self._aksiyon==GozAksiyon.SOLA_DON or self._aksiyon==GozAksiyon.SAGA_DON:
+                self.__yon=self.__yeniYon
+                
+            self._aksiyon=GozAksiyon.BEKLE
+            self.__animasyonHazirlik()'''
+
+
+        '''if self.durum!='gidiş':
+            self.texture=Mermi.kare[self.durum][self.kareSayac].texture
+            self.kareSayac+=1
+        if Mermi.kareSayisi[self.durum]>1 and self.kareSayac+1==Mermi.kareSayisi[self.durum]: #'gidiş' gibi tek resimli durumlarda animasyonun bigozTip bitmediğini kontrol etmeye gerek yok 
+            if self.durum=='patlama':
+                self.DurumDegistir('gidiş')
+            elif self.durum=='vurma':
+                self.sil=True
+                self.animasyonSaat.cancel()'''
+
+    def guncelleOlculer(self,hucreX,hucreY,hucreBoyut):#canvas içerisine çizilecek labirentin genişlik, yükseklik, x, y vs değerleri hesaplanıyor
+        self.width=hucreBoyut*GozImaj.genislikOran()
+        self.height=self.width*GozImaj.orijinalYukseklik()/GozImaj.orijinalGenislik()
+        self.konumla(hucreX,hucreY,hucreBoyut)
+
+        gitAdimSag=(int)(hucreBoyut/(GozImaj.kareSayi(GozAksiyon.GIT,Yon.SAG)*GozImaj.animasyonTekrar(GozAksiyon.GIT)))
+        gitAdimSol=(int)(hucreBoyut/(GozImaj.kareSayi(GozAksiyon.GIT,Yon.SOL)*GozImaj.animasyonTekrar(GozAksiyon.GIT)))
+        gitAdimUst=(int)(hucreBoyut/(GozImaj.kareSayi(GozAksiyon.GIT,Yon.UST)*GozImaj.animasyonTekrar(GozAksiyon.GIT)))
+        gitAdimAlt=(int)(hucreBoyut/(GozImaj.kareSayi(GozAksiyon.GIT,Yon.ALT)*GozImaj.animasyonTekrar(GozAksiyon.GIT)))
+
+        self.__gitAdim={Yon.SAG: (gitAdimSag, 0),Yon.SOL: (-gitAdimSol, 0),Yon.UST: (0, gitAdimUst),Yon.ALT: (0, -gitAdimAlt)}
+    
+    def konumla(self,hucreX,hucreY,hucreBoyut):
+        self.center_x=hucreX+hucreBoyut/2
+        self.center_y=hucreY+hucreBoyut/2
+
+
+class GozImaj(Imaj):#animasyon ve çizim işlemlerinin yürütüleceğin sınıf
+    _dizin="assets/goz"
+
+    _atlasDosya={GozTip.GOZ1:"goz1.atlas",GozTip.GOZ2:"goz2.atlas",GozTip.GOZ3:"goz3.atlas",GozTip.GOZ4:"goz4.atlas"}
+    
+    _kareAd={
         Yon.SOL:{GozAksiyon.BEKLE:"sol-bekle-",GozAksiyon.GIT:"sol-git-",GozAksiyon.PATLA:"sol-patla-",GozAksiyon.SOLA_DON:"sol-sola-don-",GozAksiyon.SAGA_DON:"sol-saga-don-"},
         Yon.ALT:{GozAksiyon.BEKLE:"alt-bekle-",GozAksiyon.GIT:"alt-git-",GozAksiyon.PATLA:"alt-patla-",GozAksiyon.SOLA_DON:"alt-sola-don-",GozAksiyon.SAGA_DON:"alt-saga-don-"},
         Yon.SAG:{GozAksiyon.BEKLE:"sag-bekle-",GozAksiyon.GIT:"sag-git-",GozAksiyon.PATLA:"sag-patla-",GozAksiyon.SOLA_DON:"sag-sola-don-",GozAksiyon.SAGA_DON:"sag-saga-don-"},
         Yon.UST:{GozAksiyon.BEKLE:"ust-bekle-",GozAksiyon.GIT:"ust-git-",GozAksiyon.PATLA:"ust-patla-",GozAksiyon.SOLA_DON:"ust-sola-don-",GozAksiyon.SAGA_DON:"ust-saga-don-"},
     }
-    __kareSayi={#animasyonların içerdiği resim sayısı.
+    _kareSayi={#animasyonların içerdiği resim sayısı.
         Yon.SOL:{GozAksiyon.BEKLE:20,GozAksiyon.GIT:6,GozAksiyon.PATLA:11,GozAksiyon.SOLA_DON:11,GozAksiyon.SAGA_DON:11},
         Yon.ALT:{GozAksiyon.BEKLE:20,GozAksiyon.GIT:6,GozAksiyon.PATLA:9,GozAksiyon.SOLA_DON:11,GozAksiyon.SAGA_DON:11},
         Yon.SAG:{GozAksiyon.BEKLE:20,GozAksiyon.GIT:6,GozAksiyon.PATLA:11,GozAksiyon.SOLA_DON:11,GozAksiyon.SAGA_DON:11},
         Yon.UST:{GozAksiyon.BEKLE:20,GozAksiyon.GIT:6,GozAksiyon.PATLA:9,GozAksiyon.SOLA_DON:11,GozAksiyon.SAGA_DON:11}
     }
-    __kare={#animasyonların içerdiği görseller. Yukle.AtlasDosya fonksiyonunda yüklenecek
+    _kare={#animasyonların içerdiği görseller. Yukle.AtlasDosya fonksiyonunda yüklenecek
         GozTip.GOZ1:{
             Yon.SOL:{GozAksiyon.BEKLE:[],GozAksiyon.GIT:[],GozAksiyon.PATLA:[],GozAksiyon.SOLA_DON:[],GozAksiyon.SAGA_DON:[]},
             Yon.ALT:{GozAksiyon.BEKLE:[],GozAksiyon.GIT:[],GozAksiyon.PATLA:[],GozAksiyon.SOLA_DON:[],GozAksiyon.SAGA_DON:[]},
@@ -454,73 +476,23 @@ class GozImaj(Image):#animasyon ve çizim işlemlerinin yürütüleceğin sını
         }
         
     }
-    __gecikme={GozAksiyon.BEKLE:1/60,GozAksiyon.GIT:1/60,GozAksiyon.PATLA:1/60,GozAksiyon.SOLA_DON:1/60,GozAksiyon.SAGA_DON:1/60}
+    _gecikme={GozAksiyon.BEKLE:5/60,GozAksiyon.GIT:5/60,GozAksiyon.PATLA:5/60,GozAksiyon.SOLA_DON:5/60,GozAksiyon.SAGA_DON:5/60}
 
-    __orijinalBoyut=563#genişlik,yükseklik aynı
-    __boyutOran=1.5#hücre genişliğine oranı
-    __atlasYuklendi={GozTip.GOZ1:False,GozTip.GOZ2:False,GozTip.GOZ3:False,GozTip.GOZ4:False} # atlas dosyalarının yüklenip yğklenmediğini kontrol edeceğimiz değişken. Yüklendiğine True olacak
-    __animasyonTekrar={GozAksiyon.BEKLE:1,GozAksiyon.GIT:3,GozAksiyon.PATLA:1,GozAksiyon.SOLA_DON:1,GozAksiyon.SAGA_DON:1} # Animasyon kaç kere çalışacak
+    _orijinalBoyut=563#genişlik,yükseklik aynı
+    _boyutOran=1.5#hücre genişliğine oranı
+    _atlasYuklendi=False # atlas dosyalarının yüklenip yğklenmediğini kontrol edeceğimiz değişken. Yüklendiğine True olacak
+    _animasyonTekrar={GozAksiyon.BEKLE:1,GozAksiyon.GIT:3,GozAksiyon.PATLA:1,GozAksiyon.SOLA_DON:1,GozAksiyon.SAGA_DON:1} # Animasyon kaç kere çalışacak
 
-    @staticmethod
-    def dizin():
-        return GozImaj.__dizin
-    @staticmethod
-    def atlasDosya(tip):
-        Denetle.TurHata(tip,GozTip)
-        return GozImaj.__atlasDosya[tip]
-    @staticmethod
-    def kareSayi(yon,aksiyon):
-        Denetle.TurHata(yon,Yon)
-        Denetle.TurHata(aksiyon,GozAksiyon)
-        return GozImaj.__kareSayi[yon][aksiyon]
-    @staticmethod
-    def kareAd(yon,aksiyon):
-        Denetle.TurHata(yon,Yon)
-        Denetle.TurHata(aksiyon,GozAksiyon)
-        return GozImaj.__kareAd[yon][aksiyon]
-    @staticmethod
-    def kare(tip,yon,aksiyon,numara):
-        Denetle.TurHata(tip,GozTip)
-        Denetle.TurHata(yon,Yon)
-        Denetle.TurHata(aksiyon,GozAksiyon)
-        return GozImaj.__kare[tip][yon][aksiyon][numara]
-    @staticmethod
-    def kareEkle(tip,yon,aksiyon,kare):
-        Denetle.TurHata(tip,GozTip)
-        Denetle.TurHata(yon,Yon)
-        Denetle.TurHata(aksiyon,GozAksiyon)
-        return GozImaj.__kare[tip][yon][aksiyon].append(kare)
-    @staticmethod
-    def gecikme(aksiyon):
-        Denetle.TurHata(aksiyon,GozAksiyon)
-        return GozImaj.__gecikme[aksiyon]
-    @staticmethod
-    def orijinalBoyut():
-        return GozImaj.__orijinalBoyut
-    @staticmethod
-    def boyutOran():
-        return GozImaj.__boyutOran
-    @staticmethod
-    def atlasYuklendi(tip):
-        Denetle.TurHata(tip,GozTip)
-        return GozImaj.__atlasYuklendi[tip.name]
-    @staticmethod
-    def atlasYuklendiGuncelle(tip,deger):
-        Denetle.TurHata(tip,GozTip)
-        GozImaj.__atlasYuklendi[tip]=deger
-    @staticmethod
-    def animasyonTekrar(aksiyon):
-        Denetle.TurHata(aksiyon,GozAksiyon)
-        return GozImaj.__animasyonTekrar[aksiyon]
+
     
     def __init__(self,tip,yon,**kwargs):
         super().__init__(**kwargs)
         self.__tip=(GozTip)(tip)
         self.__yon=(Yon)(yon)
         self.__yeniYon=None#yön değiştirilirken, animasyon yeni yöne değil, mevcut olana(self.__yon) göre çalıştırılıyor. Animasyon bittikten sonra self.__yon=self.__yeniYon olarak güncellenecek 
-        self.__aksiyon=GozAksiyon.BEKLE
-        self.__kareSayac=0
-        self.__animasyonSaat=None
+        self._aksiyon=GozAksiyon.BEKLE
+        self._kareSayac=0
+        self._animasyonSaat=None
         self.__gitAdim={Yon.SAG: (0, 0),Yon.SOL: (0, 0),Yon.UST: (0, 0),Yon.ALT: (0, 0)}
         self.__aksiyonBitti=False
 
@@ -528,15 +500,15 @@ class GozImaj(Image):#animasyon ve çizim işlemlerinin yürütüleceğin sını
         #self.fit_mode='contain'
         self.size_hint=(None,None)
 
-        self.__aksiyonDegistir(self.__aksiyon)#ilk animasyonu başlat
-        #self.texture=GozImaj.kare(self.__tip,self.__yon,self.__aksiyon,0).texture
+        self.__aksiyonDegistir(self._aksiyon)#ilk animasyonu başlat
+        #self.texture=GozImaj.kare(self.__tip,self.__yon,self._aksiyon,0).texture
 
     @property
     def tip(self):
         return self.__tip
     @property
     def aksiyon(self):
-        return self.__aksiyon
+        return self._aksiyon
     @property
     def yon(self):
         return self.__yon
@@ -564,18 +536,18 @@ class GozImaj(Image):#animasyon ve çizim işlemlerinin yürütüleceğin sını
 
     def __aksiyonDegistir(self,aksiyon):
         #bir aksiyon tamamlanmadan, diğer bir aksiyona geçilmek istenirse...
-        if self.__aksiyon!=GozAksiyon.BEKLE:
+        if self._aksiyon!=GozAksiyon.BEKLE:
             return
             
-        self.__aksiyon=aksiyon
+        self._aksiyon=aksiyon
         self.__animasyonHazirlik()
     
     def __animasyonHazirlik(self):
-        self.texture=GozImaj.kare(self.__tip,self.__yon,self.__aksiyon,0).texture#yeni aksiyonun, ilk karesi alınıyor. Aksiyon geçişinde, önceki durumun karesi kalmasın diye 
-        self.__kareSayac=0
-        if self.__animasyonSaat:
-            self.__animasyonSaat.cancel()
-        self.__animasyonSaat=Clock.schedule_interval(self.animasyonTikTak,GozImaj.gecikme(self.__aksiyon))
+        self.texture=GozImaj.kare(self._aksiyon,0,self.__tip,self.__yon).texture#yeni aksiyonun, ilk karesi alınıyor. Aksiyon geçişinde, önceki durumun karesi kalmasın diye 
+        self._kareSayac=0
+        if self._animasyonSaat:
+            self._animasyonSaat.cancel()
+        self._animasyonSaat=Clock.schedule_interval(self.animasyonTikTak,GozImaj.gecikme(self._aksiyon))
 
 
         '''self.texture=Nine.kare[self.durum][0].texture#yeni durumun, ilk karesi alınıyor. Durum geçişinde, önceki durumun karesi kalmasın diye 
@@ -600,23 +572,23 @@ class GozImaj(Image):#animasyon ve çizim işlemlerinin yürütüleceğin sını
         self.animasyonSaat=Clock.schedule_interval(self.animasyonTikTak,Nine.gecikme[self.durum])'''
     
     def animasyonTikTak(self,dt):
-        self.texture=GozImaj.kare(self.__tip,self.__yon,self.__aksiyon,self.__kareSayac%(GozImaj.kareSayi(self.__yon,self.__aksiyon))).texture
-        self.__kareSayac+=1
+        self.texture=GozImaj.kare(self._aksiyon,self._kareSayac%(GozImaj.kareSayi(self._aksiyon,self.__yon)),self.__tip,self.__yon).texture
+        self._kareSayac+=1
 
-        if self.__aksiyon==GozAksiyon.GIT:
+        if self._aksiyon==GozAksiyon.GIT:
             dx,dy=self.__gitAdim[self.__yon]
             self.center_x+=dx
             self.center_y+=dy
 
-        if self.__kareSayac>=GozImaj.kareSayi(self.__yon,self.__aksiyon)*GozImaj.animasyonTekrar(self.__aksiyon):
-            self.__kareSayac=0
+        if self._kareSayac>=GozImaj.kareSayi(self._aksiyon,self.__yon)*GozImaj.animasyonTekrar(self._aksiyon):
+            self._kareSayac=0
             self.__aksiyonBitti=True
-            if self.__aksiyon==GozAksiyon.GIT:
+            if self._aksiyon==GozAksiyon.GIT:
                 pass
-            elif self.__aksiyon==GozAksiyon.SOLA_DON or self.__aksiyon==GozAksiyon.SAGA_DON:
+            elif self._aksiyon==GozAksiyon.SOLA_DON or self._aksiyon==GozAksiyon.SAGA_DON:
                 self.__yon=self.__yeniYon
                 
-            self.__aksiyon=GozAksiyon.BEKLE
+            self._aksiyon=GozAksiyon.BEKLE
             self.__animasyonHazirlik()
 
 
@@ -636,10 +608,10 @@ class GozImaj(Image):#animasyon ve çizim işlemlerinin yürütüleceğin sını
 
         self.konumla(hucreX,hucreY,hucreBoyut)
 
-        gitAdimSag=hucreBoyut/(GozImaj.kareSayi(Yon.SAG,GozAksiyon.GIT)*GozImaj.animasyonTekrar(GozAksiyon.GIT))
-        gitAdimSol=hucreBoyut/(GozImaj.kareSayi(Yon.SOL,GozAksiyon.GIT)*GozImaj.animasyonTekrar(GozAksiyon.GIT))
-        gitAdimUst=hucreBoyut/(GozImaj.kareSayi(Yon.UST,GozAksiyon.GIT)*GozImaj.animasyonTekrar(GozAksiyon.GIT))
-        gitAdimAlt=hucreBoyut/(GozImaj.kareSayi(Yon.ALT,GozAksiyon.GIT)*GozImaj.animasyonTekrar(GozAksiyon.GIT))
+        gitAdimSag=hucreBoyut/(GozImaj.kareSayi(GozAksiyon.GIT,Yon.SAG)*GozImaj.animasyonTekrar(GozAksiyon.GIT))
+        gitAdimSol=hucreBoyut/(GozImaj.kareSayi(GozAksiyon.GIT,Yon.SOL)*GozImaj.animasyonTekrar(GozAksiyon.GIT))
+        gitAdimUst=hucreBoyut/(GozImaj.kareSayi(GozAksiyon.GIT,Yon.UST)*GozImaj.animasyonTekrar(GozAksiyon.GIT))
+        gitAdimAlt=hucreBoyut/(GozImaj.kareSayi(GozAksiyon.GIT,Yon.ALT)*GozImaj.animasyonTekrar(GozAksiyon.GIT))
 
         self.__gitAdim={Yon.SAG: (gitAdimSag, 0),Yon.SOL: (-gitAdimSol, 0),Yon.UST: (0, gitAdimUst),Yon.ALT: (0, -gitAdimAlt)}
 

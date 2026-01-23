@@ -4,14 +4,14 @@ from kivy.lang import Builder
 from kivy.clock import Clock
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.label import Label
-from siniflar import Labirent,GozImaj,Reseptor,Yon,Hareket,Denetle,Hucre,Konum,DuvarDurum,GozTip,GozAksiyon,Yukle
+from siniflar import Labirent,GozImaj,ReseptorImaj,ReseptorAksiyon,Yon,Hareket,Denetle,Hucre,Konum,DuvarDurum,GozTip,GozAksiyon,Yukle
 from yarismaci import BenimGozum
 
 from kivy.graphics import Ellipse,Line,Color,Point,Triangle,Rotate,PushMatrix,PopMatrix
 
 from kivy.config import Config
-Config.set('graphics', 'width', '1920')
-Config.set('graphics', 'height', '1080')
+Config.set('graphics', 'width', '800')
+Config.set('graphics', 'height', '600')
 
 # Manuel konumlandırmayı aktif et
 Config.set('graphics', 'position', 'custom')
@@ -31,16 +31,20 @@ class CozenGoz(FloatLayout):
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
 
-        Yukle.AtlasDosya(GozImaj,GozTip.GOZ1)
-        Yukle.AtlasDosya(GozImaj,GozTip.GOZ2)
-        Yukle.AtlasDosya(GozImaj,GozTip.GOZ3)
-        Yukle.AtlasDosya(GozImaj,GozTip.GOZ4)
+
+        Yukle.AtlasDosya(GozImaj,GozAksiyon,GozTip,Yon)
+        Yukle.AtlasDosya(ReseptorImaj,ReseptorAksiyon)
         
+
+
+    
+
         self.__yarisSaat=None
         self.labirent=None
         self.goz=None
         self.gozImaj=None
         self.gozHucre=None
+        self.reseptorImaj=None
         
         self.yarisAlaniWidget=self.ids.yarisAlaniWidget
         self.yarisAlaniWidget.bind(pos=self.guncelleCanvas, size=self.guncelleCanvas)
@@ -54,11 +58,12 @@ class CozenGoz(FloatLayout):
         #print(self.labirent.baslangicHucre)
 
         self.goz=goz1
-        self.gozImaj=GozImaj(GozTip.GOZ1,Yon.baslangic())
         self.gozHucre=self.labirent.baslangicHucre
-        
-        self.add_widget(self.gozImaj)
+        self.gozImaj=GozImaj(GozTip.GOZ1,Yon.baslangic())
+        self.reseptorImaj=ReseptorImaj()
 
+        self.add_widget(self.gozImaj)
+        self.add_widget(self.reseptorImaj)
 
 
 
