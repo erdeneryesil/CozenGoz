@@ -4,9 +4,9 @@ from kivy.lang import Builder
 from kivy.clock import Clock
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.label import Label
-from siniflar import Labirent,GozImaj,ReseptorImaj,ReseptorAksiyon,Yon,Hareket,Denetle,Hucre,Konum,DuvarDurum,GozTip,GozAksiyon,Yukle
+from siniflar import Labirent,GozImaj,Reseptor,ReseptorImaj,ReseptorAksiyon,ReseptorKonum,ReseptorAsama,Yon,Hareket,Denetle,Hucre,Konum,DuvarDurum,GozTip,GozAksiyon,Yukle
 from yarismaci import BenimGozum
-
+import time
 from kivy.graphics import Ellipse,Line,Color,Point,Triangle,Rotate,PushMatrix,PopMatrix
 
 from kivy.config import Config
@@ -41,10 +41,12 @@ class CozenGoz(FloatLayout):
 
         self.__yarisSaat=None
         self.labirent=None
+        self.gozHucre=None
         self.goz=None
         self.gozImaj=None
-        self.gozHucre=None
+        self.reseptor=None
         self.reseptorImaj=None
+        self.reseptorGuncellendi=True
         
         self.yarisAlaniWidget=self.ids.yarisAlaniWidget
         self.yarisAlaniWidget.bind(pos=self.guncelleCanvas, size=self.guncelleCanvas)
@@ -55,49 +57,58 @@ class CozenGoz(FloatLayout):
         
 
         self.labirent=Labirent(5,5)
-        #print(self.labirent.baslangicHucre)
+        self.gozHucre=self.labirent.baslangicHucre
 
         self.goz=goz1
-        self.gozHucre=self.labirent.baslangicHucre
         self.gozImaj=GozImaj(GozTip.GOZ1,Yon.baslangic())
+        
+        self.reseptor=Reseptor()
         self.reseptorImaj=ReseptorImaj()
 
         self.add_widget(self.gozImaj)
         self.add_widget(self.reseptorImaj)
 
 
-
         self.__yarisSaat=Clock.schedule_interval(self.yarisTikTak,1/60)
-
-
-
-    def yarisTikTak(self,dt):   
-
-        if self.gozImaj.aksiyon!=GozAksiyon.BEKLE:
-            pass
-        else:
-            if self.gozImaj.aksiyonBitti:
-                hucreParam=self.labirent.hucreXYBoyut(self.gozHucre,self.gozImaj.yon)
-                hucreX=hucreParam[Hucre.xKey()]
-                hucreY=hucreParam[Hucre.yKey()]
-                hucreBoyut=hucreParam[Hucre.boyutKey()]
-                self.gozImaj.konumla(hucreX,hucreY,hucreBoyut)
-                self.gozImaj.aksiyonBittiSifirla()
-            
-                reseptor=self.labirent.reseptorGonder(self.gozImaj.yon,self.gozHucre)
-                robotHareket=self.goz.kararVer(reseptor)
-                self.gozHareketUygula(robotHareket)
         
 
+
+    def yarisTikTak(self,dt):    
+         
+        if self.gozImaj.aksiyon!=GozAksiyon.BEKLE:
+            return
+        
+        if not self.reseptorGuncellendi:
+            self.__reseptorGuncelle()
+            return
+
+        if not self.gozImaj.aksiyonBasladi:
+            self.gozImaj.aksiyonTamamlandiResetle()
+            gozHareket = self.goz.kararVer(self.reseptor)
+            self.__gozHareketUygula(gozHareket)
+            return
+
+        if self.gozImaj.aksiyonTamamlandi:
+            self.gozImaj.aksiyonBasladiResetle()
+            x, y = self.labirent.hucreXY(self.gozHucre)
+            self.gozImaj.konumla(x, y, self.labirent.hucreKenarUzunluk)
+            
+            self.reseptorGuncellendi = False
+        
+
+
+
+          
+
     
-    def gozHareketUygula(self,hareket):
+    def __gozHareketUygula(self,hareket):
         match hareket:
             case Hareket.SOLA_DON:
                 self.gozImaj.solaDon()#.yon=Yon((self.gozImaj.yon+1)%len(Yon))
-                print("sola döndü")
+                #print("sola döndü")
             case Hareket.SAGA_DON:
                 self.gozImaj.sagaDon()#.yon=Yon((self.gozImaj.yon-1)%len(Yon))
-                print("sağa döndü")
+                #print("sağa döndü")
             case Hareket.ILERI:
                 hucreSatirNumara=self.gozHucre.satirNumara
                 hucreSutunNumara=self.gozHucre.sutunNumara
@@ -113,7 +124,7 @@ class CozenGoz(FloatLayout):
                 
                 duvar=self.labirent.duvar(self.gozHucre,self.labirent.hucre(hucreSatirNumara,hucreSutunNumara))
                 if duvar.durum==DuvarDurum.ACIK:   
-                    print("ileri gitti")                 
+                    #print("ileri gitti")                 
                     self.gozHucre=self.labirent.hucre(hucreSatirNumara,hucreSutunNumara)
                     self.gozImaj.git()
                 else:
@@ -130,14 +141,71 @@ class CozenGoz(FloatLayout):
         with canvas:
             self.labirent.ciz()
 
-        hucreCizimParam=self.labirent.hucreXYBoyut(self.gozHucre,self.gozImaj.yon)
-        hucreX=hucreCizimParam[Hucre.xKey()]
-        hucreY=hucreCizimParam[Hucre.yKey()]
-        hucreBoyut=hucreCizimParam[Hucre.boyutKey()]
+        x,y=self.labirent.hucreXY(self.gozHucre)
 
-        self.gozImaj.guncelleOlculer(hucreX,hucreY,hucreBoyut)
+        self.gozImaj.guncelleOlculer(x,y,self.labirent.hucreKenarUzunluk)
+        self.reseptorImaj.guncelleOlculer(self.labirent.hucreKenarUzunluk)
 
-                    
+    def __reseptorGuncelle(self):
+        if self.reseptorGuncellendi:
+            print(self.reseptorGuncellendi)
+        
+        if self.reseptor.asama == ReseptorAsama.BOSTA:
+            self.reseptor.asamaGuncelle()
+            return
+        
+
+
+        yonFark = self.gozImaj.yon - Yon.baslangic()
+        gercekReseptorKonum=ReseptorKonum((self.reseptor.konumIndis+yonFark)%len(ReseptorKonum))
+        hucreX,hucreY=self.labirent.hucreXY(self.gozHucre)
+
+        
+        if self.reseptor.asama == ReseptorAsama.TARAMA:
+            if not self.reseptorImaj.aksiyonBasladi:
+                self.reseptorImaj.aksiyonTamamlandiResetle()
+                self.reseptorImaj.konumla(gercekReseptorKonum,hucreX,hucreY,self.labirent.hucreKenarUzunluk)
+                self.reseptorImaj.tara()
+                return
+            if self.reseptorImaj.aksiyonTamamlandi:
+                self.reseptorImaj.aksiyonBasladiResetle()
+                self.reseptor.asamaGuncelle()
+                return
+
+        if self.reseptor.asama == ReseptorAsama.SONUC:
+            komsuHucreler = self.labirent.komsuHucreler(self.gozHucre)
+            hedefHucre = komsuHucreler.get(Yon(gercekReseptorKonum))
+            
+            duvarDurum = DuvarDurum.KAPALI
+            if hedefHucre:
+                duvarDurum = self.labirent.duvar(self.gozHucre, hedefHucre).durum
+            self.reseptor.degerGuncelle(self.reseptor.konumIndis, duvarDurum)
+
+            if not self.reseptorImaj.aksiyonBasladi:
+                self.reseptorImaj.aksiyonTamamlandiResetle()
+                self.reseptorImaj.konumla(gercekReseptorKonum,hucreX,hucreY,self.labirent.hucreKenarUzunluk)
+                if duvarDurum==DuvarDurum.ACIK:
+                    self.reseptorImaj.duvarAcik()
+                else:
+                    self.reseptorImaj.duvarKapali()
+                return
+            
+            if self.reseptorImaj.aksiyonTamamlandi:
+                self.reseptorImaj.aksiyonBasladiResetle()
+                self.reseptor.konumIndisGuncelle()
+                
+                if self.reseptor.konumIndis == 0:
+                    self.reseptorGuncellendi = True
+
+                self.reseptor.asamaGuncelle()
+
+
+
+
+
+    
+            
+            
         
 
 class Uygulama(App):
