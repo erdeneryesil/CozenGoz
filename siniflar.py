@@ -57,9 +57,6 @@ class Yon(IntEnum):#sıralama SOL,ALT,SAG,UST olmalı. Matematiksel işlemler ya
     def __str__(self):
         return f"YÖN : {self.name}"
 
-
-
-
 #Robotun bulunduğu konum
 class Konum:
 
@@ -259,13 +256,35 @@ class Imaj(Image):
     def kareEkle(cls,aksiyon,hamKare,tip=None,yon=None):
         cls._kare[aksiyon].append(hamKare) if tip is None and yon is None else cls._kare[tip][yon][aksiyon].append(hamKare)
     
+    @classmethod
+    def aksiyonSure(cls, aksiyon, yon=None):
+        n = cls.kareSayi(aksiyon, yon)
+        r = cls.animasyonTekrar(aksiyon)
+        delay = cls.gecikme(aksiyon)
+        return n * r * delay
+    
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
         self._aksiyon=None
         self._kareSayac=0
         self._animasyonSaat=None
+        self._aksiyonTamamlandi=False
+        self._aksiyonBasladi=False
+    
+    @property
+    def aksiyon(self):
+        return self._aksiyon
+    @property
+    def aksiyonBasladi(self):
+        return self._aksiyonBasladi
+    def aksiyonBasladiResetle(self):
+        self._aksiyonBasladi=False
+    @property
+    def aksiyonTamamlandi(self):
+        return self._aksiyonTamamlandi
+    def aksiyonTamamlandiResetle(self):
+       self._aksiyonTamamlandi=False
 
-        
 class ReseptorAksiyon(IntEnum):
     TARANIYOR=0
     DUVAR_ACIK=1
@@ -281,7 +300,7 @@ class ReseptorImaj(Imaj):
     _atlasDosya="reseptor.atlas"
 
     _kareAd={ReseptorAksiyon.TARANIYOR:"reseptor-beyaz-",ReseptorAksiyon.DUVAR_ACIK:"reseptor-yesil-",ReseptorAksiyon.DUVAR_KAPALI:"reseptor-kirmizi-"}
-    _kareSayi={ReseptorAksiyon.TARANIYOR:13,ReseptorAksiyon.DUVAR_ACIK:13,ReseptorAksiyon.DUVAR_KAPALI:13}
+    _kareSayi={ReseptorAksiyon.TARANIYOR:8,ReseptorAksiyon.DUVAR_ACIK:8,ReseptorAksiyon.DUVAR_KAPALI:8}
     _kare={ReseptorAksiyon.TARANIYOR:[],ReseptorAksiyon.DUVAR_ACIK:[],ReseptorAksiyon.DUVAR_KAPALI:[]}
             
     _gecikme={ReseptorAksiyon.TARANIYOR:1/60,ReseptorAksiyon.DUVAR_ACIK:1/60,ReseptorAksiyon.DUVAR_KAPALI:1/60}
@@ -291,41 +310,13 @@ class ReseptorImaj(Imaj):
     _atlasYuklendi=False # atlas dosyasının yüklenip yüklenmediğini kontrol edeceğimiz değişken. Yüklendiğine True olacak
     _animasyonTekrar={ReseptorAksiyon.TARANIYOR:1,ReseptorAksiyon.DUVAR_ACIK:1,ReseptorAksiyon.DUVAR_KAPALI:1} # Animasyon kaç kere çalışacak
 
-
-
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
-        self.__aksiyonTamamlandi=False
-        self.__aksiyonBasladi=False
-        self._aksiyon=ReseptorAksiyon.TARANIYOR
-
 
         #self.allow_stretch=True
         #self.fit_mode='contain'
         self.size_hint=(None,None)
-        #self._aksiyonDegistir(ReseptorAksiyon.DUVAR_KAPALI)
         self.opacity=0
-
-    
-    @property
-    def aksiyon(self):
-        return self._aksiyon.name
-
-    @property
-    def aksiyonBasladi(self):
-        return self.__aksiyonBasladi
-    
-    def aksiyonBasladiResetle(self):
-        self.__aksiyonBasladi=False
-    
-    @property
-    def aksiyonTamamlandi(self):
-        return self.__aksiyonTamamlandi
-    
-    def aksiyonTamamlandiResetle(self):
-       self.__aksiyonTamamlandi=False 
-
-
 
     def tara(self):
         self._aksiyonDegistir(ReseptorAksiyon.TARANIYOR)
@@ -338,16 +329,13 @@ class ReseptorImaj(Imaj):
         self._aksiyon=aksiyon
         self._animasyonHazirlik()
 
-    
     def _animasyonHazirlik(self):
-        
         self.texture=ReseptorImaj.kare(self._aksiyon,0).texture#yeni reseptorAksiyonun, ilk karesi alınıyor. Aksiyon geçişinde, önceki durumun karesi kalmasın diye 
         self._kareSayac=0
         self.opacity=1
-        self.__aksiyonBasladi=True
+        self._aksiyonBasladi=True
         if self._animasyonSaat:
             self._animasyonSaat.cancel()
-
         self._animasyonSaat=Clock.schedule_interval(self.animasyonTikTak,ReseptorImaj.gecikme(self._aksiyon))
     
     def animasyonTikTak(self,dt):
@@ -357,7 +345,7 @@ class ReseptorImaj(Imaj):
 
         if self._kareSayac>=ReseptorImaj.kareSayi(self._aksiyon)*ReseptorImaj.animasyonTekrar(self._aksiyon):
             self._kareSayac=0
-            self.__aksiyonTamamlandi=True
+            self._aksiyonTamamlandi=True
             if self._aksiyon in (ReseptorAksiyon.DUVAR_ACIK,ReseptorAksiyon.DUVAR_KAPALI):
                 self.opacity=0
                 
@@ -383,8 +371,6 @@ class ReseptorImaj(Imaj):
         self.height=self.width
         #self.konumla(hucreX,hucreY,hucreBoyut)
 
-
-    
     def konumla(self,gercekYon,hucreX,hucreY,hucreBoyut):
         match gercekYon:
             case Yon.SAG:
@@ -444,7 +430,7 @@ class GozImaj(Imaj):#animasyon ve çizim işlemlerinin yürütüleceğin sınıf
         }
         
     }
-    _gecikme={GozAksiyon.BEKLE:10/60,GozAksiyon.GIT:10/60,GozAksiyon.PATLA:10/60,GozAksiyon.SOLA_DON:10/60,GozAksiyon.SAGA_DON:10/60}
+    _gecikme={GozAksiyon.BEKLE:2/60,GozAksiyon.GIT:2/60,GozAksiyon.PATLA:2/60,GozAksiyon.SOLA_DON:2/60,GozAksiyon.SAGA_DON:2/60}#minimum değer 3/60. Bunun altında bir değer verme
 
     _orijinalBoyut=563#genişlik,yükseklik aynı
     _boyutOran=1.5#hücre genişliğine oranı
@@ -460,39 +446,19 @@ class GozImaj(Imaj):#animasyon ve çizim işlemlerinin yürütüleceğin sınıf
         self.__yeniYon=None#yön değiştirilirken, animasyon yeni yöne değil, mevcut olana(self.__yon) göre çalıştırılıyor. Animasyon bittikten sonra self.__yon=self.__yeniYon olarak güncellenecek 
         
         self.__gitAdim={Yon.SAG: (0, 0),Yon.SOL: (0, 0),Yon.UST: (0, 0),Yon.ALT: (0, 0)}
-        self.__aksiyonTamamlandi=False
-        self.__aksiyonBasladi=False
 
         #self.allow_stretch=True
         #self.fit_mode='contain'
         self.size_hint=(None,None)
 
         self._aksiyonDegistir(GozAksiyon.BEKLE)#ilk animasyonu başlat
-        #self.texture=GozImaj.kare(self.__tip,self.__yon,self._aksiyon,0).texture
 
     @property
     def tip(self):
         return self.__tip
     @property
-    def aksiyon(self):
-        return self._aksiyon
-    @property
     def yon(self):
         return self.__yon
-
-    @property
-    def aksiyonBasladi(self):
-        return self.__aksiyonBasladi
-    
-    def aksiyonBasladiResetle(self):
-        self.__aksiyonBasladi=False
-
-    @property
-    def aksiyonTamamlandi(self):
-        return self.__aksiyonTamamlandi
-
-    def aksiyonTamamlandiResetle(self):
-        self.__aksiyonTamamlandi=False
         
     def bekle(self):
         self._aksiyonDegistir(GozAksiyon.BEKLE)
@@ -519,32 +485,11 @@ class GozImaj(Imaj):#animasyon ve çizim işlemlerinin yürütüleceğin sınıf
     def _animasyonHazirlik(self):
         self.texture=GozImaj.kare(self._aksiyon,0,self.__tip,self.__yon).texture#yeni aksiyonun, ilk karesi alınıyor. Aksiyon geçişinde, önceki durumun karesi kalmasın diye 
         self._kareSayac=0    
-        self.__aksiyonBasladi=True    
+        self._aksiyonBasladi=True    
         if self._animasyonSaat:
             self._animasyonSaat.cancel()
         self._animasyonSaat=Clock.schedule_interval(self.animasyonTikTak,GozImaj.gecikme(self._aksiyon))
 
-
-        '''self.texture=Nine.kare[self.durum][0].texture#yeni durumun, ilk karesi alınıyor. Durum geçişinde, önceki durumun karesi kalmasın diye 
-        self.BoyutAyarla()
-        self.KonumAyarla()
-
-        if self.durum=='tokmakla':
-            self.tokmakVurdu=False
-        elif self.durum=='ateş et':
-            self.mermiAdet-=1
-            self.silahGosterge.MermiAdetDegistir(self.mermiAdet)
-            if self.mermiAdet==0:
-                self.tufekVar=False
-                self.silahGosterge.DurumDegistir('tokmak')
-        elif self.durum.split('-')[0]=='zıpla':#eğer durum, zıpla-tüfekli ya da zıpla-tüfeksiz ise
-            self.ziplaHiz=self.ziplaHizOrijinal[self.durum]
-
-
-        self.kareSayac=0
-        if self.animasyonSaat:
-            self.animasyonSaat.cancel()
-        self.animasyonSaat=Clock.schedule_interval(self.animasyonTikTak,Nine.gecikme[self.durum])'''
     
     def animasyonTikTak(self,dt):
         self.texture=GozImaj.kare(self._aksiyon,self._kareSayac%(GozImaj.kareSayi(self._aksiyon,self.__yon)),self.__tip,self.__yon).texture
@@ -557,7 +502,7 @@ class GozImaj(Imaj):#animasyon ve çizim işlemlerinin yürütüleceğin sınıf
 
         if self._kareSayac>=GozImaj.kareSayi(self._aksiyon,self.__yon)*GozImaj.animasyonTekrar(self._aksiyon):
             self._kareSayac=0
-            self.__aksiyonTamamlandi=True
+            self._aksiyonTamamlandi=True
             if self._aksiyon==GozAksiyon.GIT:
                 pass
             elif self._aksiyon==GozAksiyon.SOLA_DON or self._aksiyon==GozAksiyon.SAGA_DON:
@@ -565,17 +510,6 @@ class GozImaj(Imaj):#animasyon ve çizim işlemlerinin yürütüleceğin sınıf
                 
             self._aksiyon=GozAksiyon.BEKLE
             self._animasyonHazirlik()
-
-
-        '''if self.durum!='gidiş':
-            self.texture=Mermi.kare[self.durum][self.kareSayac].texture
-            self.kareSayac+=1
-        if Mermi.kareSayisi[self.durum]>1 and self.kareSayac+1==Mermi.kareSayisi[self.durum]: #'gidiş' gibi tek resimli durumlarda animasyonun tip bitmediğini kontrol etmeye gerek yok 
-            if self.durum=='patlama':
-                self.DurumDegistir('gidiş')
-            elif self.durum=='vurma':
-                self.sil=True
-                self.animasyonSaat.cancel()'''
 
     def guncelleOlculer(self,hucreX,hucreY,hucreBoyut):#canvas içerisine çizilecek labirentin genişlik, yükseklik, x, y vs değerleri hesaplanıyor
         self.width=hucreBoyut*GozImaj.boyutOran()
@@ -590,7 +524,6 @@ class GozImaj(Imaj):#animasyon ve çizim işlemlerinin yürütüleceğin sınıf
 
         self.__gitAdim={Yon.SAG: (gitAdimSag, 0),Yon.SOL: (-gitAdimSol, 0),Yon.UST: (0, gitAdimUst),Yon.ALT: (0, -gitAdimAlt)}
 
-    
     def konumla(self,hucreX,hucreY,hucreBoyut):
         self.center_x=hucreX+hucreBoyut/2
         self.center_y=hucreY+hucreBoyut/2
@@ -642,40 +575,26 @@ class Reseptor:
     def konumIndisGuncelle(self):
         self.__konumIndis=(ReseptorKonum)((self.__konumIndis+1)%len(ReseptorKonum))
     
-        
-
 class Goz(ABC):
     def __init__(self,isim):
         self.__hafiza={} #değişken saklamak için
         self.__isim=isim
-
     
     @property
     def isim(self):
         return self.__isim
-
-
-
-
-
-
     def isimDegistir(self,isim):
         self.__isim=isim
-    
-
     @property
     def solaDon(self):
         return Hareket.SOLA_DON
-
     @property
     def sagaDon(self):
         return Hareket.SAGA_DON
-    
     @property
     def ileriGit(self):
         return Hareket.ILERI
 
-        
     @abstractmethod
     def kararVer(self,reseptor):
         """
@@ -706,7 +625,6 @@ class LabirentTip(IntEnum):
             return LabirentTip.KARE
 
 class Labirent:   
-
     def __init__(self,satirSayi,sutunSayi):
         #çizim ile ilgili özellikler
         self.__satirAnahtar="satir"
@@ -729,38 +647,20 @@ class Labirent:
         self.__bitisSatirNumara=-1
         self.__bitisSutunNumara=-1
 
-        
-
-        #self.__hucreler=self.__olusturOnHucreler() #olustur metodunda oluşturuluyor
-        #self.__duvarlar=self.__olusturDuvarlar() #olustur metodunda oluşturuluyor
-
         self.__rastgeleBaslangicBitisBelirle()
 
         self.__minimumCozumUzunlugu=self.__satirSayi*self.__sutunSayi*0.5
         self.__cozumYolu=[]
         self.__olustur()
         
-        #from pympler.asizeof import asizeof
-
-        #print(asizeof(self.__hucreler[0][0])*self.__satirSayi*self.__sutunSayi/1024)
         self.__hucreler=self.__olusturHucreler()
-        #print(asizeof(self.__hucreler[0][0])*self.__satirSayi*self.__sutunSayi/1024)
-    
-    #@property
-    #def satirSayi(self):
-        #return self.__satirSayi
-    #@property
-    #def sutunSayi(self):
-        #return self.__sutunSayi
-    
+        
     @property
     def baslangicHucre(self):
         return self.__hucreler[self.__baslangicSatirNumara][self.__baslangicSutunNumara]
-
     @property
     def bitisHucre(self):
         return self.__hucreler[self.__bitisSatirNumara][self.__bitisSutunNumara]
-    
     @property
     def hucreKenarUzunluk(self):
         return self.__hucreKenarUzunluk
@@ -828,8 +728,8 @@ class Labirent:
         #hucreTip=Hucre.gozTip(Hucre.gozTipBaslangicKey())
         #self.__boyaHucre(self.__solUstX, self.__solUstY,Konum(self.__baslangicSatirNumara,self.__baslangicSutunNumara),hucreTip[Hucre.gozTipUzunlukCarpanKey()],hucreTip[Hucre.gozTipRenkKey()])
             
-        hucreTip=Hucre.gozTip(Hucre.gozTipBitisKey())
-        self.__boyaHucre(self.__solUstX, self.__solUstY,Konum(self.__bitisSatirNumara,self.__bitisSutunNumara),hucreTip[Hucre.gozTipUzunlukCarpanKey()],hucreTip[Hucre.gozTipRenkKey()])
+        #hucreTip=Hucre.gozTip(Hucre.gozTipBitisKey())
+        #self.__boyaHucre(self.__solUstX, self.__solUstY,Konum(self.__bitisSatirNumara,self.__bitisSutunNumara),hucreTip[Hucre.gozTipUzunlukCarpanKey()],hucreTip[Hucre.gozTipRenkKey()])
            
     def guncelleOlculer(self,yarisAlaniX,yarisAlaniY,yarisAlaniGenislik,yarisAlaniYukseklik):#canvas içerisine çizilecek labirentin genişlik, yükseklik, x, y vs değerleri hesaplanıyor
         genislikOlcek=yarisAlaniGenislik/self.__sutunSayi
@@ -845,7 +745,7 @@ class Labirent:
         self.__solUstX=self.__merkezX - self.__genislik / 2
         self.__solUstY=self.__merkezY + self.__yukseklik / 2
 
-        self.__kenarlikKalinlik=self.__genislik/400
+        self.__kenarlikKalinlik=self.__genislik/300#self.__genislik/400
         self.__hucreKenarUzunluk=self.__genislik/self.__sutunSayi
     
     def __olustur(self):

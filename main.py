@@ -20,13 +20,19 @@ Config.set('graphics', 'position', 'custom')
 # Örneğin 2. monitörünüz ana monitörün sağındaysa ve ana monitör 1920px genişliğindeyse:
 Config.set('graphics', 'left', '1920') 
 Config.set('graphics', 'top', '0')
+#Config.set('graphics', 'left', '2180') 
+#Config.set('graphics', 'top', '1')
 
 
 Builder.load_file('dizayn.kv')
 
     
 class CozenGoz(FloatLayout):
-
+    # Epsilon Değeri (Hassas Zamanlama Payı)
+    __epsilon=1/120
+    @staticmethod
+    def epsilon():
+        return CozenGoz.__epsilon 
     
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
@@ -60,7 +66,7 @@ class CozenGoz(FloatLayout):
         self.gozHucre=self.labirent.baslangicHucre
 
         self.goz=goz1
-        self.gozImaj=GozImaj(GozTip.GOZ1,Yon.baslangic())
+        self.gozImaj=GozImaj(GozTip.GOZ4,Yon.baslangic())
         
         self.reseptor=Reseptor()
         self.reseptorImaj=ReseptorImaj()
@@ -69,23 +75,64 @@ class CozenGoz(FloatLayout):
         self.add_widget(self.reseptorImaj)
 
 
-        self.__yarisSaat=Clock.schedule_interval(self.yarisTikTak,1/60)
+        self.__yarisSaat=Clock.schedule_once(self.yarisTikTak,1/60)
         
 
 
-    def yarisTikTak(self,dt):    
-         
+    def yarisTikTak(self,dt):  
+
         if self.gozImaj.aksiyon!=GozAksiyon.BEKLE:
+            Clock.schedule_once(self.yarisTikTak,1/60)
             return
         
         if not self.reseptorGuncellendi:
-            self.__reseptorGuncelle()
+            aksiyonSure=self.__reseptorGuncelle()
+            Clock.schedule_once(self.yarisTikTak, aksiyonSure+CozenGoz.epsilon() if aksiyonSure > 0 else 1/60)
+            return
+
+
+
+        if self.gozImaj.aksiyonTamamlandi:
+            self.gozImaj.aksiyonBasladiResetle()
+            self.gozImaj.aksiyonTamamlandiResetle()
+            x, y = self.labirent.hucreXY(self.gozHucre)
+            self.gozImaj.konumla(x, y, self.labirent.hucreKenarUzunluk)
+            self.reseptorGuncellendi = False
+            
+            #aksiyonSure=self.__reseptorGuncelle()
+            #Clock.schedule_once(self.yarisTikTak, aksiyonSure+CozenGoz.epsilon() if aksiyonSure > 0 else 1/60)
+            #print("goz aksiyon tamamlandı",self.reseptor.asama.name)
+            #return
+
+
+        #if not self.gozImaj.aksiyonBasladi:
+        #self.gozImaj.aksiyonTamamlandiResetle()
+
+        gozHareket = self.goz.kararVer(self.reseptor)
+        aksiyonSure=self.__gozHareketUygula(gozHareket)
+        Clock.schedule_once(self.yarisTikTak, aksiyonSure+CozenGoz.epsilon())
+        return
+        
+        
+
+        
+
+        
+
+
+        '''if self.gozImaj.aksiyon!=GozAksiyon.BEKLE:
+            return
+        
+        if not self.reseptorGuncellendi:
+            aksiyonSure=self.__reseptorGuncelle()
+            Clock.schedule_once(self.yarisTikTak, aksiyonSure+CozenGoz.epsilon() if aksiyonSure > 0 else 1/60)
             return
 
         if not self.gozImaj.aksiyonBasladi:
             self.gozImaj.aksiyonTamamlandiResetle()
             gozHareket = self.goz.kararVer(self.reseptor)
-            self.__gozHareketUygula(gozHareket)
+            aksiyonSure=self.__gozHareketUygula(gozHareket)
+            Clock.schedule_once(self.yarisTikTak, aksiyonSure+CozenGoz.epsilon())
             return
 
         if self.gozImaj.aksiyonTamamlandi:
@@ -93,14 +140,14 @@ class CozenGoz(FloatLayout):
             x, y = self.labirent.hucreXY(self.gozHucre)
             self.gozImaj.konumla(x, y, self.labirent.hucreKenarUzunluk)
             
-            self.reseptorGuncellendi = False
+            self.reseptorGuncellendi = False'''
+            
         
 
-
-
-          
-
     
+
+
+
     def __gozHareketUygula(self,hareket):
         match hareket:
             case Hareket.SOLA_DON:
@@ -130,6 +177,7 @@ class CozenGoz(FloatLayout):
                 else:
                     print("DUVAR KAPALI")
 
+        return GozImaj.aksiyonSure(self.gozImaj.aksiyon, self.gozImaj.yon)
 
     def guncelleCanvas(self,*args):
         Denetle.TurHata(yarisAlani:=args[0],Widget)
@@ -147,15 +195,11 @@ class CozenGoz(FloatLayout):
         self.reseptorImaj.guncelleOlculer(self.labirent.hucreKenarUzunluk)
 
     def __reseptorGuncelle(self):
-        if self.reseptorGuncellendi:
-            print(self.reseptorGuncellendi)
-        
+       
         if self.reseptor.asama == ReseptorAsama.BOSTA:
             self.reseptor.asamaGuncelle()
-            return
+            return 0
         
-
-
         yonFark = self.gozImaj.yon - Yon.baslangic()
         gercekReseptorKonum=ReseptorKonum((self.reseptor.konumIndis+yonFark)%len(ReseptorKonum))
         hucreX,hucreY=self.labirent.hucreXY(self.gozHucre)
@@ -166,11 +210,12 @@ class CozenGoz(FloatLayout):
                 self.reseptorImaj.aksiyonTamamlandiResetle()
                 self.reseptorImaj.konumla(gercekReseptorKonum,hucreX,hucreY,self.labirent.hucreKenarUzunluk)
                 self.reseptorImaj.tara()
-                return
+                return ReseptorImaj.aksiyonSure(self.reseptorImaj.aksiyon)
             if self.reseptorImaj.aksiyonTamamlandi:
                 self.reseptorImaj.aksiyonBasladiResetle()
                 self.reseptor.asamaGuncelle()
-                return
+                return 0
+            self.reseptor.asamaGuncelle()
 
         if self.reseptor.asama == ReseptorAsama.SONUC:
             komsuHucreler = self.labirent.komsuHucreler(self.gozHucre)
@@ -188,28 +233,73 @@ class CozenGoz(FloatLayout):
                     self.reseptorImaj.duvarAcik()
                 else:
                     self.reseptorImaj.duvarKapali()
-                return
-            
+                return ReseptorImaj.aksiyonSure(self.reseptorImaj.aksiyon)
+
             if self.reseptorImaj.aksiyonTamamlandi:
                 self.reseptorImaj.aksiyonBasladiResetle()
                 self.reseptor.konumIndisGuncelle()
-                
+
                 if self.reseptor.konumIndis == 0:
                     self.reseptorGuncellendi = True
 
                 self.reseptor.asamaGuncelle()
 
+        return 0
 
-
-
-
-    
-            
-            
+'''
+    def __reseptorGuncelle(self):
+       
+        if self.reseptor.asama == ReseptorAsama.BOSTA:
+            self.reseptor.asamaGuncelle()
+            return 0
         
+        yonFark = self.gozImaj.yon - Yon.baslangic()
+        gercekReseptorKonum=ReseptorKonum((self.reseptor.konumIndis+yonFark)%len(ReseptorKonum))
+        hucreX,hucreY=self.labirent.hucreXY(self.gozHucre)
+
+        if self.reseptor.asama == ReseptorAsama.TARAMA:
+            self.reseptor.asamaGuncelle()
+
+        if self.reseptor.asama == ReseptorAsama.SONUC:
+            komsuHucreler = self.labirent.komsuHucreler(self.gozHucre)
+            hedefHucre = komsuHucreler.get(Yon(gercekReseptorKonum))
+            
+            duvarDurum = DuvarDurum.KAPALI
+            if hedefHucre:
+                duvarDurum = self.labirent.duvar(self.gozHucre, hedefHucre).durum
+            self.reseptor.degerGuncelle(self.reseptor.konumIndis, duvarDurum)
+
+            if duvarDurum==DuvarDurum.ACIK:
+                if not self.reseptorImaj.aksiyonBasladi:
+                    self.reseptorImaj.aksiyonTamamlandiResetle()
+                    self.reseptorImaj.konumla(gercekReseptorKonum,hucreX,hucreY,self.labirent.hucreKenarUzunluk)
+                
+                    self.reseptorImaj.duvarAcik()
+                
+                    return ReseptorImaj.aksiyonSure(self.reseptorImaj.aksiyon)
+                
+                if self.reseptorImaj.aksiyonTamamlandi:
+                    self.reseptorImaj.aksiyonBasladiResetle()
+                    self.reseptor.konumIndisGuncelle()
+
+                    if self.reseptor.konumIndis == 0:
+                        self.reseptorGuncellendi = True
+
+                    self.reseptor.asamaGuncelle()
+            else:
+                self.reseptor.konumIndisGuncelle()
+
+                if self.reseptor.konumIndis == 0:
+                    self.reseptorGuncellendi = True
+
+                self.reseptor.asamaGuncelle()
+
+        return 0
+'''
 
 class Uygulama(App):
     def build(self):
+        self.title="ÇözenGöz"
         self.roboLabirent=CozenGoz()
         return self.roboLabirent
 
