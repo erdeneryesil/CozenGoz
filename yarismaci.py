@@ -9,7 +9,6 @@ class BenimGozum(Goz):
         """
         Bu fonksiyon her adımda çağrılır.
         """
-        #return self.ileriGit
         if reseptor.on==DuvarDurum.ACIK:
             return self.ileriGit
         else:

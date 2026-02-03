@@ -30,19 +30,26 @@ Builder.load_file('dizayn.kv')
 class CozenGoz(FloatLayout):
     # Epsilon Değeri (Hassas Zamanlama Payı)
     __epsilon=1/120
+
+    __animasyonGecikme=1/60
+    __geriSayimGecikme=4
+
     @staticmethod
     def epsilon():
         return CozenGoz.__epsilon 
+    @staticmethod
+    def animasyonGecikme():
+        return CozenGoz.__animasyonGecikme
+    @staticmethod
+    def geriSayimGecikme():
+        return CozenGoz.__geriSayimGecikme 
     
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
 
-        
-
         Yukle.AtlasDosya(GozImaj,GozAksiyon,GozTip,Yon)
         Yukle.AtlasDosya(ReseptorImaj)
         
-
 
         self.__yarisSaat=None
         self.labirent=None
@@ -60,7 +67,7 @@ class CozenGoz(FloatLayout):
         
         goz1=BenimGozum("ROBOT1")
         self.goz=goz1
-        self.gozImaj=GozImaj(GozTip.GOZ4,Yon.baslangic())
+        self.gozImaj=GozImaj(GozTip.GOZ1,Yon.baslangic())
 
         self.gozHucre=self.labirent.baslangicHucre
         
@@ -79,52 +86,34 @@ class CozenGoz(FloatLayout):
 
 
 
-    def baslangicBekleyisi(self,dt):
-        self.__yarisSaat=Clock.schedule_once(self.yarisTikTak,1/60)
 
 
     def yarisBaslat(self):
         self.reseptorGuncellendi=False
         self.oyunBitti=False
-        #self.gozHucre=Hucre(2,0)
         self.gozHucre=self.labirent.baslangicHucre
         self.gozImaj.bekle()
-        animasyonSure=GozImaj.animasyonSure(GozAksiyon.BEKLE, self.gozImaj.yon)
-        
-        #print(animasyonSure)
-        self.__yarisSaat=Clock.schedule_once(self.baslangicBekleyisi,4)
-        #print(self.__yarisSaat)
 
+        #animasyonSure=GozImaj.animasyonSure(GozAksiyon.BEKLE, self.gozImaj.yon)
+        self.__yarisSaat=Clock.schedule_once(self.geriSayim,CozenGoz.geriSayimGecikme())
 
-
-
-        '''self.reseptorGuncellendi=False
-        self.oyunBitti=False
-        #self.gozHucre=self.labirent.baslangicHucre
-        self.gozHucre=Hucre(2,0)
-
-        self.__yarisSaat=Clock.schedule_once(self.yarisTikTak,1/60)'''
-
+    def geriSayim(self,dt):
+        self.__yarisSaat=Clock.schedule_once(self.yarisTikTak,CozenGoz.animasyonGecikme())
 
     def yarisTikTak(self,dt):          
         
         if self.gozImaj.aksiyon!=GozAksiyon.BEKLE:
-            self.__yarisSaat=Clock.schedule_once(self.yarisTikTak,1/60)
+            self.__yarisSaat=Clock.schedule_once(self.yarisTikTak,CozenGoz.animasyonGecikme())
             return
         
-        if self.gozHucre==self.labirent.bitisHucre:
-            #self.oyunBitti=True
-            #self.gozImaj.animasyonSaatDurdur()
-            
+        if self.gozHucre==self.labirent.bitisHucre:           
             print("bitti")
-            #self.reseptorGuncellendi=True
-            #self.reseptorImaj.animasyonSaatDurdur()
             return
                     
         
         if not self.reseptorGuncellendi:
             animasyonSure=self.__reseptorGuncelle()
-            self.__yarisSaat=Clock.schedule_once(self.yarisTikTak, animasyonSure+CozenGoz.epsilon() if animasyonSure > 0 else 1/60)
+            self.__yarisSaat=Clock.schedule_once(self.yarisTikTak, animasyonSure+CozenGoz.epsilon() if animasyonSure > 0 else CozenGoz.animasyonGecikme())
             return
 
         
@@ -144,7 +133,7 @@ class CozenGoz(FloatLayout):
          
 
         
-        self.__yarisSaat=Clock.schedule_once(self.yarisTikTak, 1/60)
+        self.__yarisSaat=Clock.schedule_once(self.yarisTikTak, CozenGoz.animasyonGecikme())
         
         
         
