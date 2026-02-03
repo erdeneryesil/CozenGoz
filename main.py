@@ -4,7 +4,7 @@ from kivy.lang import Builder
 from kivy.clock import Clock
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.label import Label
-from siniflar import Labirent,GozImaj,Reseptor,ReseptorImaj,ReseptorKonum,Yon,Hareket,Denetle,Hucre,Konum,DuvarDurum,GozTip,GozAksiyon,Yukle
+from siniflar import DosyaTip,AtlasYuklemeBilgi,AcilirPencere,Labirent,GozImaj,Reseptor,ReseptorImaj,ReseptorKonum,Yon,Hareket,Denetle,Hucre,Konum,DuvarDurum,GozTip,GozAksiyon,Yukle
 from yarismaci import BenimGozum
 import time
 from kivy.graphics import Ellipse,Line,Color,Point,Triangle,Rotate,PushMatrix,PopMatrix
@@ -32,7 +32,7 @@ class CozenGoz(FloatLayout):
     __epsilon=1/120
 
     __animasyonGecikme=1/60
-    __geriSayimGecikme=4
+    __geriSayimGecikme=1
 
     @staticmethod
     def epsilon():
@@ -47,10 +47,23 @@ class CozenGoz(FloatLayout):
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
 
-        Yukle.AtlasDosya(GozImaj,GozAksiyon,GozTip,Yon)
-        Yukle.AtlasDosya(ReseptorImaj)
-        
+        #önce dosyalar yüklensin
+        gozAtlasYuklemeBilgi={AtlasYuklemeBilgi.ACIKLAMA:"Göz görselleri yükleniyor",AtlasYuklemeBilgi.IMAJ_SINIF:GozImaj,AtlasYuklemeBilgi.AKSIYON_SINIF:GozAksiyon,AtlasYuklemeBilgi.TIP_SINIF:GozTip,AtlasYuklemeBilgi.YON_SINIF:Yon}
+        reseptorAtlasYuklemeBilgi={AtlasYuklemeBilgi.ACIKLAMA:"Reseptör görselleri yükleniyor",AtlasYuklemeBilgi.IMAJ_SINIF:ReseptorImaj}
+        atlasDosyaBilgiler=[gozAtlasYuklemeBilgi,reseptorAtlasYuklemeBilgi]
 
+        self.dosyaYuklemePencere=AcilirPencere()
+
+        #dosya yükleme penceresi kapandığında, diğer işlemler başlasın
+        self.dosyaYuklemePencere.bind(on_dismiss=self.baslangicIslemleri)
+
+        self.dosyaYuklemePencere.dosyaYuklemeBaslat(DosyaTip.ATLAS,atlasDosyaBilgiler)
+
+        
+        #Yukle.AtlasDosya(GozImaj,GozAksiyon,GozTip,Yon)
+        #Yukle.AtlasDosya(ReseptorImaj)
+        
+    def baslangicIslemleri(self,instance):
         self.__yarisSaat=None
         self.labirent=None
         self.gozHucre=None
@@ -62,9 +75,8 @@ class CozenGoz(FloatLayout):
         
         self.yarisAlaniWidget=self.ids.yarisAlaniWidget
         self.yarisAlaniWidget.bind(pos=self.guncelleCanvas, size=self.guncelleCanvas)
-        
+                
         self.labirent=Labirent(3,3)
-        
         goz1=BenimGozum("ROBOT1")
         self.goz=goz1
         self.gozImaj=GozImaj(GozTip.GOZ1,Yon.baslangic())
@@ -77,9 +89,7 @@ class CozenGoz(FloatLayout):
         self.add_widget(self.gozImaj)
         self.add_widget(self.reseptorImaj)
 
-
-        
-        
+        Clock.schedule_once(lambda dt: self.guncelleCanvas(self.yarisAlaniWidget), 0) #pencere açılması tamamlandığında, boyutların güncellenmesi için
         self.yarisBaslat()
         
 
@@ -171,6 +181,8 @@ class CozenGoz(FloatLayout):
         return GozImaj.animasyonSure(self.gozImaj.aksiyon, self.gozImaj.yon)
 
     def guncelleCanvas(self,*args):
+        if self.labirent is None:return
+
         Denetle.TurHata(yarisAlani:=args[0],Widget)
 
         self.labirent.guncelleOlculer(yarisAlani.x,yarisAlani.y,yarisAlani.width,yarisAlani.height)

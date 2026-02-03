@@ -156,10 +156,162 @@ class OnHucre(Hucre):
     def isaretKaldir(self):
         self.__isaret=False
 
+
+class DosyaTip(IntEnum):
+    ATLAS=1
+
+class AtlasYuklemeBilgi(IntEnum):
+    ACIKLAMA=0 #dosya yüklenirken, görüntülenmek istenen açıklama
+    IMAJ_SINIF=1
+    AKSIYON_SINIF=2
+    TIP_SINIF=3
+    YON_SINIF=4
+
+class AcilirPencereTip(IntEnum):
+    DOSYA_YUKLEME=1
+
+class AcilirPencereDurum(IntEnum):
+    YUKLENIYOR=1
+    ACILMAYA_HAZIR=2
+    ACIK=3
+    ISLEM_DEVAM_EDIYOR=4
+    ISLEM_BITTI=5
+    KAPALI=6
+
+
+from kivy.uix.modalview import ModalView #Açılır Pencere
+from kivy.uix.label import Label
+from kivy.clock import mainthread
+from kivy.uix.boxlayout import BoxLayout
+class AcilirPencere(ModalView):
+    #logo='assets/sahne/logo.png'
+    #logoOrijinalGenislik=2000
+    #logoOrijinalYukseklik=2116
+
+    #Her açılır pencere tipi için yalnızca tek bir Label nesnesi kullanılacak
+    etiketRenk=[.894,.157,.157,1]       #etiketin yazı rengi
+    etiketBoyutOran={'dosya yükle pencere':.05,'seviye yükle pencere':.05,'oyun başlat pencere':.15,'oyun kaybetti pencere':.15,'oyun kazandı pencere':.15}#Etiketin, yazı boyutunun pencere yüksekliğine oranı
+    etiketYazi={'dosya yükle pencere':u'DOSYALAR Y\u00dbKLEN\u00ceYOR','seviye yükle pencere':u'OYUN Y\u00dbKLEN\u00ceYOR','oyun başlat pencere':u'SEV\u00ceYE ','oyun kaybetti pencere':u'OYUN B\u00ceTT\u00ce','oyun kazandı pencere':u'TEBR\u00ceKLER'}
+
+    pencereGenislikOran=.9     #Açılır pencerenin genişliğinin, ana pencerenin genişliğine oranı
+    pencereYukseklikOran=.9    #Açılır pencerenin yüksekliğinin, ana pencerenin yüksekliğine oranı
+
+
+    
+    def __init__(self,**kwargs):
+        super().__init__(**kwargs)
+
+        self.background=''
+        self.background_color=[.8,.8,.8,.7]
+
+
+        
+        self.__tip=None
+        self.__durum=None
+        self.__saat=None
+        self.__dosyaTip=None
+        self.__dosyaBilgiler=None
+        self.auto_dismiss=False
+        
+
+        #self.etiket=Label()
+        #self.etiket.font_name=Oyun.acilirPencereYaziTipiIsim
+        #self.etiket.color=AcilirPencere.etiketRenk
+        #self.etiket.text=AcilirPencere.etiketYazi[self.__tip]
+        
+        #self.boyutAyarla()
+            
+
+
+        
+    def dosyaYuklemeBaslat(self,dosyaTip,dosyaYuklemeBilgiler):
+        self.__tip=AcilirPencereTip.DOSYA_YUKLEME
+
+        self.__dosyaTip=dosyaTip
+        self.__dosyaYuklemeBilgiler=dosyaYuklemeBilgiler
+        self.__dosyaYuklemeIcinAyarla()
+        self.__saat=Clock.schedule_interval(self.dosyaYuklemeTikTak,1/60)
+        
+        
+
+
+    def dosyaYuklemeTikTak(self,dt):
+        print(self.__durum.name)
+        if self.__durum==AcilirPencereDurum.ACILMAYA_HAZIR:
+            self.open()
+        elif self.__durum==AcilirPencereDurum.ACIK:#açılır pencere tamamen açılmadan, dosya yüklemeye başlama. Çünkü açılır pencere görünümünde donmalar oluyor
+            self.__durum=AcilirPencereDurum.ISLEM_DEVAM_EDIYOR
+            if self.__dosyaTip==DosyaTip.ATLAS:
+                self.atlasYukle(self.__dosyaYuklemeBilgiler)
+        elif self.__durum==AcilirPencereDurum.ISLEM_BITTI:    
+            self.dismiss()
+        elif self.__durum==AcilirPencereDurum.KAPALI:
+            self.__saat.cancel()
+            
+            #if not self.dosyaYuklePencereAcildi:
+                #self.dosyaYuklePencereAcildi=True
+                #self.dosyaYukle()
+            
+            #else:
+                #dosyaYuklemeSurec=0
+                #for i in Oyun.dosyaYuklemeDurumu:
+                    #dosyaYuklemeSurec+=Oyun.dosyaYuklemeDurumu[i]()# atlasları yüklenmiş olan nesneler 1, yüklenmemiş olanlar 0 değerini ekler
+
+                #if dosyaYuklemeSurec==Oyun.dosyaAdet:
+                    #self.dismiss()
+                    #self.acilirPencereSaat.cancel()
+                    #self.seviyeYuklePencereAc()
+
+
+    @mainthread
+    def atlasYukle(self,AtlasYuklemeBilgiler):
+        for bilgi in AtlasYuklemeBilgiler:
+            aciklama=bilgi.get(AtlasYuklemeBilgi.ACIKLAMA)
+            print(aciklama)
+            imajSinif=bilgi.get(AtlasYuklemeBilgi.IMAJ_SINIF)
+            aksiyonSinif=bilgi.get(AtlasYuklemeBilgi.AKSIYON_SINIF)
+            tipSinif=bilgi.get(AtlasYuklemeBilgi.TIP_SINIF)
+            yonSinif=bilgi.get(AtlasYuklemeBilgi.YON_SINIF)
+            Yukle.AtlasDosya(imajSinif,aksiyonSinif,tipSinif,yonSinif)
+        self.__durum=AcilirPencereDurum.ISLEM_BITTI
+            
+
+    @mainthread #ayrı bir thread içerisinde nesne oluşturabilmek için fonksiyonun mainthread olması gerekiyor
+    def __dosyaYuklemeIcinAyarla(self):
+        self.__durum=AcilirPencereDurum.YUKLENIYOR
+        yerlesim=BoxLayout(orientation='vertical')
+
+
+        #self.logo=Image(source=AcilirPencere.logo,allow_stretch=False,keep_ratio=True)
+        #self.logo.size_hint=None,None
+        #self.logoBoyutAyarla()
+
+        #self.etiketBoyutAyarla(self.__tip)
+
+        #yerlesim.add_widget(self.logo)
+        #yerlesim.add_widget(self.etiket)
+        self.add_widget(yerlesim)
+        self.__durum=AcilirPencereDurum.ACILMAYA_HAZIR
+
+    def boyutAyarla(self):
+        pass
+    
+    def on_pre_open(self):
+        self.__durum=AcilirPencereDurum.ACIK
+        return super().on_pre_open()
+
+    #def on_pre_dismiss(self):
+        #self.__durum=AcilirPencereDurum.KAPALI
+        #return super().on_pre_dismiss()
+    
+    def on_dismiss(self):
+        self.__durum=AcilirPencereDurum.KAPALI
+        return super().on_dismiss()
+
 class Yukle:
     @staticmethod
     def AtlasDosya(ImajSinif,AksiyonSinif=None,TipSinif=None,YonSinif=None):
-        ImajSinif.atlasYuklendiGuncelle(False)
+        #ImajSinif.atlasYuklendiGuncelle(False)
     
         # Başlangıçta durum tespiti yaparak döngü içindeki 'if' yükünü azaltıyoruz
         aksiyonlar= AksiyonSinif if AksiyonSinif else [None]
@@ -198,8 +350,8 @@ class Yukle:
                         else:
                             ImajSinif.kareEkle(hamKare)
 
-        ImajSinif.atlasYuklendiGuncelle(True)
-        
+        #ImajSinif.atlasYuklendiGuncelle(True)
+    
 class GozTip(IntEnum):
     GOZ1=1
     GOZ2=2
