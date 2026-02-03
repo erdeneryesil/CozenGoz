@@ -105,7 +105,7 @@ class Hucre(Konum):
     __tipRenkKey="renk"
     __tipUzunlukCarpanKey="uzunlukCarpan"
     __sayiKey="sayı"
-    __tip={__tipBaslangicKey:{__tipRenkKey:{"r":245/255,"g":73/255,"b":39/255,"a":1},__tipUzunlukCarpanKey:1},__tipBitisKey:{__tipRenkKey:{"r":88/255,"g":219/255,"b":88/255,"a":1},__tipUzunlukCarpanKey:1},__tipYolKey:{__tipRenkKey:{"r":255/255,"g":247/255,"b":173/255,"a":0.5},__tipUzunlukCarpanKey:0.8}}
+    __tip={__tipBaslangicKey:{__tipRenkKey:{"r":245/255,"g":73/255,"b":39/255,"a":1},__tipUzunlukCarpanKey:1},__tipBitisKey:{__tipRenkKey:{"r":219/255,"g":88/255,"b":88/255,"a":1},__tipUzunlukCarpanKey:1},__tipYolKey:{__tipRenkKey:{"r":255/255,"g":247/255,"b":173/255,"a":0.5},__tipUzunlukCarpanKey:0.8}}
 
     @staticmethod
     def gozTipBaslangicKey():
@@ -262,7 +262,16 @@ class Imaj(Image,metaclass=ImajMeta):
     @abstractmethod
     def animasyonSure(cls):
         pass
-
+    @abstractmethod
+    def _animasyonTikTak(self,dt):
+        pass
+    @abstractmethod
+    def guncelleOlculer(self):
+        pass
+    @abstractmethod
+    def konumla(self):
+        pass
+    
 
     @classmethod
     def dizin(cls):
@@ -300,6 +309,9 @@ class Imaj(Image,metaclass=ImajMeta):
     def animasyonTamamlandiResetle(self):
        self._animasyonTamamlandi=False
 
+    def animasyonSaatDurdur(self):
+        if self._animasyonSaat is not None: 
+            self._animasyonSaat.cancel()
 
 class ReseptorImaj(Imaj):
     _dizin="assets/reseptor"
@@ -351,13 +363,9 @@ class ReseptorImaj(Imaj):
         r = cls.animasyonTekrar()
         delay = cls.gecikme()         
         return n * r * delay
-
-
-
     
     def duvarAcik(self):
         self._animasyonHazirlik()
-
 
     def _animasyonHazirlik(self):
         self.texture=ReseptorImaj.kare(0).texture#yeni reseptorAksiyonun, ilk karesi alınıyor. Aksiyon geçişinde, önceki durumun karesi kalmasın diye 
@@ -366,9 +374,9 @@ class ReseptorImaj(Imaj):
         self._animasyonBasladi=True
         if self._animasyonSaat:
             self._animasyonSaat.cancel()
-        self._animasyonSaat=Clock.schedule_interval(self.animasyonTikTak,ReseptorImaj.gecikme())
+        self._animasyonSaat=Clock.schedule_interval(self._animasyonTikTak,ReseptorImaj.gecikme())
     
-    def animasyonTikTak(self,dt):
+    def _animasyonTikTak(self,dt):
         self.texture=ReseptorImaj.kare(self._kareSayac%(ReseptorImaj.kareSayi())).texture
         self._kareSayac+=1
 
@@ -536,10 +544,10 @@ class GozImaj(Imaj):#animasyon ve çizim işlemlerinin yürütüleceğin sınıf
         self._animasyonBasladi=True    
         if self._animasyonSaat:
             self._animasyonSaat.cancel()
-        self._animasyonSaat=Clock.schedule_interval(self.animasyonTikTak,GozImaj.gecikme(self.__aksiyon))
+        self._animasyonSaat=Clock.schedule_interval(self._animasyonTikTak,GozImaj.gecikme(self.__aksiyon))
 
     
-    def animasyonTikTak(self,dt):
+    def _animasyonTikTak(self,dt):
         self.texture=GozImaj.kare(self._kareSayac%(GozImaj.kareSayi(self.__aksiyon,self.__yon)),self.__aksiyon,self.__tip,self.__yon).texture
         self._kareSayac+=1
 
@@ -707,6 +715,8 @@ class Labirent:
     def hucreKenarUzunluk(self):
         return self.__hucreKenarUzunluk
     def hucre(self,satirNumara,sutunNumara):
+        if satirNumara<0 or satirNumara>=self.__satirSayi or sutunNumara<0 or sutunNumara>=self.__sutunSayi:
+            return None
         return self.__hucreler[satirNumara][sutunNumara]
     
     def komsuHucreler(self,hucre):
@@ -730,12 +740,9 @@ class Labirent:
         return komsuHucreler
 
     def duvar(self,hucre1,hucre2):
-        satirUygunDegil = (hucre1.satirNumara<0 or hucre1.satirNumara>=self.__satirSayi) or ((hucre2.satirNumara<0 or hucre2.satirNumara>=self.__satirSayi))
-        sutunUygunDegil = (hucre1.sutunNumara<0 or hucre1.sutunNumara>=self.__sutunSayi) or ((hucre2.sutunNumara<0 or hucre2.sutunNumara>=self.__sutunSayi))
-
-        if satirUygunDegil or sutunUygunDegil:#Eğer satır ya da sutun numarası labirentin sınırları dışındaysa, KAPALI bir duvar dönsün 
+        if hucre1 is None or hucre2 is None:#Eğer satır ya da sutun numarası labirentin sınırları dışındaysa, KAPALI bir duvar dönsün 
             return Duvar()   
-        
+                
         if hucre1.satirNumara==hucre2.satirNumara:#aynı satırdaki hücreler arasındaki bir duvar ise
             if hucre2.sutunNumara<hucre1.sutunNumara:#hücre2 küçük indisli ise
                 return self.__duvarlar[self.__satirAnahtar][hucre2.satirNumara][hucre2.sutunNumara]
@@ -770,8 +777,8 @@ class Labirent:
         #hucreTip=Hucre.gozTip(Hucre.gozTipBaslangicKey())
         #self.__boyaHucre(self.__solUstX, self.__solUstY,Konum(self.__baslangicSatirNumara,self.__baslangicSutunNumara),hucreTip[Hucre.gozTipUzunlukCarpanKey()],hucreTip[Hucre.gozTipRenkKey()])
             
-        #hucreTip=Hucre.gozTip(Hucre.gozTipBitisKey())
-        #self.__boyaHucre(self.__solUstX, self.__solUstY,Konum(self.__bitisSatirNumara,self.__bitisSutunNumara),hucreTip[Hucre.gozTipUzunlukCarpanKey()],hucreTip[Hucre.gozTipRenkKey()])
+        hucreTip=Hucre.gozTip(Hucre.gozTipBitisKey())
+        self.__boyaHucre(self.__solUstX, self.__solUstY,Konum(self.__bitisSatirNumara,self.__bitisSutunNumara),hucreTip[Hucre.gozTipUzunlukCarpanKey()],hucreTip[Hucre.gozTipRenkKey()])
            
     def guncelleOlculer(self,yarisAlaniX,yarisAlaniY,yarisAlaniGenislik,yarisAlaniYukseklik):#canvas içerisine çizilecek labirentin genişlik, yükseklik, x, y vs değerleri hesaplanıyor
         genislikOlcek=yarisAlaniGenislik/self.__sutunSayi

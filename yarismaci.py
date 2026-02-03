@@ -9,10 +9,12 @@ class BenimGozum(Goz):
         """
         Bu fonksiyon her adımda çağrılır.
         """
+        #return self.ileriGit
         if reseptor.on==DuvarDurum.ACIK:
             return self.ileriGit
         else:
             pass
+            
 
         if reseptor.sol==DuvarDurum.ACIK:
             return self.solaDon
@@ -28,6 +30,8 @@ class BenimGozum(Goz):
             return self.sagaDon
         else:
             pass
+
+
 
 
         
