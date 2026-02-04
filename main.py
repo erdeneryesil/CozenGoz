@@ -1,14 +1,3 @@
-from kivy.app import App
-from kivy.uix.widget import Widget
-from kivy.lang import Builder
-from kivy.clock import Clock
-from kivy.uix.floatlayout import FloatLayout
-from kivy.uix.label import Label
-from siniflar import DosyaTip,AtlasYuklemeBilgi,AcilirPencere,Labirent,GozImaj,Reseptor,ReseptorImaj,ReseptorKonum,Yon,Hareket,Denetle,Hucre,Konum,DuvarDurum,GozTip,GozAksiyon,Yukle
-from yarismaci import BenimGozum
-import time
-from kivy.graphics import Ellipse,Line,Color,Point,Triangle,Rotate,PushMatrix,PopMatrix
-
 from kivy.config import Config
 Config.set('graphics', 'width', '800')
 Config.set('graphics', 'height', '600')
@@ -22,6 +11,21 @@ Config.set('graphics', 'left', '1920')
 Config.set('graphics', 'top', '0')
 #Config.set('graphics', 'left', '2180') 
 #Config.set('graphics', 'top', '1')
+
+from kivy.app import App
+from kivy.uix.widget import Widget
+from kivy.lang import Builder
+from kivy.clock import Clock
+from kivy.uix.floatlayout import FloatLayout
+from kivy.uix.label import Label
+from siniflar import DosyaTip,AtlasYuklemeBilgi,AcilirPencere,Labirent,GozImaj,Reseptor,ReseptorImaj,ReseptorKonum,Yon,Hareket,Denetle,Hucre,Konum,DuvarDurum,GozTip,GozAksiyon,Yukle
+from yarismaci import BenimGozum
+import time
+from kivy.graphics import Ellipse,Line,Color,Point,Triangle,Rotate,PushMatrix,PopMatrix
+
+
+
+
 
 
 Builder.load_file('dizayn.kv')
@@ -52,6 +56,12 @@ class CozenGoz(FloatLayout):
         reseptorAtlasYuklemeBilgi={AtlasYuklemeBilgi.ACIKLAMA:"Reseptör görselleri yükleniyor",AtlasYuklemeBilgi.IMAJ_SINIF:ReseptorImaj}
         atlasDosyaBilgiler=[gozAtlasYuklemeBilgi,reseptorAtlasYuklemeBilgi]
 
+
+
+
+        
+
+
         self.dosyaYuklemePencere=AcilirPencere()
 
         #dosya yükleme penceresi kapandığında, diğer işlemler başlasın
@@ -63,6 +73,7 @@ class CozenGoz(FloatLayout):
         #Yukle.AtlasDosya(GozImaj,GozAksiyon,GozTip,Yon)
         #Yukle.AtlasDosya(ReseptorImaj)
         
+
     def baslangicIslemleri(self,instance):
         self.__yarisSaat=None
         self.labirent=None
@@ -92,10 +103,6 @@ class CozenGoz(FloatLayout):
         Clock.schedule_once(lambda dt: self.guncelleCanvas(self.yarisAlaniWidget), 0) #pencere açılması tamamlandığında, boyutların güncellenmesi için
         self.yarisBaslat()
         
-
-
-
-
 
 
     def yarisBaslat(self):

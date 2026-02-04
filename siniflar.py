@@ -158,7 +158,7 @@ class OnHucre(Hucre):
 
 
 class DosyaTip(IntEnum):
-    ATLAS=1
+    ATLAS=0
 
 class AtlasYuklemeBilgi(IntEnum):
     ACIKLAMA=0 #dosya yüklenirken, görüntülenmek istenen açıklama
@@ -168,12 +168,13 @@ class AtlasYuklemeBilgi(IntEnum):
     YON_SINIF=4
 
 class AcilirPencereTip(IntEnum):
-    DOSYA_YUKLEME=1
+    DOSYA_YUKLEME=0
 
 class AcilirPencereDurum(IntEnum):
-    YUKLENIYOR=1
-    ACILMAYA_HAZIR=2
-    ACIK=3
+    YUKLENIYOR=0
+    ACILMAYA_HAZIR=1
+    ACIK=2
+    ETIKET_ACIKLAMA_GUNCELLE = 3 
     ISLEM_DEVAM_EDIYOR=4
     ISLEM_BITTI=5
     KAPALI=6
@@ -183,18 +184,20 @@ from kivy.uix.modalview import ModalView #Açılır Pencere
 from kivy.uix.label import Label
 from kivy.clock import mainthread
 from kivy.uix.boxlayout import BoxLayout
+from kivy.core.window import Window
 class AcilirPencere(ModalView):
     #logo='assets/sahne/logo.png'
     #logoOrijinalGenislik=2000
     #logoOrijinalYukseklik=2116
 
     #Her açılır pencere tipi için yalnızca tek bir Label nesnesi kullanılacak
-    etiketRenk=[.894,.157,.157,1]       #etiketin yazı rengi
-    etiketBoyutOran={'dosya yükle pencere':.05,'seviye yükle pencere':.05,'oyun başlat pencere':.15,'oyun kaybetti pencere':.15,'oyun kazandı pencere':.15}#Etiketin, yazı boyutunun pencere yüksekliğine oranı
-    etiketYazi={'dosya yükle pencere':u'DOSYALAR Y\u00dbKLEN\u00ceYOR','seviye yükle pencere':u'OYUN Y\u00dbKLEN\u00ceYOR','oyun başlat pencere':u'SEV\u00ceYE ','oyun kaybetti pencere':u'OYUN B\u00ceTT\u00ce','oyun kazandı pencere':u'TEBR\u00ceKLER'}
+    #etiketBoyutOran={'dosya yükle pencere':.05,'seviye yükle pencere':.05,'oyun başlat pencere':.15,'oyun kaybetti pencere':.15,'oyun kazandı pencere':.15}#Etiketin, yazı boyutunun pencere yüksekliğine oranı
+    #etiketYazi={'dosya yükle pencere':u'DOSYALAR Y\u00dbKLEN\u00ceYOR','seviye yükle pencere':u'OYUN Y\u00dbKLEN\u00ceYOR','oyun başlat pencere':u'SEV\u00ceYE ','oyun kaybetti pencere':u'OYUN B\u00ceTT\u00ce','oyun kazandı pencere':u'TEBR\u00ceKLER'}
 
-    pencereGenislikOran=.9     #Açılır pencerenin genişliğinin, ana pencerenin genişliğine oranı
-    pencereYukseklikOran=.9    #Açılır pencerenin yüksekliğinin, ana pencerenin yüksekliğine oranı
+    __pencereGenislikOran=.9     #Açılır pencerenin genişliğinin, ana pencerenin genişliğine oranı
+    __pencereYukseklikOran=.9    #Açılır pencerenin yüksekliğinin, ana pencerenin yüksekliğine oranı
+    __etiketBoyutOran=.03         #Etiket yazı boyutunun, açılır pencerenin genişliğine oranı
+    ___etiketRenk=[.694,.157,.157,1]       #etiketin yazı rengi
 
 
     
@@ -204,77 +207,84 @@ class AcilirPencere(ModalView):
         self.background=''
         self.background_color=[.8,.8,.8,.7]
 
-
-        
         self.__tip=None
         self.__durum=None
         self.__saat=None
         self.__dosyaTip=None
         self.__dosyaBilgiler=None
+        self.__dosyaYuklemeIndis=0
         self.auto_dismiss=False
-        
+        self.__etiket=Label()
+        self.__etiket.color=self.___etiketRenk
+        #self.__etiket.text="DENEME"
 
-        #self.etiket=Label()
-        #self.etiket.font_name=Oyun.acilirPencereYaziTipiIsim
-        #self.etiket.color=AcilirPencere.etiketRenk
-        #self.etiket.text=AcilirPencere.etiketYazi[self.__tip]
+
+        #self.__etiket.font_name=Oyun.acilirPencereYaziTipiIsim
+        #self.__etiket.color=AcilirPencere.etiketRenk
+        #self.__etiket.text=AcilirPencere.etiketYazi[self.__tip]
         
-        #self.boyutAyarla()
+        self.bind(pos=self.boyutAyarla, size=self.boyutAyarla)
+
+        
             
-
-
-        
     def dosyaYuklemeBaslat(self,dosyaTip,dosyaYuklemeBilgiler):
+        self.__dosyaYuklemeIndis = 0
         self.__tip=AcilirPencereTip.DOSYA_YUKLEME
-
         self.__dosyaTip=dosyaTip
         self.__dosyaYuklemeBilgiler=dosyaYuklemeBilgiler
         self.__dosyaYuklemeIcinAyarla()
         self.__saat=Clock.schedule_interval(self.dosyaYuklemeTikTak,1/60)
-        
-        
 
-
-    def dosyaYuklemeTikTak(self,dt):
-        print(self.__durum.name)
+    def dosyaYuklemeTikTak(self, dt):
         if self.__durum==AcilirPencereDurum.ACILMAYA_HAZIR:
             self.open()
-        elif self.__durum==AcilirPencereDurum.ACIK:#açılır pencere tamamen açılmadan, dosya yüklemeye başlama. Çünkü açılır pencere görünümünde donmalar oluyor
-            self.__durum=AcilirPencereDurum.ISLEM_DEVAM_EDIYOR
-            if self.__dosyaTip==DosyaTip.ATLAS:
-                self.atlasYukle(self.__dosyaYuklemeBilgiler)
-        elif self.__durum==AcilirPencereDurum.ISLEM_BITTI:    
+        elif self.__durum==AcilirPencereDurum.ACIK:
+            self.__durum=AcilirPencereDurum.ETIKET_ACIKLAMA_GUNCELLE
+        elif self.__durum==AcilirPencereDurum.ETIKET_ACIKLAMA_GUNCELLE:
+            if self.__dosyaYuklemeIndis<len(self.__dosyaYuklemeBilgiler):
+                # AŞAMA 1: Sadece etiketi güncelle ve DUR
+                bilgi=self.__dosyaYuklemeBilgiler[self.__dosyaYuklemeIndis]
+                self.__etiket.text = bilgi.get(AtlasYuklemeBilgi.ACIKLAMA)
+                # Durumu değiştiriyoruz ki bir sonraki 'tiktak'ta yükleme yapılsın
+                self.__durum=AcilirPencereDurum.ISLEM_DEVAM_EDIYOR
+            else:
+                self.__durum=AcilirPencereDurum.ISLEM_BITTI
+        elif self.__durum==AcilirPencereDurum.ISLEM_DEVAM_EDIYOR:
+            # AŞAMA 2: Ağır olan yükleme işlemini yap
+            bilgi = self.__dosyaYuklemeBilgiler[self.__dosyaYuklemeIndis]
+            imajSinif = bilgi.get(AtlasYuklemeBilgi.IMAJ_SINIF)
+            aksiyonSinif = bilgi.get(AtlasYuklemeBilgi.AKSIYON_SINIF)
+            tipSinif = bilgi.get(AtlasYuklemeBilgi.TIP_SINIF)
+            yonSinif = bilgi.get(AtlasYuklemeBilgi.YON_SINIF)
+            
+            Yukle.AtlasDosya(imajSinif, aksiyonSinif, tipSinif, yonSinif)
+            
+            # Yükleme bitti, indisi artır ve tekrar etiket güncelleme moduna dön
+            self.__dosyaYuklemeIndis+= 1
+            self.__durum=AcilirPencereDurum.ETIKET_ACIKLAMA_GUNCELLE
+
+        elif self.__durum==AcilirPencereDurum.ISLEM_BITTI:
             self.dismiss()
+
         elif self.__durum==AcilirPencereDurum.KAPALI:
             self.__saat.cancel()
-            
-            #if not self.dosyaYuklePencereAcildi:
-                #self.dosyaYuklePencereAcildi=True
-                #self.dosyaYukle()
-            
-            #else:
-                #dosyaYuklemeSurec=0
-                #for i in Oyun.dosyaYuklemeDurumu:
-                    #dosyaYuklemeSurec+=Oyun.dosyaYuklemeDurumu[i]()# atlasları yüklenmiş olan nesneler 1, yüklenmemiş olanlar 0 değerini ekler
-
-                #if dosyaYuklemeSurec==Oyun.dosyaAdet:
-                    #self.dismiss()
-                    #self.acilirPencereSaat.cancel()
-                    #self.seviyeYuklePencereAc()
 
 
-    @mainthread
-    def atlasYukle(self,AtlasYuklemeBilgiler):
-        for bilgi in AtlasYuklemeBilgiler:
-            aciklama=bilgi.get(AtlasYuklemeBilgi.ACIKLAMA)
-            print(aciklama)
-            imajSinif=bilgi.get(AtlasYuklemeBilgi.IMAJ_SINIF)
-            aksiyonSinif=bilgi.get(AtlasYuklemeBilgi.AKSIYON_SINIF)
-            tipSinif=bilgi.get(AtlasYuklemeBilgi.TIP_SINIF)
-            yonSinif=bilgi.get(AtlasYuklemeBilgi.YON_SINIF)
-            Yukle.AtlasDosya(imajSinif,aksiyonSinif,tipSinif,yonSinif)
-        self.__durum=AcilirPencereDurum.ISLEM_BITTI
-            
+    def __tekliAtlasYukle(self,bilgi):
+        aciklama = bilgi.get(AtlasYuklemeBilgi.ACIKLAMA)
+        print(aciklama)
+        self.__etiket.text = aciklama # Bu artık her dosyada güncellenecek
+        
+        imajSinif = bilgi.get(AtlasYuklemeBilgi.IMAJ_SINIF)
+        aksiyonSinif = bilgi.get(AtlasYuklemeBilgi.AKSIYON_SINIF)
+        tipSinif = bilgi.get(AtlasYuklemeBilgi.TIP_SINIF)
+        yonSinif = bilgi.get(AtlasYuklemeBilgi.YON_SINIF)
+        
+        # Gerçek yükleme işlemi
+        Yukle.AtlasDosya(imajSinif, aksiyonSinif, tipSinif, yonSinif)
+
+
+
 
     @mainthread #ayrı bir thread içerisinde nesne oluşturabilmek için fonksiyonun mainthread olması gerekiyor
     def __dosyaYuklemeIcinAyarla(self):
@@ -286,16 +296,24 @@ class AcilirPencere(ModalView):
         #self.logo.size_hint=None,None
         #self.logoBoyutAyarla()
 
-        #self.etiketBoyutAyarla(self.__tip)
+        self.__etiketBoyutAyarla()
 
         #yerlesim.add_widget(self.logo)
-        #yerlesim.add_widget(self.etiket)
+        yerlesim.add_widget(self.__etiket)
         self.add_widget(yerlesim)
         self.__durum=AcilirPencereDurum.ACILMAYA_HAZIR
 
-    def boyutAyarla(self):
-        pass
+    def __etiketBoyutAyarla(self):
+        self.__etiket.font_size=self.width*self.__etiketBoyutOran
+                          
+    def boyutAyarla(self,*args):
+        self.size_hint=None,None
+        self.width=Window.width*self.__pencereGenislikOran
+        self.height=Window.height*self.__pencereYukseklikOran
+
+        self.__etiketBoyutAyarla()
     
+
     def on_pre_open(self):
         self.__durum=AcilirPencereDurum.ACIK
         return super().on_pre_open()
