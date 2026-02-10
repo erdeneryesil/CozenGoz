@@ -1,4 +1,4 @@
-#!/home/carpan/Desktop/RoboLabirent/sanal_ortam/bin/python3
+#!/home/ogretmen/Projects/CozenGoz/sanal_ortam/bin/python3
 
 import sys
 import argparse
