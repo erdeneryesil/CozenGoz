@@ -1,4 +1,6 @@
-from siniflar import Goz,Reseptor,DuvarDurum
+from sabitler import DuvarDurum
+from goz import Goz,Reseptor
+
 
 class BenimGozum(Goz):
     def __init__(self,isim):

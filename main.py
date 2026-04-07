@@ -12,16 +12,22 @@ Config.set('graphics', 'top', '0')
 #Config.set('graphics', 'left', '2180') 
 #Config.set('graphics', 'top', '1')
 
+import time
+
 from kivy.app import App
 from kivy.uix.widget import Widget
 from kivy.lang import Builder
 from kivy.clock import Clock
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.label import Label
-from siniflar import DosyaTip,AtlasYuklemeBilgi,AcilirPencere,Labirent,GozImaj,Reseptor,ReseptorImaj,ReseptorKonum,Yon,Hareket,Denetle,Hucre,Konum,DuvarDurum,GozTip,GozAksiyon,Yukle
-from yarismaci import BenimGozum
-import time
 from kivy.graphics import Ellipse,Line,Color,Point,Triangle,Rotate,PushMatrix,PopMatrix
+
+from sabitler import GozTip,GozAksiyon,Hareket,Yon,DuvarDurum,ReseptorKonum,AtlasYuklemeBilgi,DosyaTip
+from temel import Denetle
+from grafik_pencere_dosya import GozImaj,ReseptorImaj,AcilirPencere
+from labirent import Labirent
+from goz import Reseptor
+from yarismaci import BenimGozum
 
 
 
@@ -55,11 +61,6 @@ class CozenGoz(FloatLayout):
         gozAtlasYuklemeBilgi={AtlasYuklemeBilgi.ACIKLAMA:"Göz görselleri yükleniyor",AtlasYuklemeBilgi.IMAJ_SINIF:GozImaj,AtlasYuklemeBilgi.AKSIYON_SINIF:GozAksiyon,AtlasYuklemeBilgi.TIP_SINIF:GozTip,AtlasYuklemeBilgi.YON_SINIF:Yon}
         reseptorAtlasYuklemeBilgi={AtlasYuklemeBilgi.ACIKLAMA:"Reseptör görselleri yükleniyor",AtlasYuklemeBilgi.IMAJ_SINIF:ReseptorImaj}
         atlasDosyaBilgiler=[gozAtlasYuklemeBilgi,reseptorAtlasYuklemeBilgi]
-
-
-
-
-        
 
 
         self.dosyaYuklemePencere=AcilirPencere()
@@ -102,7 +103,6 @@ class CozenGoz(FloatLayout):
 
         Clock.schedule_once(lambda dt: self.guncelleCanvas(self.yarisAlaniWidget), 0) #pencere açılması tamamlandığında, boyutların güncellenmesi için
         self.yarisBaslat()
-        
 
 
     def yarisBaslat(self):
@@ -147,12 +147,8 @@ class CozenGoz(FloatLayout):
             
             self.__yarisSaat=Clock.schedule_once(self.yarisTikTak, animasyonSure+CozenGoz.epsilon())
             return
-         
-
         
         self.__yarisSaat=Clock.schedule_once(self.yarisTikTak, CozenGoz.animasyonGecikme())
-        
-        
         
         
     def __gozHareketUygula(self,hareket):
