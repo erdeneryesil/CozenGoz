@@ -99,3 +99,21 @@ class AcilirPencereDurum(IntEnum):
     ISLEM_DEVAM_EDIYOR=4
     ISLEM_BITTI=5
     KAPALI=6
+
+#Yarışmadaki animasyona ilişkin sabit değerler
+class YarisAnimasyon:
+    # Epsilon Değeri (Hassas Zamanlama Payı)
+    __epsilon=1/120
+
+    __animasyonGecikme=1/60
+    __geriSayimGecikme=1
+
+    @staticmethod
+    def epsilon():
+        return YarisAnimasyon.__epsilon 
+    @staticmethod
+    def animasyonGecikme():
+        return YarisAnimasyon.__animasyonGecikme
+    @staticmethod
+    def geriSayimGecikme():
+        return YarisAnimasyon.__geriSayimGecikme 
