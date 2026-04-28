@@ -16,14 +16,7 @@ import time
 
 from kivy.app import App
 from kivy.lang import Builder
-from kivy.uix.floatlayout import FloatLayout
-
-from temel import Denetle
-from labirent import Labirent
-from goz import Reseptor
-from yarismaci import BenimGozum
-
-from pencereler import AnaPencere
+from pencereler import PencereYonetici
 
 
 Builder.load_file('dizayn.kv')
@@ -38,8 +31,8 @@ class Uygulama(App):
         self.title="ÇözenGöz"
         #self.roboLabirent=CozenGoz()
         #return self.roboLabirent
-        self.anaPencere=AnaPencere()
-        return self.anaPencere
+        self.pencereYonetici=PencereYonetici()
+        return self.pencereYonetici
     
 
 

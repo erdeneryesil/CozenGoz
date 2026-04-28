@@ -1,53 +1,76 @@
 #:kivy 2.3.1
 
+<PencereYonetici>:
+    AnaPencere:
+    YarisPencere:
+    #DenemePencere:
+    
+<DenemePencere>:
+    name:"denemePencere"
+    Label:
+        text:"Burası Deneme Penceresi"
+
 
 <AnaPencere>:
-    Button:
-        text:"Burası AnaPencere"
-        on_press:root.denemeClick()
+    name:"anaPencere"
+    FloatLayout:
+        Label:
+            canvas.before:
+                Color:
+                    rgba:.5,.1,.2,1
+                Rectangle:
+                    size:self.size
+            text:"Burası Ana Pencere"
+        Button:
+            size_hint:None,None
+            size:200,100
+            text:"Yarış Pencere Aç"
+            on_press:root.denemeClick()
         
 
 <YarisPencere>:
-    canvas.before:
-        Color:
-            rgba:(1,1,1,1)
-        Rectangle:
-            pos:self.pos
-            size:self.size
-    
-    Widget:
-        id:solAlan
-        size_hint:.1,1#.2,1
-        pos_hint:{'x':0,'y':0}
+    name:"yarisPencere"
+    FloatLayout:
         canvas.before:
             Color:
-                rgba:(.4,.4,.4,1)
-            Rectangle:
-                pos:self.pos
-                size:self.size
-    
-    AnchorLayout:
-        id:sagAlan
-
-        anchor_x:'center'
-        anchor_y:'center'
-        size_hint:1,1#.7,1
-        pos_hint:{'right':1,'y':0}
-        canvas.before:
-            Color:
-                rgba:(0,0,0,1)
+                rgba:(1,1,1,1)
             Rectangle:
                 pos:self.pos
                 size:self.size
         
         Widget:
-            id:yarisAlaniWidget
-            size_hint:.9,.9
-            pos_hint:{'center_x':.5,'center_y':.5}
+            id:solAlan
+            size_hint:.1,1#.2,1
+            pos_hint:{'x':0,'y':0}
             canvas.before:
                 Color:
-                    rgba:(0,0,0,1)#rgba:(.2,.2,.2,1)
+                    rgba:(.4,.4,.4,1)
                 Rectangle:
                     pos:self.pos
                     size:self.size
+        
+        AnchorLayout:
+            id:sagAlan
+
+            anchor_x:'center'
+            anchor_y:'center'
+            size_hint:1,1#.7,1
+            pos_hint:{'right':1,'y':0}
+            canvas.before:
+                Color:
+                    rgba:(0,0,0,1)
+                Rectangle:
+                    pos:self.pos
+                    size:self.size
+            
+            Widget:
+                id:yarisAlaniWidget
+                size_hint:.9,.9
+                pos_hint:{'center_x':.5,'center_y':.5}
+                canvas.before:
+                    Color:
+                        rgba:(0,0,0,1)#rgba:(.2,.2,.2,1)
+                    Rectangle:
+                        pos:self.pos
+                        size:self.size
     

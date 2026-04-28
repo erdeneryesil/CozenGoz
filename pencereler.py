@@ -1,6 +1,7 @@
 
 from kivy.uix.widget import Widget
 from kivy.clock import Clock
+from kivy.uix.screenmanager import ScreenManager,Screen
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.modalview import ModalView #Açılır Pencere
 from kivy.uix.label import Label
@@ -14,6 +15,11 @@ from yarismaci import BenimGozum
 from goz import Reseptor
 from labirent import Labirent
 from temel import Denetle
+
+class PencereYonetici(ScreenManager):
+    def __init__(self,**kwargs):
+        super().__init__()
+        
 
 class AcilirPencere(ModalView):
     #logo='assets/sahne/logo.png'
@@ -156,40 +162,42 @@ class AcilirPencere(ModalView):
         self.__durum=AcilirPencereDurum.KAPALI
         return super().on_dismiss()
 
-class AnaPencere(FloatLayout):
+class DenemePencere(Screen):
+    pass
+
+class AnaPencere(Screen):
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
-
+        print("asd")
+        
         self.yarisPencere=None
     
     def denemeClick(self):
-        print("sad")
-        #return self.yarisPencere
+        denemePencere=DenemePencere()
+
         self.yarisPencere=YarisPencere()
+        self.manager.current=self.yarisPencere.name
+        
 
-
-class YarisPencere(FloatLayout):
+class YarisPencere(Screen):
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
-
+    
+    def on_enter(self, *args):
+        self.__dosyaYuklemeBaslat()
+    
+    def __dosyaYuklemeBaslat(self):
         #önce dosyalar yüklensin
         gozAtlasYuklemeBilgi={AtlasYuklemeBilgi.ACIKLAMA:"Göz görselleri yükleniyor",AtlasYuklemeBilgi.IMAJ_SINIF:GozImaj,AtlasYuklemeBilgi.AKSIYON_SINIF:GozAksiyon,AtlasYuklemeBilgi.TIP_SINIF:GozTip,AtlasYuklemeBilgi.YON_SINIF:Yon}
         reseptorAtlasYuklemeBilgi={AtlasYuklemeBilgi.ACIKLAMA:"Reseptör görselleri yükleniyor",AtlasYuklemeBilgi.IMAJ_SINIF:ReseptorImaj}
         atlasDosyaBilgiler=[gozAtlasYuklemeBilgi,reseptorAtlasYuklemeBilgi]
 
-
-        self.dosyaYuklemePencere=AcilirPencere()
+        dosyaYuklemePencere=AcilirPencere()
 
         #dosya yükleme penceresi kapandığında, diğer işlemler başlasın
-        self.dosyaYuklemePencere.bind(on_dismiss=self.baslangicIslemleri)
-
-        self.dosyaYuklemePencere.dosyaYuklemeBaslat(DosyaTip.ATLAS,atlasDosyaBilgiler)
-
+        dosyaYuklemePencere.bind(on_dismiss=self.baslangicIslemleri)
+        dosyaYuklemePencere.dosyaYuklemeBaslat(DosyaTip.ATLAS,atlasDosyaBilgiler)
         
-        #Yukle.AtlasDosya(GozImaj,GozAksiyon,GozTip,Yon)
-        #Yukle.AtlasDosya(ReseptorImaj)
-        
-
     def baslangicIslemleri(self,instance):
         self.__yarisSaat=None
         self.labirent=None
