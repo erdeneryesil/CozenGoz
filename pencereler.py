@@ -1,24 +1,23 @@
 
-from kivy.uix.widget import Widget
-from kivy.clock import Clock
+
+
 from kivy.uix.screenmanager import ScreenManager,Screen
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.modalview import ModalView #Açılır Pencere
 from kivy.uix.label import Label
-from kivy.clock import mainthread
+
+from kivy.clock import mainthread, Clock
+
 from kivy.uix.boxlayout import BoxLayout
 from kivy.core.window import Window
 
 from grafik_pencere_dosya import Yukle,GozImaj,ReseptorImaj
 from sabitler import AtlasYuklemeBilgi,AcilirPencereTip,AcilirPencereDurum,YarisAnimasyon,DosyaTip,GozTip,GozAksiyon,Hareket,Yon,DuvarDurum,ReseptorKonum
-from yarismaci import BenimGozum
-from goz import Reseptor
-from labirent import Labirent
-from temel import Denetle
+from labirent import Yarisma
 
 class PencereYonetici(ScreenManager):
     def __init__(self,**kwargs):
-        super().__init__()
+        super().__init__(**kwargs)
         
 
 class AcilirPencere(ModalView):
@@ -30,18 +29,18 @@ class AcilirPencere(ModalView):
     #etiketBoyutOran={'dosya yükle pencere':.05,'seviye yükle pencere':.05,'oyun başlat pencere':.15,'oyun kaybetti pencere':.15,'oyun kazandı pencere':.15}#Etiketin, yazı boyutunun pencere yüksekliğine oranı
     #etiketYazi={'dosya yükle pencere':u'DOSYALAR Y\u00dbKLEN\u00ceYOR','seviye yükle pencere':u'OYUN Y\u00dbKLEN\u00ceYOR','oyun başlat pencere':u'SEV\u00ceYE ','oyun kaybetti pencere':u'OYUN B\u00ceTT\u00ce','oyun kazandı pencere':u'TEBR\u00ceKLER'}
 
-    __pencereGenislikOran=.9     #Açılır pencerenin genişliğinin, ana pencerenin genişliğine oranı
-    __pencereYukseklikOran=.9    #Açılır pencerenin yüksekliğinin, ana pencerenin yüksekliğine oranı
-    __etiketBoyutOran=.03         #Etiket yazı boyutunun, açılır pencerenin genişliğine oranı
-    ___etiketRenk=[.694,.157,.157,1]       #etiketin yazı rengi
-
+    __PENCERE_GENISLIK_ORAN=.9     #Açılır pencerenin genişliğinin, ana pencerenin genişliğine oranı
+    __PENCERE_YUKSEKLIK_ORAN=.9    #Açılır pencerenin yüksekliğinin, ana pencerenin yüksekliğine oranı
+    __ETIKET_BOYUT_ORAN=.03         #Etiket yazı boyutunun, açılır pencerenin genişliğine oranı
+    __ETIKET_RENK=[.694,.157,.157,1]       #etiketin yazı rengi
+    __ARKAPLAN_RENK=[.8,.8,.8,.7]
 
     
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
 
         self.background=''
-        self.background_color=[.8,.8,.8,.7]
+        self.background_color=AcilirPencere.__ARKAPLAN_RENK
 
         self.__tip=None
         self.__durum=None
@@ -51,7 +50,7 @@ class AcilirPencere(ModalView):
         self.__dosyaYuklemeIndis=0
         self.auto_dismiss=False
         self.__etiket=Label()
-        self.__etiket.color=self.___etiketRenk
+        self.__etiket.color=self.__ETIKET_RENK
         #self.__etiket.text="DENEME"
 
 
@@ -59,9 +58,7 @@ class AcilirPencere(ModalView):
         #self.__etiket.color=AcilirPencere.etiketRenk
         #self.__etiket.text=AcilirPencere.etiketYazi[self.__tip]
         
-        self.bind(pos=self.boyutAyarla, size=self.boyutAyarla)
-
-        
+        self.bind(pos=self.boyutAyarla, size=self.boyutAyarla)    
             
     def dosyaYuklemeBaslat(self,dosyaTip,dosyaYuklemeBilgiler):
         self.__dosyaYuklemeIndis = 0
@@ -140,12 +137,12 @@ class AcilirPencere(ModalView):
         self.__durum=AcilirPencereDurum.ACILMAYA_HAZIR
 
     def __etiketBoyutAyarla(self):
-        self.__etiket.font_size=self.width*self.__etiketBoyutOran
+        self.__etiket.font_size=self.width*self.__ETIKET_BOYUT_ORAN
                           
     def boyutAyarla(self,*args):
         self.size_hint=None,None
-        self.width=Window.width*self.__pencereGenislikOran
-        self.height=Window.height*self.__pencereYukseklikOran
+        self.width=Window.width*self.__PENCERE_GENISLIK_ORAN
+        self.height=Window.height*self.__PENCERE_YUKSEKLIK_ORAN
 
         self.__etiketBoyutAyarla()
     
@@ -162,29 +159,20 @@ class AcilirPencere(ModalView):
         self.__durum=AcilirPencereDurum.KAPALI
         return super().on_dismiss()
 
-class DenemePencere(Screen):
-    pass
 
 class AnaPencere(Screen):
     def __init__(self,**kwargs):
-        super().__init__(**kwargs)
-        print("asd")
-        
-        self.yarisPencere=None
-    
-    def denemeClick(self):
-        denemePencere=DenemePencere()
+        super().__init__()
 
-        self.yarisPencere=YarisPencere()
-        self.manager.current=self.yarisPencere.name
+        self.yarisma=Yarisma(self.ids.saha)
         
 
-class YarisPencere(Screen):
-    def __init__(self,**kwargs):
-        super().__init__(**kwargs)
-    
+    def yarisBaslatClick(self):
+        self.yarisma.baslat() 
+
     def on_enter(self, *args):
         self.__dosyaYuklemeBaslat()
+        
     
     def __dosyaYuklemeBaslat(self):
         #önce dosyalar yüklensin
@@ -195,172 +183,9 @@ class YarisPencere(Screen):
         dosyaYuklemePencere=AcilirPencere()
 
         #dosya yükleme penceresi kapandığında, diğer işlemler başlasın
-        dosyaYuklemePencere.bind(on_dismiss=self.baslangicIslemleri)
         dosyaYuklemePencere.dosyaYuklemeBaslat(DosyaTip.ATLAS,atlasDosyaBilgiler)
-        
-    def baslangicIslemleri(self,instance):
-        self.__yarisSaat=None
-        self.labirent=None
-        self.gozHucre=None
-        self.goz=None
-        self.gozImaj=None
-        self.reseptor=None
-        self.reseptorImaj=None
-        self.reseptorGuncellendi=None
-        
-        self.yarisAlaniWidget=self.ids.yarisAlaniWidget
-        self.yarisAlaniWidget.bind(pos=self.guncelleCanvas, size=self.guncelleCanvas)
-                
-        self.labirent=Labirent(3,3)
-        goz1=BenimGozum("ROBOT1")
-        self.goz=goz1
-        self.gozImaj=GozImaj(GozTip.GOZ1,Yon.baslangic())
-
-        self.gozHucre=self.labirent.baslangicHucre
-        
-        self.reseptor=Reseptor()
-        self.reseptorImaj=ReseptorImaj()
-
-        self.add_widget(self.gozImaj)
-        self.add_widget(self.reseptorImaj)
-
-        Clock.schedule_once(lambda dt: self.guncelleCanvas(self.yarisAlaniWidget), 0) #pencere açılması tamamlandığında, boyutların güncellenmesi için
-        self.yarisBaslat()
-
-
-    def yarisBaslat(self):
-        self.reseptorGuncellendi=False
-        self.oyunBitti=False
-        self.gozHucre=self.labirent.baslangicHucre
-        self.gozImaj.bekle()
-
-        #animasyonSure=GozImaj.animasyonSure(GozAksiyon.BEKLE, self.gozImaj.yon)
-        self.__yarisSaat=Clock.schedule_once(self.geriSayim,YarisAnimasyon.geriSayimGecikme())
-
-    def geriSayim(self,dt):
-        self.__yarisSaat=Clock.schedule_once(self.yarisTikTak,YarisAnimasyon.animasyonGecikme())
-
-    def yarisTikTak(self,dt):          
-        
-        if self.gozImaj.aksiyon!=GozAksiyon.BEKLE:
-            self.__yarisSaat=Clock.schedule_once(self.yarisTikTak,YarisAnimasyon.animasyonGecikme())
-            return
-        
-        if self.gozHucre==self.labirent.bitisHucre:           
-            print("bitti")
-            return
-                    
-        
-        if not self.reseptorGuncellendi:
-            animasyonSure=self.__reseptorGuncelle()
-            self.__yarisSaat=Clock.schedule_once(self.yarisTikTak, animasyonSure+YarisAnimasyon.epsilon() if animasyonSure > 0 else YarisAnimasyon.animasyonGecikme())
-            return
 
         
-        if self.gozImaj.animasyonTamamlandi:
-            self.gozImaj.animasyonBasladiResetle()
-            self.gozImaj.animasyonTamamlandiResetle()
-            x, y = self.labirent.hucreXY(self.gozHucre)
-            self.gozImaj.konumla(x, y, self.labirent.hucreKenarUzunluk)
-            self.reseptorGuncellendi = False
-            
-            
-            gozHareket = self.goz.kararVer(self.reseptor)
-            animasyonSure=self.__gozHareketUygula(gozHareket)
-            
-            self.__yarisSaat=Clock.schedule_once(self.yarisTikTak, animasyonSure+YarisAnimasyon.epsilon())
-            return
-        
-        self.__yarisSaat=Clock.schedule_once(self.yarisTikTak, YarisAnimasyon.animasyonGecikme())
-        
-        
-    def __gozHareketUygula(self,hareket):
-        match hareket:
-            case Hareket.SOLA_DON:
-                self.gozImaj.solaDon()#.yon=Yon((self.gozImaj.yon+1)%len(Yon))
-                #print("sola döndü")
-            case Hareket.SAGA_DON:
-                self.gozImaj.sagaDon()#.yon=Yon((self.gozImaj.yon-1)%len(Yon))
-                #print("sağa döndü")
-            case Hareket.ILERI:
-                hucreSatirNumara=self.gozHucre.satirNumara
-                hucreSutunNumara=self.gozHucre.sutunNumara
-                match self.gozImaj.yon:
-                    case Yon.SAG:
-                        hucreSutunNumara+=1
-                    case Yon.SOL:
-                        hucreSutunNumara-=1
-                    case Yon.ALT:
-                        hucreSatirNumara+=1
-                    case Yon.UST:
-                        hucreSatirNumara-=1
-                
-                duvar=self.labirent.duvar(self.gozHucre,self.labirent.hucre(hucreSatirNumara,hucreSutunNumara))
-                
-                if duvar.durum==DuvarDurum.ACIK:   
-                    self.gozHucre=self.labirent.hucre(hucreSatirNumara,hucreSutunNumara)
-                    self.gozImaj.git()
-                else:
-                    print("HÖSTT")
-                    #self.gozImaj.bekle()
 
-        return GozImaj.animasyonSure(self.gozImaj.aksiyon, self.gozImaj.yon)
-
-    def guncelleCanvas(self,*args):
-        if self.labirent is None:return
-
-        Denetle.TurHata(yarisAlani:=args[0],Widget)
-
-        self.labirent.guncelleOlculer(yarisAlani.x,yarisAlani.y,yarisAlani.width,yarisAlani.height)
-
-        
-        
-        canvas=yarisAlani.canvas#yarışın çizildiği canvas
-        canvas.clear()
-        with canvas:
-            self.labirent.ciz()
-        
-        x,y=self.labirent.hucreXY(self.gozHucre)
-        
-        self.gozImaj.guncelleOlculer(x,y,self.labirent.hucreKenarUzunluk)
-        self.reseptorImaj.guncelleOlculer(self.labirent.hucreKenarUzunluk)
-
-    def __reseptorGuncelle(self):
-               
-        yonFark = self.gozImaj.yon - Yon.baslangic()
-        gercekReseptorKonum=ReseptorKonum((self.reseptor.konumIndis+yonFark)%len(ReseptorKonum))
-        hucreX,hucreY=self.labirent.hucreXY(self.gozHucre)
-
-        komsuHucreler = self.labirent.komsuHucreler(self.gozHucre)
-        hedefHucre = komsuHucreler.get(Yon(gercekReseptorKonum))
-        
-        duvarDurum = DuvarDurum.KAPALI
-        if hedefHucre:
-            duvarDurum = self.labirent.duvar(self.gozHucre, hedefHucre).durum
-        self.reseptor.degerGuncelle(self.reseptor.konumIndis, duvarDurum)
-
-        if duvarDurum==DuvarDurum.ACIK:
-            if not self.reseptorImaj.animasyonBasladi:
-                self.reseptorImaj.animasyonTamamlandiResetle()
-                self.reseptorImaj.konumla(gercekReseptorKonum,hucreX,hucreY,self.labirent.hucreKenarUzunluk)
-            
-                self.reseptorImaj.duvarAcik()
-            
-                return ReseptorImaj.animasyonSure()
-            
-            if self.reseptorImaj.animasyonTamamlandi:
-                self.reseptorImaj.animasyonBasladiResetle()
-                self.reseptor.konumIndisGuncelle()
-
-                if self.reseptor.konumIndis == 0:
-                    self.reseptorGuncellendi = True
-
-        else:
-            self.reseptor.konumIndisGuncelle()
-
-            if self.reseptor.konumIndis == 0:
-                self.reseptorGuncellendi = True
-
-        return 0
 
 

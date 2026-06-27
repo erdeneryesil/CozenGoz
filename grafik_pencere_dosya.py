@@ -61,15 +61,18 @@ class ImajMeta(type(Image), ABCMeta):
     pass
 
 class Imaj(Image,metaclass=ImajMeta):
-    _dizin = None
-    _atlasDosya = None
-    _kareAd = None
-    _kareSayi = None
-    _kare = None
-    _gecikme = None
-    _orijinalBoyut = None
-    _boyutOran = None
-    _animasyonTekrar = None
+    #SABİTLER
+    _DIZIN = None
+    _ATLAS_DOSYA = None
+    _KARE_AD = None
+    _KARE = None
+    _KARE_SAYI = None
+    _GECIKME = None
+    _ORIJINAL_BOYUT = None
+    _BOYUT_ORAN = None
+    _ANIMASYON_TEKRAR = None
+
+
     _atlasYuklendi = False
 
 
@@ -119,7 +122,7 @@ class Imaj(Image,metaclass=ImajMeta):
 
     @classmethod
     def dizin(cls):
-        return cls._dizin
+        return cls._DIZIN
     @classmethod
     def atlasYuklendi(cls):
         return cls._atlasYuklendi
@@ -128,10 +131,10 @@ class Imaj(Image,metaclass=ImajMeta):
         cls._atlasYuklendi = deger
     @classmethod
     def orijinalBoyut(cls):
-        return cls._orijinalBoyut
+        return cls._ORIJINAL_BOYUT
     @classmethod
     def boyutOran(cls):
-        return cls._boyutOran
+        return cls._BOYUT_ORAN
     
     
     def __init__(self,**kwargs):
@@ -158,19 +161,19 @@ class Imaj(Image,metaclass=ImajMeta):
             self._animasyonSaat.cancel()
 
 class ReseptorImaj(Imaj):
-    _dizin="assets/reseptor"
-    _atlasDosya="reseptor.atlas"
+    #SABİTLER
+    _DIZIN="assets/reseptor"
+    _ATLAS_DOSYA="reseptor.atlas"
+    _KARE_AD="reseptor-yesil-"
+    _KARE=[]
+    _KARE_SAYI=8
+    _GECIKME=1/60
+    _ORIJINAL_BOYUT=340
+    _BOYUT_ORAN=1#hücre genişliğine oranı
+    _ANIMASYON_TEKRAR=1 # Animasyon kaç kere çalışacak
 
-    _kareAd="reseptor-yesil-"
-    _kareSayi=8
-    _kare=[]
-            
-    _gecikme=1/60
 
-    _orijinalBoyut=340
-    _boyutOran=1#hücre genişliğine oranı
     _atlasYuklendi=False # atlas dosyasının yüklenip yüklenmediğini kontrol edeceğimiz değişken. Yüklendiğine True olacak
-    _animasyonTekrar=1 # Animasyon kaç kere çalışacak
 
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
@@ -182,25 +185,25 @@ class ReseptorImaj(Imaj):
         
     @classmethod
     def atlasDosya(cls):
-        return cls._atlasDosya
+        return cls._ATLAS_DOSYA
     @classmethod
     def gecikme(cls):
-        return cls._gecikme
+        return cls._GECIKME
     @classmethod
     def animasyonTekrar(cls):
-        return cls._animasyonTekrar
+        return cls._ANIMASYON_TEKRAR
     @classmethod
     def kareAd(cls):
-        return cls._kareAd
+        return cls._KARE_AD
     @classmethod
     def kareSayi(cls):
-        return cls._kareSayi
+        return cls._KARE_SAYI
     @classmethod
     def kare(cls,numara):
-        return cls._kare[numara]
+        return cls._KARE[numara]
     @classmethod
     def kareEkle(cls,hamKare):
-        cls._kare.append(hamKare)
+        cls._KARE.append(hamKare)
     @classmethod
     def animasyonSure(cls):
         n = cls.kareSayi()
@@ -251,23 +254,23 @@ class ReseptorImaj(Imaj):
                 self.center_y=hucreY+hucreBoyut           
                     
 class GozImaj(Imaj):#animasyon ve çizim işlemlerinin yürütüleceğin sınıf
-    _dizin="assets/goz"
+    _DIZIN="assets/goz"
 
-    _atlasDosya={GozTip.GOZ1:"goz1.atlas",GozTip.GOZ2:"goz2.atlas",GozTip.GOZ3:"goz3.atlas",GozTip.GOZ4:"goz4.atlas"}
+    _ATLAS_DOSYA={GozTip.GOZ1:"goz1.atlas",GozTip.GOZ2:"goz2.atlas",GozTip.GOZ3:"goz3.atlas",GozTip.GOZ4:"goz4.atlas"}
     
-    _kareAd={
+    _KARE_AD={
         Yon.SOL:{GozAksiyon.BEKLE:"sol-bekle-",GozAksiyon.GIT:"sol-git-",GozAksiyon.PATLA:"sol-patla-",GozAksiyon.SOLA_DON:"sol-sola-don-",GozAksiyon.SAGA_DON:"sol-saga-don-"},
         Yon.ALT:{GozAksiyon.BEKLE:"alt-bekle-",GozAksiyon.GIT:"alt-git-",GozAksiyon.PATLA:"alt-patla-",GozAksiyon.SOLA_DON:"alt-sola-don-",GozAksiyon.SAGA_DON:"alt-saga-don-"},
         Yon.SAG:{GozAksiyon.BEKLE:"sag-bekle-",GozAksiyon.GIT:"sag-git-",GozAksiyon.PATLA:"sag-patla-",GozAksiyon.SOLA_DON:"sag-sola-don-",GozAksiyon.SAGA_DON:"sag-saga-don-"},
         Yon.UST:{GozAksiyon.BEKLE:"ust-bekle-",GozAksiyon.GIT:"ust-git-",GozAksiyon.PATLA:"ust-patla-",GozAksiyon.SOLA_DON:"ust-sola-don-",GozAksiyon.SAGA_DON:"ust-saga-don-"},
     }
-    _kareSayi={#animasyonların içerdiği resim sayısı.
+    _KARE_SAYI={#animasyonların içerdiği resim sayısı.
         Yon.SOL:{GozAksiyon.BEKLE:20,GozAksiyon.GIT:6,GozAksiyon.PATLA:11,GozAksiyon.SOLA_DON:11,GozAksiyon.SAGA_DON:11},
         Yon.ALT:{GozAksiyon.BEKLE:20,GozAksiyon.GIT:6,GozAksiyon.PATLA:9,GozAksiyon.SOLA_DON:11,GozAksiyon.SAGA_DON:11},
         Yon.SAG:{GozAksiyon.BEKLE:20,GozAksiyon.GIT:6,GozAksiyon.PATLA:11,GozAksiyon.SOLA_DON:11,GozAksiyon.SAGA_DON:11},
         Yon.UST:{GozAksiyon.BEKLE:20,GozAksiyon.GIT:6,GozAksiyon.PATLA:9,GozAksiyon.SOLA_DON:11,GozAksiyon.SAGA_DON:11}
     }
-    _kare={#animasyonların içerdiği görseller. Yukle.AtlasDosya fonksiyonunda yüklenecek
+    _KARE={#animasyonların içerdiği görseller. Yukle.AtlasDosya fonksiyonunda yüklenecek
         GozTip.GOZ1:{
             Yon.SOL:{GozAksiyon.BEKLE:[],GozAksiyon.GIT:[],GozAksiyon.PATLA:[],GozAksiyon.SOLA_DON:[],GozAksiyon.SAGA_DON:[]},
             Yon.ALT:{GozAksiyon.BEKLE:[],GozAksiyon.GIT:[],GozAksiyon.PATLA:[],GozAksiyon.SOLA_DON:[],GozAksiyon.SAGA_DON:[]},
@@ -294,12 +297,12 @@ class GozImaj(Imaj):#animasyon ve çizim işlemlerinin yürütüleceğin sınıf
         }
         
     }
-    _gecikme={GozAksiyon.BEKLE:2/60,GozAksiyon.GIT:2/60,GozAksiyon.PATLA:2/60,GozAksiyon.SOLA_DON:2/60,GozAksiyon.SAGA_DON:2/60}#minimum değer 3/60. Bunun altında bir değer verme
+    _GECIKME={GozAksiyon.BEKLE:2/60,GozAksiyon.GIT:2/60,GozAksiyon.PATLA:2/60,GozAksiyon.SOLA_DON:2/60,GozAksiyon.SAGA_DON:2/60}#minimum değer 3/60. Bunun altında bir değer verme
 
-    _orijinalBoyut=563#genişlik,yükseklik aynı
-    _boyutOran=1.5#hücre genişliğine oranı
+    _ORIJINAL_BOYUT=563#genişlik,yükseklik aynı
+    _BOYUT_ORAN=1.5#hücre genişliğine oranı
     _atlasYuklendi=False # atlas dosyalarının yüklenip yğklenmediğini kontrol edeceğimiz değişken. Yüklendiğine True olacak
-    _animasyonTekrar={GozAksiyon.BEKLE:1,GozAksiyon.GIT:3,GozAksiyon.PATLA:1,GozAksiyon.SOLA_DON:1,GozAksiyon.SAGA_DON:1} # Animasyon kaç kere çalışacak
+    _ANIMASYON_TEKRAR={GozAksiyon.BEKLE:1,GozAksiyon.GIT:3,GozAksiyon.PATLA:1,GozAksiyon.SOLA_DON:1,GozAksiyon.SAGA_DON:1} # Animasyon kaç kere çalışacak
 
 
     
@@ -320,25 +323,25 @@ class GozImaj(Imaj):#animasyon ve çizim işlemlerinin yürütüleceğin sınıf
 
     @classmethod
     def atlasDosya(cls, tip):
-        return cls._atlasDosya[tip]
+        return cls._ATLAS_DOSYA[tip]
     @classmethod
     def gecikme(cls, aksiyon):
-        return cls._gecikme[aksiyon]
+        return cls._GECIKME[aksiyon]
     @classmethod
     def animasyonTekrar(cls, aksiyon):
-        return cls._animasyonTekrar[aksiyon]
+        return cls._ANIMASYON_TEKRAR[aksiyon]
     @classmethod
     def kareAd(cls,aksiyon,yon):
-        return cls._kareAd[yon][aksiyon]
+        return cls._KARE_AD[yon][aksiyon]
     @classmethod
     def kareSayi(cls,aksiyon,yon):
-        return cls._kareSayi[yon][aksiyon]
+        return cls._KARE_SAYI[yon][aksiyon]
     @classmethod
     def kare(cls,numara,aksiyon,tip,yon):
-        return cls._kare[tip][yon][aksiyon][numara]
+        return cls._KARE[tip][yon][aksiyon][numara]
     @classmethod
     def kareEkle(cls,hamKare,aksiyon,tip,yon):
-        cls._kare[tip][yon][aksiyon].append(hamKare)
+        cls._KARE[tip][yon][aksiyon].append(hamKare)
     @classmethod
     def animasyonSure(cls, aksiyon, yon):
         n = cls.kareSayi(aksiyon, yon)

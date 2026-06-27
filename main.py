@@ -1,17 +1,18 @@
 from kivy.config import Config
-Config.set('graphics', 'width', '800')
-Config.set('graphics', 'height', '600')
+#Config.set('graphics', 'width', '800')
+#Config.set('graphics', 'height', '600')
 
 # Manuel konumlandırmayı aktif et
-Config.set('graphics', 'position', 'custom')
+#Config.set('graphics', 'position', 'custom')
 
 # Sol ve Üst koordinatları belirle
 # Örneğin 2. monitörünüz ana monitörün sağındaysa ve ana monitör 1920px genişliğindeyse:
-Config.set('graphics', 'left', '1920') 
-Config.set('graphics', 'top', '0')
+#Config.set('graphics', 'left', '1920') 
+#Config.set('graphics', 'top', '0')
 #Config.set('graphics', 'left', '2180') 
 #Config.set('graphics', 'top', '1')
-
+Config.set('graphics', 'window_state', 'maximized') 
+#Config.set('graphics', 'fullscreen', 'auto')
 import time
 
 from kivy.app import App
@@ -22,8 +23,9 @@ from pencereler import PencereYonetici
 Builder.load_file('dizayn.kv')
 
 
-
-
+from kivy.uix.widget import Widget
+class Pencere(Widget):
+    pass
     
 
 class Uygulama(App):
@@ -33,6 +35,7 @@ class Uygulama(App):
         #return self.roboLabirent
         self.pencereYonetici=PencereYonetici()
         return self.pencereYonetici
+
     
 
 

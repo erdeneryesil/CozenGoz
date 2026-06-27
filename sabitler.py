@@ -3,6 +3,97 @@
 
 from enum import IntEnum
 
+
+    
+class EkranSabit:
+    #uygulama ekranının max boyutları
+    __MAX_GENISLIK=3840
+    __MAX_YUKSEKLIK=2160
+    
+    #solPanel,yarismaPanel,sagPanel genişlik oranları
+    __SOL_PANEL_GENISLIK_ORAN=.15
+    __YARISMA_PANEL_GENISLIK_ORAN=.7 #aynı zamanda, sahanın; ekran genişliğine oranı.
+    __SAG_PANEL_GENISLIK_ORAN=.15
+
+    #yarışma panelinde; sahanın altında ve üstünde alan bırakıldı
+    __SAHA_YUKSEKLIK_ORAN=.8
+    __SAHA_UST_YUKSEKLIK_ORAN=.1
+    __SAHA_ALT_YUKSEKLIK_ORAN=.1
+
+    #labirent çizimi ile alakalı değerler
+    __LABIRENT_KENARLIK_KALINLIK_ORAN=300
+
+    #saha max boyutlarında iken, sahip olduğu ölçü ve koordinatlar
+    __MAX_SAHA_GENISLIK=__MAX_GENISLIK*__YARISMA_PANEL_GENISLIK_ORAN
+    __MAX_SAHA_YUKSEKLIK=__MAX_YUKSEKLIK*__SAHA_YUKSEKLIK_ORAN
+    __MAX_SAHA_KENARLIK_KALINLIK=__MAX_GENISLIK*__YARISMA_PANEL_GENISLIK_ORAN/__LABIRENT_KENARLIK_KALINLIK_ORAN
+
+    @staticmethod
+    def maxSahaHucreKenarUzunluk(sutunSayi):
+        return EkranSabit.__MAX_SAHA_GENISLIK/sutunSayi
+    
+    @staticmethod
+    def maxGenislik():
+        return EkranSabit.__MAX_GENISLIK
+    @staticmethod
+    def maxYukseklik():
+        return EkranSabit.__MAX_YUKSEKLIK
+    
+    @staticmethod
+    def solPanelGenislikOran():
+        return EkranSabit.__SOL_PANEL_GENISLIK_ORAN
+    @staticmethod
+    def yarismaPanelGenislikOran():
+        return EkranSabit.__YARISMA_PANEL_GENISLIK_ORAN
+    @staticmethod
+    def sagPanelGenislikOran():
+        return EkranSabit.__SAG_PANEL_GENISLIK_ORAN
+    
+
+    @staticmethod
+    def sahaYukseklikOran():
+        return EkranSabit.__SAHA_YUKSEKLIK_ORAN
+    @staticmethod
+    def sahaUstYukseklikOran():
+        return EkranSabit.__SAHA_UST_YUKSEKLIK_ORAN
+    @staticmethod
+    def sahaAltYukseklikOran():
+        return EkranSabit.__SAHA_ALT_YUKSEKLIK_ORAN
+    
+    @staticmethod
+    def labirentKenarlikKalinlikOran():
+        return EkranSabit.__LABIRENT_KENARLIK_KALINLIK_ORAN
+    
+    @staticmethod
+    def maxSahaGenislik():
+        return EkranSabit.__MAX_SAHA_GENISLIK
+    @staticmethod
+    def maxSahaYukseklik():
+        return EkranSabit.__MAX_SAHA_YUKSEKLIK
+    @staticmethod
+    def maxSahaX():
+        return EkranSabit.__maxSahaX
+    @staticmethod
+    def maxSahaY():
+        return EkranSabit.__maxSahaY
+    @staticmethod
+    def maxSahaNerkezX():
+        return EkranSabit.__maxSahaNerkezX
+    @staticmethod
+    def maxSahaNerkezY():
+        return EkranSabit.__maxSahaNerkezY
+    @staticmethod
+    def maxSahaSolUstX():
+        return EkranSabit.__maxSahaSolUstX
+    @staticmethod
+    def maxSahaSolUstY():
+        return EkranSabit.__maxSahaSolUstY
+    @staticmethod
+    def maxSahaKenarlikKalinlik():
+        return EkranSabit.__MAX_SAHA_KENARLIK_KALINLIK
+
+
+    
 class LabirentTip(IntEnum):
     KARE=0
     YATAY=1
@@ -46,16 +137,16 @@ class Yon(IntEnum):#sıralama SOL,ALT,SAG,UST olmalı. Matematiksel işlemler ya
     SAG=2
     UST=3
 
-    __donusAci=90   #her dönüş 90 derece dönmesi anlamına geliyor
-    __baslangic=UST
+    __DONUS_ACI=90   #her dönüş 90 derece dönmesi anlamına geliyor
+    __BASLANGIC=UST
     
     @staticmethod
     def baslangic():
-        return Yon.__baslangic
+        return Yon.__BASLANGIC
     
     @staticmethod
     def donusAci():
-        return Yon.__donusAci
+        return Yon.__DONUS_ACI
     
     @staticmethod
     def solaDon(yon):
@@ -102,18 +193,20 @@ class AcilirPencereDurum(IntEnum):
 
 #Yarışmadaki animasyona ilişkin sabit değerler
 class YarisAnimasyon:
-    # Epsilon Değeri (Hassas Zamanlama Payı)
-    __epsilon=1/120
+    #SABİTLER
 
-    __animasyonGecikme=1/60
-    __geriSayimGecikme=1
+    # Epsilon Değeri (Hassas Zamanlama Payı)
+    __EPSILON=1/120
+
+    __ANIMASYON_GECIKME=1/60
+    __GERI_SAYIM_GECIKME=1
 
     @staticmethod
     def epsilon():
-        return YarisAnimasyon.__epsilon 
+        return YarisAnimasyon.__EPSILON 
     @staticmethod
     def animasyonGecikme():
-        return YarisAnimasyon.__animasyonGecikme
+        return YarisAnimasyon.__ANIMASYON_GECIKME
     @staticmethod
     def geriSayimGecikme():
-        return YarisAnimasyon.__geriSayimGecikme 
+        return YarisAnimasyon.__GERI_SAYIM_GECIKME 
