@@ -1,6 +1,5 @@
 #TEMEL VERİ YAPILARI VE DOĞRULAMA ARAÇLARI
 
-
 class Denetle:
     @staticmethod
     def TurHata(deger,tur):#Bir nesneye atama yapılırken, doğru türde bir değer mi diye kontrol ediliyor
@@ -34,9 +33,9 @@ class Konum:
     def sutunNumara(self):
         return self.__sutunNumara
     
-    def satirDegistir(self,degisim,max=99):
+    def satirDegistir(self,degisim):
         self.__satir+=degisim
 
-    def sutunDegistir(self,degisim,max=99):
+    def sutunDegistir(self,degisim):
         self.__sutun+=degisim
 

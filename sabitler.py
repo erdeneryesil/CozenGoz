@@ -1,115 +1,13 @@
 # SABİT VE GLOBAL SINIFLAR
 
-
 from enum import IntEnum
 
+#IntEnum SINIFLAR
 
+class ImajTip(IntEnum):
+    GOZ_IMAJ=0
+    RESEPTOR_IMAJ=1
     
-class EkranSabit:
-    #uygulama ekranının max boyutları
-    __MAX_GENISLIK=3840
-    __MAX_YUKSEKLIK=2160
-    
-    #solPanel,yarismaPanel,sagPanel genişlik oranları
-    __SOL_PANEL_GENISLIK_ORAN=.15
-    __YARISMA_PANEL_GENISLIK_ORAN=.7 #aynı zamanda, sahanın; ekran genişliğine oranı.
-    __SAG_PANEL_GENISLIK_ORAN=.15
-
-    #yarışma panelinde; sahanın altında ve üstünde alan bırakıldı
-    __SAHA_YUKSEKLIK_ORAN=.8
-    __SAHA_UST_YUKSEKLIK_ORAN=.1
-    __SAHA_ALT_YUKSEKLIK_ORAN=.1
-
-    #labirent çizimi ile alakalı değerler
-    __LABIRENT_KENARLIK_KALINLIK_ORAN=300
-
-    #saha max boyutlarında iken, sahip olduğu ölçü ve koordinatlar
-    __MAX_SAHA_GENISLIK=__MAX_GENISLIK*__YARISMA_PANEL_GENISLIK_ORAN
-    __MAX_SAHA_YUKSEKLIK=__MAX_YUKSEKLIK*__SAHA_YUKSEKLIK_ORAN
-    __MAX_SAHA_KENARLIK_KALINLIK=__MAX_GENISLIK*__YARISMA_PANEL_GENISLIK_ORAN/__LABIRENT_KENARLIK_KALINLIK_ORAN
-
-    @staticmethod
-    def maxSahaHucreKenarUzunluk(sutunSayi):
-        return EkranSabit.__MAX_SAHA_GENISLIK/sutunSayi
-    
-    @staticmethod
-    def maxGenislik():
-        return EkranSabit.__MAX_GENISLIK
-    @staticmethod
-    def maxYukseklik():
-        return EkranSabit.__MAX_YUKSEKLIK
-    
-    @staticmethod
-    def solPanelGenislikOran():
-        return EkranSabit.__SOL_PANEL_GENISLIK_ORAN
-    @staticmethod
-    def yarismaPanelGenislikOran():
-        return EkranSabit.__YARISMA_PANEL_GENISLIK_ORAN
-    @staticmethod
-    def sagPanelGenislikOran():
-        return EkranSabit.__SAG_PANEL_GENISLIK_ORAN
-    
-
-    @staticmethod
-    def sahaYukseklikOran():
-        return EkranSabit.__SAHA_YUKSEKLIK_ORAN
-    @staticmethod
-    def sahaUstYukseklikOran():
-        return EkranSabit.__SAHA_UST_YUKSEKLIK_ORAN
-    @staticmethod
-    def sahaAltYukseklikOran():
-        return EkranSabit.__SAHA_ALT_YUKSEKLIK_ORAN
-    
-    @staticmethod
-    def labirentKenarlikKalinlikOran():
-        return EkranSabit.__LABIRENT_KENARLIK_KALINLIK_ORAN
-    
-    @staticmethod
-    def maxSahaGenislik():
-        return EkranSabit.__MAX_SAHA_GENISLIK
-    @staticmethod
-    def maxSahaYukseklik():
-        return EkranSabit.__MAX_SAHA_YUKSEKLIK
-    @staticmethod
-    def maxSahaX():
-        return EkranSabit.__maxSahaX
-    @staticmethod
-    def maxSahaY():
-        return EkranSabit.__maxSahaY
-    @staticmethod
-    def maxSahaNerkezX():
-        return EkranSabit.__maxSahaNerkezX
-    @staticmethod
-    def maxSahaNerkezY():
-        return EkranSabit.__maxSahaNerkezY
-    @staticmethod
-    def maxSahaSolUstX():
-        return EkranSabit.__maxSahaSolUstX
-    @staticmethod
-    def maxSahaSolUstY():
-        return EkranSabit.__maxSahaSolUstY
-    @staticmethod
-    def maxSahaKenarlikKalinlik():
-        return EkranSabit.__MAX_SAHA_KENARLIK_KALINLIK
-
-
-    
-class LabirentTip(IntEnum):
-    KARE=0
-    YATAY=1
-    DIKEY=2
-    def __str__(self):
-        return f"Labirent Tipi : {self.name}"
-    
-    @staticmethod
-    def belirle(satirSayi,sutunSayi):
-        if satirSayi>sutunSayi:
-            return LabirentTip.DIKEY
-        elif sutunSayi>satirSayi:
-            return LabirentTip.YATAY
-        else:
-            return LabirentTip.KARE
-
 class GozTip(IntEnum):
     GOZ1=1
     GOZ2=2
@@ -191,22 +89,143 @@ class AcilirPencereDurum(IntEnum):
     ISLEM_BITTI=5
     KAPALI=6
 
+class LabirentTip(IntEnum):
+    KARE=0
+    YATAY=1
+    DIKEY=2
+    def __str__(self):
+        return f"Labirent Tipi : {self.name}"
+    
+    @staticmethod
+    def belirle(satirSayi,sutunSayi):
+        if satirSayi>sutunSayi:
+            return LabirentTip.DIKEY
+        elif sutunSayi>satirSayi:
+            return LabirentTip.YATAY
+        else:
+            return LabirentTip.KARE
+        
+#SABİT DEĞERLERİ İÇEREN STATİK SINIFLAR
+class SabitMetaClass(type):#sadece sabit değerleri içerecek olan statik sınıflar, bu sınıftan metaclass ile kalıtım alacak
+    """Sınıf seviyesindeki özniteliklerin değiştirilmesini veya silinmesini engeller."""
+    def __setattr__(cls, name, value):
+        raise AttributeError(f"'{cls.__name__}' statik bir sınıftır; '{name}' sabiti değiştirilemez.")
+
+    def __delattr__(cls, name):
+        raise AttributeError(f"'{cls.__name__}' statik bir sınıftır; '{name}' sabiti silinemez.")
+
+class ImajSabit(metaclass=SabitMetaClass):
+    DIZIN={ImajTip.RESEPTOR_IMAJ:"assets/reseptor",ImajTip.GOZ_IMAJ:"assets/goz"}
+    ATLAS_DOSYA={
+                    ImajTip.RESEPTOR_IMAJ:"reseptor.atlas",
+                    ImajTip.GOZ_IMAJ:{GozTip.GOZ1:"goz1.atlas",GozTip.GOZ2:"goz2.atlas",GozTip.GOZ3:"goz3.atlas",GozTip.GOZ4:"goz4.atlas"}
+                }
+    KARE_AD={
+                ImajTip.RESEPTOR_IMAJ:"reseptor-yesil-",
+                ImajTip.GOZ_IMAJ:{
+                    Yon.SOL:{GozAksiyon.BEKLE:"sol-bekle-",GozAksiyon.GIT:"sol-git-",GozAksiyon.PATLA:"sol-patla-",GozAksiyon.SOLA_DON:"sol-sola-don-",GozAksiyon.SAGA_DON:"sol-saga-don-"},
+                    Yon.ALT:{GozAksiyon.BEKLE:"alt-bekle-",GozAksiyon.GIT:"alt-git-",GozAksiyon.PATLA:"alt-patla-",GozAksiyon.SOLA_DON:"alt-sola-don-",GozAksiyon.SAGA_DON:"alt-saga-don-"},
+                    Yon.SAG:{GozAksiyon.BEKLE:"sag-bekle-",GozAksiyon.GIT:"sag-git-",GozAksiyon.PATLA:"sag-patla-",GozAksiyon.SOLA_DON:"sag-sola-don-",GozAksiyon.SAGA_DON:"sag-saga-don-"},
+                    Yon.UST:{GozAksiyon.BEKLE:"ust-bekle-",GozAksiyon.GIT:"ust-git-",GozAksiyon.PATLA:"ust-patla-",GozAksiyon.SOLA_DON:"ust-sola-don-",GozAksiyon.SAGA_DON:"ust-saga-don-"},
+                }
+            }
+    KARE_SAYI={
+                ImajTip.RESEPTOR_IMAJ:8,
+                ImajTip.GOZ_IMAJ:{#animasyonların içerdiği resim sayısı.
+                    Yon.SOL:{GozAksiyon.BEKLE:20,GozAksiyon.GIT:6,GozAksiyon.PATLA:11,GozAksiyon.SOLA_DON:11,GozAksiyon.SAGA_DON:11},
+                    Yon.ALT:{GozAksiyon.BEKLE:20,GozAksiyon.GIT:6,GozAksiyon.PATLA:9,GozAksiyon.SOLA_DON:11,GozAksiyon.SAGA_DON:11},
+                    Yon.SAG:{GozAksiyon.BEKLE:20,GozAksiyon.GIT:6,GozAksiyon.PATLA:11,GozAksiyon.SOLA_DON:11,GozAksiyon.SAGA_DON:11},
+                    Yon.UST:{GozAksiyon.BEKLE:20,GozAksiyon.GIT:6,GozAksiyon.PATLA:9,GozAksiyon.SOLA_DON:11,GozAksiyon.SAGA_DON:11}
+                }
+            }
+    GECIKME={
+                ImajTip.RESEPTOR_IMAJ:1/60,
+                ImajTip.GOZ_IMAJ:{GozAksiyon.BEKLE:2/60,GozAksiyon.GIT:2/60,GozAksiyon.PATLA:2/60,GozAksiyon.SOLA_DON:2/60,GozAksiyon.SAGA_DON:2/60}#minimum değer 3/60. Bunun altında bir değer verme
+            }
+    ORIJINAL_BOYUT={ImajTip.RESEPTOR_IMAJ:340,ImajTip.GOZ_IMAJ:563}#genişlik,yükseklik aynı
+    BOYUT_ORAN={ImajTip.RESEPTOR_IMAJ:1,ImajTip.GOZ_IMAJ:1.5}#hücre genişliğine oranı
+    ANIMASYON_TEKRAR={
+                ImajTip.RESEPTOR_IMAJ:1,
+                ImajTip.GOZ_IMAJ:{GozAksiyon.BEKLE:1,GozAksiyon.GIT:3,GozAksiyon.PATLA:1,GozAksiyon.SOLA_DON:1,GozAksiyon.SAGA_DON:1}
+    } # Animasyon kaç kere çalışacak
+    
+    BOS_KARE={
+                ImajTip.RESEPTOR_IMAJ:[],
+                ImajTip.GOZ_IMAJ:{#animasyonların içerdiği görseller. Yukle.AtlasDosya fonksiyonunda yüklenecek
+                    GozTip.GOZ1:{
+                        Yon.SOL:{GozAksiyon.BEKLE:[],GozAksiyon.GIT:[],GozAksiyon.PATLA:[],GozAksiyon.SOLA_DON:[],GozAksiyon.SAGA_DON:[]},
+                        Yon.ALT:{GozAksiyon.BEKLE:[],GozAksiyon.GIT:[],GozAksiyon.PATLA:[],GozAksiyon.SOLA_DON:[],GozAksiyon.SAGA_DON:[]},
+                        Yon.SAG:{GozAksiyon.BEKLE:[],GozAksiyon.GIT:[],GozAksiyon.PATLA:[],GozAksiyon.SOLA_DON:[],GozAksiyon.SAGA_DON:[]},
+                        Yon.UST:{GozAksiyon.BEKLE:[],GozAksiyon.GIT:[],GozAksiyon.PATLA:[],GozAksiyon.SOLA_DON:[],GozAksiyon.SAGA_DON:[]}
+                    },
+                    GozTip.GOZ2:{
+                        Yon.SOL:{GozAksiyon.BEKLE:[],GozAksiyon.GIT:[],GozAksiyon.PATLA:[],GozAksiyon.SOLA_DON:[],GozAksiyon.SAGA_DON:[]},
+                        Yon.ALT:{GozAksiyon.BEKLE:[],GozAksiyon.GIT:[],GozAksiyon.PATLA:[],GozAksiyon.SOLA_DON:[],GozAksiyon.SAGA_DON:[]},
+                        Yon.SAG:{GozAksiyon.BEKLE:[],GozAksiyon.GIT:[],GozAksiyon.PATLA:[],GozAksiyon.SOLA_DON:[],GozAksiyon.SAGA_DON:[]},
+                        Yon.UST:{GozAksiyon.BEKLE:[],GozAksiyon.GIT:[],GozAksiyon.PATLA:[],GozAksiyon.SOLA_DON:[],GozAksiyon.SAGA_DON:[]}
+                    },
+                    GozTip.GOZ3:{
+                        Yon.SOL:{GozAksiyon.BEKLE:[],GozAksiyon.GIT:[],GozAksiyon.PATLA:[],GozAksiyon.SOLA_DON:[],GozAksiyon.SAGA_DON:[]},
+                        Yon.ALT:{GozAksiyon.BEKLE:[],GozAksiyon.GIT:[],GozAksiyon.PATLA:[],GozAksiyon.SOLA_DON:[],GozAksiyon.SAGA_DON:[]},
+                        Yon.SAG:{GozAksiyon.BEKLE:[],GozAksiyon.GIT:[],GozAksiyon.PATLA:[],GozAksiyon.SOLA_DON:[],GozAksiyon.SAGA_DON:[]},
+                        Yon.UST:{GozAksiyon.BEKLE:[],GozAksiyon.GIT:[],GozAksiyon.PATLA:[],GozAksiyon.SOLA_DON:[],GozAksiyon.SAGA_DON:[]}
+                    },
+                    GozTip.GOZ4:{
+                        Yon.SOL:{GozAksiyon.BEKLE:[],GozAksiyon.GIT:[],GozAksiyon.PATLA:[],GozAksiyon.SOLA_DON:[],GozAksiyon.SAGA_DON:[]},
+                        Yon.ALT:{GozAksiyon.BEKLE:[],GozAksiyon.GIT:[],GozAksiyon.PATLA:[],GozAksiyon.SOLA_DON:[],GozAksiyon.SAGA_DON:[]},
+                        Yon.SAG:{GozAksiyon.BEKLE:[],GozAksiyon.GIT:[],GozAksiyon.PATLA:[],GozAksiyon.SOLA_DON:[],GozAksiyon.SAGA_DON:[]},
+                        Yon.UST:{GozAksiyon.BEKLE:[],GozAksiyon.GIT:[],GozAksiyon.PATLA:[],GozAksiyon.SOLA_DON:[],GozAksiyon.SAGA_DON:[]}
+                    }   
+                }
+            }
+
+class HucreSabit(metaclass=SabitMetaClass):
+    TIP_BASLANGIC_KEY="baslangic"
+    TIP_BITIS_KEY="bitis"
+    TIP_YOL_KEY="yol"
+    TIP_RENK_KEY="renk"
+    TIP_UZUNLUK_CARPAN_KEY="uzunlukCarpan"
+    SAYI_KEY="sayı"
+    TIP={
+        TIP_BASLANGIC_KEY:{
+            TIP_RENK_KEY:{"r":245/255,"g":73/255,"b":39/255,"a":1},
+            TIP_UZUNLUK_CARPAN_KEY:1},
+        TIP_BITIS_KEY:{
+            TIP_RENK_KEY:{"r":219/255,"g":88/255,"b":88/255,"a":1},
+            TIP_UZUNLUK_CARPAN_KEY:1},
+        TIP_YOL_KEY:{
+            TIP_RENK_KEY:{"r":255/255,"g":247/255,"b":173/255,"a":0.5},
+            TIP_UZUNLUK_CARPAN_KEY:1.0}
+        }
+
+class EkranSabit(metaclass=SabitMetaClass):
+    #uygulama ekranının max boyutları
+    MAX_GENISLIK=3840
+    MAX_YUKSEKLIK=2160
+    
+    #solPanel,yarismaPanel,sagPanel genişlik oranları
+    SOL_PANEL_GENISLIK_ORAN=.15
+    YARISMA_PANEL_GENISLIK_ORAN=.7 #aynı zamanda, sahanın; ekran genişliğine oranı.
+    SAG_PANEL_GENISLIK_ORAN=.15
+
+    #yarışma panelinde; sahanın altında ve üstünde alan bırakıldı
+    SAHA_YUKSEKLIK_ORAN=.8
+    SAHA_UST_YUKSEKLIK_ORAN=.1
+    SAHA_ALT_YUKSEKLIK_ORAN=.1
+
+    #labirent çizimi ile alakalı değerler
+    LABIRENT_KENARLIK_KALINLIK_ORAN=300
+
+    #saha max boyutlarında iken, sahip olduğu ölçü ve koordinatlar
+    MAX_SAHA_GENISLIK=MAX_GENISLIK*YARISMA_PANEL_GENISLIK_ORAN
+    MAX_SAHA_YUKSEKLIK=MAX_YUKSEKLIK*SAHA_YUKSEKLIK_ORAN
+    MAX_SAHA_KENARLIK_KALINLIK=MAX_GENISLIK*YARISMA_PANEL_GENISLIK_ORAN/LABIRENT_KENARLIK_KALINLIK_ORAN
+
+
 #Yarışmadaki animasyona ilişkin sabit değerler
-class YarisAnimasyon:
-    #SABİTLER
-
+class YarisAnimasyon(metaclass=SabitMetaClass):
     # Epsilon Değeri (Hassas Zamanlama Payı)
-    __EPSILON=1/120
+    EPSILON=1/120
 
-    __ANIMASYON_GECIKME=1/60
-    __GERI_SAYIM_GECIKME=1
-
-    @staticmethod
-    def epsilon():
-        return YarisAnimasyon.__EPSILON 
-    @staticmethod
-    def animasyonGecikme():
-        return YarisAnimasyon.__ANIMASYON_GECIKME
-    @staticmethod
-    def geriSayimGecikme():
-        return YarisAnimasyon.__GERI_SAYIM_GECIKME 
+    ANIMASYON_GECIKME=1/60
+    GERI_SAYIM_GECIKME=1

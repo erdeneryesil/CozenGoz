@@ -1,12 +1,10 @@
 from sabitler import DuvarDurum
 from goz import Goz,Reseptor
 
-
 class BenimGozum(Goz):
     def __init__(self,isim):
         super().__init__(isim)
         
-    
     def kararVer(self,reseptor):
         """
         Bu fonksiyon her adımda çağrılır.
@@ -15,7 +13,6 @@ class BenimGozum(Goz):
             return self.ileriGit
         else:
             pass
-            
 
         if reseptor.sol==DuvarDurum.ACIK:
             return self.solaDon
@@ -31,9 +28,3 @@ class BenimGozum(Goz):
             return self.sagaDon
         else:
             pass
-
-
-
-
-        
-        

@@ -1,6 +1,3 @@
-
-
-
 from kivy.uix.screenmanager import ScreenManager,Screen
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.modalview import ModalView #Açılır Pencere
@@ -19,7 +16,6 @@ class PencereYonetici(ScreenManager):
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
         
-
 class AcilirPencere(ModalView):
     #logo='assets/sahne/logo.png'
     #logoOrijinalGenislik=2000
@@ -159,21 +155,18 @@ class AcilirPencere(ModalView):
         self.__durum=AcilirPencereDurum.KAPALI
         return super().on_dismiss()
 
-
 class AnaPencere(Screen):
     def __init__(self,**kwargs):
         super().__init__()
 
         self.yarisma=Yarisma(self.ids.saha)
         
-
     def yarisBaslatClick(self):
         self.yarisma.baslat() 
 
     def on_enter(self, *args):
         self.__dosyaYuklemeBaslat()
         
-    
     def __dosyaYuklemeBaslat(self):
         #önce dosyalar yüklensin
         gozAtlasYuklemeBilgi={AtlasYuklemeBilgi.ACIKLAMA:"Göz görselleri yükleniyor",AtlasYuklemeBilgi.IMAJ_SINIF:GozImaj,AtlasYuklemeBilgi.AKSIYON_SINIF:GozAksiyon,AtlasYuklemeBilgi.TIP_SINIF:GozTip,AtlasYuklemeBilgi.YON_SINIF:Yon}
@@ -184,8 +177,3 @@ class AnaPencere(Screen):
 
         #dosya yükleme penceresi kapandığında, diğer işlemler başlasın
         dosyaYuklemePencere.dosyaYuklemeBaslat(DosyaTip.ATLAS,atlasDosyaBilgiler)
-
-        
-
-
-

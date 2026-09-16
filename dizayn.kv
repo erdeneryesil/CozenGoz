@@ -26,7 +26,7 @@
         BoxLayout:
             id:solPanel
             orientation:'vertical'
-            size_hint_x:EkranSabit.solPanelGenislikOran()
+            size_hint_x:EkranSabit.SOL_PANEL_GENISLIK_ORAN
             canvas.before:
                 Color:
                     rgba:.5,.1,.2,1
@@ -40,11 +40,11 @@
         BoxLayout:
             orientation:'vertical'
             id:yarismaPanel
-            size_hint_x:EkranSabit.yarismaPanelGenislikOran()
+            size_hint_x:EkranSabit.YARISMA_PANEL_GENISLIK_ORAN
 
             BoxLayout:
                 orientation:'horizontal'
-                size_hint_y:EkranSabit.sahaUstYukseklikOran()
+                size_hint_y:EkranSabit.SAHA_UST_YUKSEKLIK_ORAN
                 canvas.before:
                     Color:
                         rgba:.2,.5,.2,1
@@ -64,12 +64,12 @@
                         size:self.size
                         pos:self.pos
                 id:saha
-                size_hint_y:EkranSabit.sahaYukseklikOran()
+                size_hint_y:EkranSabit.SAHA_YUKSEKLIK_ORAN
 
 
             BoxLayout:
                 orientation:'horizontal'
-                size_hint_y:EkranSabit.sahaAltYukseklikOran()
+                size_hint_y:EkranSabit.SAHA_ALT_YUKSEKLIK_ORAN
                 canvas.before:
                     Color:
                         rgba:.1,.5,.7,1
@@ -88,7 +88,7 @@
         BoxLayout:
             orientation:'vertical'
             id:sagPanel
-            size_hint_x:EkranSabit.sagPanelGenislikOran()
+            size_hint_x:EkranSabit.SAG_PANEL_GENISLIK_ORAN
             canvas.before:
                 Color:
                     rgba:.2,.1,.5,1

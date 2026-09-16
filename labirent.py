@@ -1,56 +1,51 @@
 #DÜNYA VE ÇEVRE
 
-
-from enum import IntEnum
+#from enum import IntEnum
 import random
-from kivy.uix.widget import Widget
+#from kivy.uix.widget import Widget
 from kivy.clock import Clock
 from kivy.uix.image import Image
 
-from kivy.graphics import Color, Line, Ellipse, Fbo, RenderContext, Scale, Translate
+from kivy.graphics import Color, Line, Ellipse, Fbo#, RenderContext, Scale, Translate
 
-
-from temel import Konum,Denetle
-from sabitler import LabirentTip,DuvarDurum,Yon,YarisAnimasyon,GozTip,GozAksiyon,Hareket,Yon,DuvarDurum,ReseptorKonum,EkranSabit
+from temel import Konum#,Denetle
+from sabitler import HucreSabit,LabirentTip,DuvarDurum,Yon,YarisAnimasyon,GozTip,GozAksiyon,Hareket,Yon,DuvarDurum,ReseptorKonum,EkranSabit
 from yarismaci import BenimGozum
 from goz import Reseptor
 
 from grafik_pencere_dosya import GozImaj,ReseptorImaj
 
-
 class Hucre(Konum):
     #SABİTLER
-    __TIP_BASLANGIC_KEY="baslangic"
-    __TIP_BITIS_KEY="bitis"
-    __TIP_YOL_KEY="yol"
-    __TIP_RENK_KEY="renk"
-    __TIP_UZUNLUK_CARPAN_KEY="uzunlukCarpan"
-    __SAYI_KEY="sayı"
-    __TIP={__TIP_BASLANGIC_KEY:{__TIP_RENK_KEY:{"r":245/255,"g":73/255,"b":39/255,"a":1},__TIP_UZUNLUK_CARPAN_KEY:1},__TIP_BITIS_KEY:{__TIP_RENK_KEY:{"r":219/255,"g":88/255,"b":88/255,"a":1},__TIP_UZUNLUK_CARPAN_KEY:1},__TIP_YOL_KEY:{__TIP_RENK_KEY:{"r":255/255,"g":247/255,"b":173/255,"a":0.5},__TIP_UZUNLUK_CARPAN_KEY:1.0}}
+    __TIP_BASLANGIC_KEY=HucreSabit.TIP_BASLANGIC_KEY
+    __TIP_BITIS_KEY=HucreSabit.TIP_BITIS_KEY
+    __TIP_YOL_KEY=HucreSabit.TIP_YOL_KEY
+    __TIP_RENK_KEY=HucreSabit.TIP_RENK_KEY
+    __TIP_UZUNLUK_CARPAN_KEY=HucreSabit.TIP_UZUNLUK_CARPAN_KEY
+    __SAYI_KEY=HucreSabit.SAYI_KEY
+    __TIP=HucreSabit.TIP
 
     @staticmethod
-    def gozTipBaslangicKey():
+    def tipBaslangicKey():
         return Hucre.__TIP_BASLANGIC_KEY
     @staticmethod
-    def gozTipBitisKey():
+    def tipBitisKey():
         return Hucre.__TIP_BITIS_KEY
     @staticmethod
-    def gozTipYolKey():
+    def tipYolKey():
         return Hucre.__TIP_YOL_KEY
     @staticmethod
-    def gozTipRenkKey():
+    def tipRenkKey():
         return Hucre.__TIP_RENK_KEY
     @staticmethod
-    def gozTipUzunlukCarpanKey():
+    def tipUzunlukCarpanKey():
         return Hucre.__TIP_UZUNLUK_CARPAN_KEY
     @staticmethod
     def sayiKey():
         return Hucre.__SAYI_KEY
     @staticmethod
-    def gozTip(gozTipKey):
-        return Hucre.__TIP[gozTipKey]
-
-
+    def tip(tipKey):
+        return Hucre.__TIP[tipKey]
 
 
     def __init__(self,satirNumara,sutunNumara):
@@ -106,7 +101,7 @@ class Labirent:
 
         self.__satirSayi=satirSayi
         self.__sutunSayi=sutunSayi
-        self.__TIP=LabirentTip.belirle(self.__satirSayi,self.__sutunSayi)
+        self.__tip=LabirentTip.belirle(self.__satirSayi,self.__sutunSayi)
         self.__baslangicSatirNumara=None
         self.__baslangicSutunNumara=None
         self.__bitisSatirNumara=None
@@ -147,7 +142,6 @@ class Labirent:
         return self.__hucreler[satirNumara][sutunNumara]
     
     def komsuHucreler(self,hucre):
-
         komsuHucreler={Yon.SOL:None,Yon.ALT:None,Yon.SAG:None,Yon.UST:None,Hucre.sayiKey():0}
         if hucre.satirNumara+1<self.__satirSayi:#altında komşu var mı
             komsuHucreler[Yon.ALT]=self.__hucreler[hucre.satirNumara+1][hucre.sutunNumara]
@@ -179,28 +173,27 @@ class Labirent:
                 return self.__duvarlar[Labirent.__SUTUN_ANAHTAR][hucre2.sutunNumara][hucre2.satirNumara]    
             return self.__duvarlar[Labirent.__SUTUN_ANAHTAR][hucre1.sutunNumara][hucre1.satirNumara]#hücre1 küçük indisli ise
 
-
-    def hucreXY(self,hucre,saha):#konumu verilen hücreye, robotu çizebilmek için gerekli koordinatlar ve boyut
+    def hucreXY(self,hucre,saha):#konumu verilen hücreye, robotu çizebilmek için gerekli koordinatlar
         genislik,yukseklik=self.__hesaplaGenislikYukseklik(saha.width,saha.height)
         solUstX,solUstY=self.__hesaplaSolUstXY(saha,genislik,yukseklik)
         x=solUstX+self.__hucreKenarUzunluk*hucre.sutunNumara+self.__kenarlikKalinlik+self.__hucreKenarUzunluk/2-self.__hucreKenarUzunluk/2        
         y=solUstY-self.__hucreKenarUzunluk*(1+hucre.satirNumara)+self.__kenarlikKalinlik+self.__hucreKenarUzunluk/2-self.__hucreKenarUzunluk/2
         return (x,y)
     
-    def __hucreTipKey(self,hucre):# hucrenin gozTip key (__TIP_BASLANGIC_KEY="baslangic",__TIP_BITIS_KEY="bitis",__TIP_YOL_KEY="yol") bilgisini döndürür
+    '''def __hucreTipKey(self,hucre):# hucrenin tip key (__TIP_BASLANGIC_KEY="baslangic",__TIP_BITIS_KEY="bitis",__TIP_YOL_KEY="yol") bilgisini döndürür
         if hucre==self.baslangicHucre:
-            return Hucre.gozTipBaslangicKey()
+            return Hucre.tipBaslangicKey()
         elif hucre==self.bitisHucre:
-            return Hucre.gozTipBitisKey()
+            return Hucre.tipBitisKey()
         else:
-            return Hucre.gozTipYolKey()
+            return Hucre.tipYolKey()'''
 
     def __textureOlustur(self):
-        #labirent görselini, max boyutlara göre bir kez oluşturup, sonrasında boyutları ölçekleyeceğiz
+        #labirent görselini, max boyutlara göre bir kez oluşturup, sonrasında ölçekleniyor
         
-        self.__kenarlikKalinlik=EkranSabit.maxSahaKenarlikKalinlik()
+        self.__kenarlikKalinlik=EkranSabit.MAX_SAHA_KENARLIK_KALINLIK
 
-        canvasGenislik,canvasYukseklik=self.__hesaplaGenislikYukseklik(EkranSabit.maxSahaGenislik(),EkranSabit.maxSahaYukseklik())#labirentin çizileceği alanın genişlik ve yükseklik
+        canvasGenislik,canvasYukseklik=self.__hesaplaGenislikYukseklik(EkranSabit.MAX_SAHA_GENISLIK,EkranSabit.MAX_SAHA_YUKSEKLIK)#labirentin çizileceği alanın genişlik ve yükseklik
         
         # alt-üst(2+2), sol-sağ(2+2) taraflardan kenarlık kalınlığının 2 katı kadar küçültme yapılacak
         kucultmeCarpan2Kenar=4
@@ -232,16 +225,16 @@ class Labirent:
             self.__cizDuvar(solUstX,solUstY)
             
             # Çözüm yolu veya Başlangıç/Bitiş hücrelerinin boyanması
-            hucreTip=Hucre.gozTip(Hucre.gozTipYolKey())
+            hucreTip=Hucre.tip(Hucre.tipYolKey())
             for hucre in self.__cozumYolu:
-                self.__boyaHucre(solUstX,solUstY,hucre,hucreTip[Hucre.gozTipUzunlukCarpanKey()],hucreTip[Hucre.gozTipRenkKey()])
+                self.__boyaHucre(solUstX,solUstY,hucre,hucreTip[Hucre.tipUzunlukCarpanKey()],hucreTip[Hucre.tipRenkKey()])
 
 
-            hucreTip=Hucre.gozTip(Hucre.gozTipBaslangicKey())
-            self.__boyaHucre(solUstX,solUstY,Konum(self.__baslangicSatirNumara,self.__baslangicSutunNumara),hucreTip[Hucre.gozTipUzunlukCarpanKey()],hucreTip[Hucre.gozTipRenkKey()])
+            hucreTip=Hucre.tip(Hucre.tipBaslangicKey())
+            self.__boyaHucre(solUstX,solUstY,Konum(self.__baslangicSatirNumara,self.__baslangicSutunNumara),hucreTip[Hucre.tipUzunlukCarpanKey()],hucreTip[Hucre.tipRenkKey()])
             
-            hucreTip=Hucre.gozTip(Hucre.gozTipBitisKey())
-            self.__boyaHucre(solUstX,solUstY,Konum(self.__bitisSatirNumara,self.__bitisSutunNumara),hucreTip[Hucre.gozTipUzunlukCarpanKey()],hucreTip[Hucre.gozTipRenkKey()])
+            hucreTip=Hucre.tip(Hucre.tipBitisKey())
+            self.__boyaHucre(solUstX,solUstY,Konum(self.__bitisSatirNumara,self.__bitisSutunNumara),hucreTip[Hucre.tipUzunlukCarpanKey()],hucreTip[Hucre.tipRenkKey()])
 
         # 3. Fbo üzerindeki çizimleri ekrana yansıtılmaya hazır bir doku (texture) olarak çekiyoruz
         fbo.draw()
@@ -281,14 +274,13 @@ class Labirent:
         boyut=uzunlukCarpan*self.__hucreKenarUzunluk-2*self.__kenarlikKalinlik
         Ellipse(size=(boyut,boyut),pos=(x,y))
 
-
     def guncelleOlculer(self,saha):#canvas içerisine çizilecek labirentin genişlik, yükseklik, x, y vs değerleri hesaplanıyor        
         
         genislik,yukseklik=self.__hesaplaGenislikYukseklik(saha.width,saha.height)
 
         solUstX,solUstY=self.__hesaplaSolUstXY(saha,genislik,yukseklik)
 
-        self.__kenarlikKalinlik=genislik/EkranSabit.labirentKenarlikKalinlikOran()
+        self.__kenarlikKalinlik=genislik/EkranSabit.LABIRENT_KENARLIK_KALINLIK_ORAN
         self.__hucreKenarUzunluk=genislik/self.__sutunSayi
         self.__hucreKenarUzunluk=self.__hesaplaHucreKenarUzunluk(genislik,yukseklik)
         
@@ -296,13 +288,11 @@ class Labirent:
         self.__imaj.pos=(solUstX,solUstY-yukseklik)
 
     def __hesaplaHucreKenarUzunluk(self,genislik,yukseklik):
-        if self.__TIP==LabirentTip.YATAY:
+        if self.__tip==LabirentTip.YATAY:
             return genislik/self.__sutunSayi
         return yukseklik/self.__satirSayi
         
-        
-        
-
+    
     def __hesaplaKenarlikKalinlik(self):
         pass
 
@@ -315,7 +305,6 @@ class Labirent:
     
     def __hesaplaSolUstXY(self,saha,labirentGenislik,labirentYukseklik):
         return (saha.x+saha.width/2-labirentGenislik/2,saha.y+saha.height/2 + labirentYukseklik / 2)
-        
 
     def __olustur(self):
          
@@ -439,10 +428,10 @@ class Labirent:
                 self.__duvarlar[Labirent.__SUTUN_ANAHTAR][sutunNumara][satirNumara].kapat()
     
     def __rastgeleBaslangicBitisBelirle(self):#labirentin başlangıç ve bitiş hücreleri rastgele belirleniyor
-        if self.__TIP==LabirentTip.KARE:
+        if self.__tip==LabirentTip.KARE:
             labirentTip=random.choice([LabirentTip.YATAY,LabirentTip.DIKEY])
         else:
-            labirentTip=self.__TIP
+            labirentTip=self.__tip
 
 
         match labirentTip:
@@ -509,15 +498,15 @@ class Yarisma:
         self.__gozImaj.bekle()
 
         #animasyonSure=GozImaj.animasyonSure(GozAksiyon.BEKLE, self.__gozImaj.yon)
-        self.__yarismaSaat=Clock.schedule_once(self.geriSayim,YarisAnimasyon.geriSayimGecikme())
+        self.__yarismaSaat=Clock.schedule_once(self.geriSayim,YarisAnimasyon.GERI_SAYIM_GECIKME)
 
 
     def geriSayim(self,dt):
-        self.__yarismaSaat=Clock.schedule_once(self.yarisTikTak,YarisAnimasyon.animasyonGecikme())
+        self.__yarismaSaat=Clock.schedule_once(self.yarisTikTak,YarisAnimasyon.ANIMASYON_GECIKME)
 
     def yarisTikTak(self,dt):          
         if self.__gozImaj.aksiyon!=GozAksiyon.BEKLE:
-            self.__yarismaSaat=Clock.schedule_once(self.yarisTikTak,YarisAnimasyon.animasyonGecikme())
+            self.__yarismaSaat=Clock.schedule_once(self.yarisTikTak,YarisAnimasyon.ANIMASYON_GECIKME)
             return
         
         if self.__gozHucre==self.__labirent.bitisHucre:           
@@ -527,7 +516,7 @@ class Yarisma:
         
         if not self.__reseptorGuncellendi:
             animasyonSure=self.__reseptorGuncelle()
-            self.__yarismaSaat=Clock.schedule_once(self.yarisTikTak, animasyonSure+YarisAnimasyon.epsilon() if animasyonSure > 0 else YarisAnimasyon.animasyonGecikme())
+            self.__yarismaSaat=Clock.schedule_once(self.yarisTikTak, animasyonSure+YarisAnimasyon.EPSILON if animasyonSure > 0 else YarisAnimasyon.ANIMASYON_GECIKME)
             return
 
         
@@ -542,7 +531,7 @@ class Yarisma:
             gozHareket = self.__goz.kararVer(self.__reseptor)
             animasyonSure=self.__gozHareketUygula(gozHareket)
             
-            self.__yarismaSaat=Clock.schedule_once(self.yarisTikTak, animasyonSure+YarisAnimasyon.epsilon())
+            self.__yarismaSaat=Clock.schedule_once(self.yarisTikTak, animasyonSure+YarisAnimasyon.EPSILON)
             return
         
         self.__yarismaSaat=Clock.schedule_once(self.yarisTikTak, YarisAnimasyon.animasyonGecikme())
