@@ -1,5 +1,5 @@
 from sabitler import DuvarDurum
-from goz import Goz,Reseptor
+from goz import Goz
 
 class BenimGozum(Goz):
     def __init__(self,isim):

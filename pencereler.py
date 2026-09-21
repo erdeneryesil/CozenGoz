@@ -9,7 +9,7 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.core.window import Window
 
 from grafik_pencere_dosya import Yukle,GozImaj,ReseptorImaj
-from sabitler import AtlasYuklemeBilgi,AcilirPencereTip,AcilirPencereDurum,YarisAnimasyon,DosyaTip,GozTip,GozAksiyon,Hareket,Yon,DuvarDurum,ReseptorKonum
+from sabitler import AnaPencereSabit, AcilirPencereSabit, AtlasYuklemeBilgi,AcilirPencereTip,AcilirPencereDurum,DosyaTip,GozTip,GozAksiyon,Yon
 from labirent import Yarisma
 
 class PencereYonetici(ScreenManager):
@@ -24,19 +24,12 @@ class AcilirPencere(ModalView):
     #Her açılır pencere tipi için yalnızca tek bir Label nesnesi kullanılacak
     #etiketBoyutOran={'dosya yükle pencere':.05,'seviye yükle pencere':.05,'oyun başlat pencere':.15,'oyun kaybetti pencere':.15,'oyun kazandı pencere':.15}#Etiketin, yazı boyutunun pencere yüksekliğine oranı
     #etiketYazi={'dosya yükle pencere':u'DOSYALAR Y\u00dbKLEN\u00ceYOR','seviye yükle pencere':u'OYUN Y\u00dbKLEN\u00ceYOR','oyun başlat pencere':u'SEV\u00ceYE ','oyun kaybetti pencere':u'OYUN B\u00ceTT\u00ce','oyun kazandı pencere':u'TEBR\u00ceKLER'}
-
-    __PENCERE_GENISLIK_ORAN=.9     #Açılır pencerenin genişliğinin, ana pencerenin genişliğine oranı
-    __PENCERE_YUKSEKLIK_ORAN=.9    #Açılır pencerenin yüksekliğinin, ana pencerenin yüksekliğine oranı
-    __ETIKET_BOYUT_ORAN=.03         #Etiket yazı boyutunun, açılır pencerenin genişliğine oranı
-    __ETIKET_RENK=[.694,.157,.157,1]       #etiketin yazı rengi
-    __ARKAPLAN_RENK=[.8,.8,.8,.7]
-
     
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
 
         self.background=''
-        self.background_color=AcilirPencere.__ARKAPLAN_RENK
+        self.background_color=AcilirPencereSabit.ARKAPLAN_RENK
 
         self.__tip=None
         self.__durum=None
@@ -46,7 +39,7 @@ class AcilirPencere(ModalView):
         self.__dosyaYuklemeIndis=0
         self.auto_dismiss=False
         self.__etiket=Label()
-        self.__etiket.color=self.__ETIKET_RENK
+        self.__etiket.color=AcilirPencereSabit.ETIKET_RENK
         #self.__etiket.text="DENEME"
 
 
@@ -133,12 +126,12 @@ class AcilirPencere(ModalView):
         self.__durum=AcilirPencereDurum.ACILMAYA_HAZIR
 
     def __etiketBoyutAyarla(self):
-        self.__etiket.font_size=self.width*self.__ETIKET_BOYUT_ORAN
+        self.__etiket.font_size=self.width*AcilirPencereSabit.ETIKET_BOYUT_ORAN
                           
     def boyutAyarla(self,*args):
         self.size_hint=None,None
-        self.width=Window.width*self.__PENCERE_GENISLIK_ORAN
-        self.height=Window.height*self.__PENCERE_YUKSEKLIK_ORAN
+        self.width=Window.width*AcilirPencereSabit.PENCERE_GENISLIK_ORAN
+        self.height=Window.height*AcilirPencereSabit.PENCERE_YUKSEKLIK_ORAN
 
         self.__etiketBoyutAyarla()
     
@@ -169,8 +162,8 @@ class AnaPencere(Screen):
         
     def __dosyaYuklemeBaslat(self):
         #önce dosyalar yüklensin
-        gozAtlasYuklemeBilgi={AtlasYuklemeBilgi.ACIKLAMA:"Göz görselleri yükleniyor",AtlasYuklemeBilgi.IMAJ_SINIF:GozImaj,AtlasYuklemeBilgi.AKSIYON_SINIF:GozAksiyon,AtlasYuklemeBilgi.TIP_SINIF:GozTip,AtlasYuklemeBilgi.YON_SINIF:Yon}
-        reseptorAtlasYuklemeBilgi={AtlasYuklemeBilgi.ACIKLAMA:"Reseptör görselleri yükleniyor",AtlasYuklemeBilgi.IMAJ_SINIF:ReseptorImaj}
+        gozAtlasYuklemeBilgi={AtlasYuklemeBilgi.ACIKLAMA:AnaPencereSabit.ACIKLAMA_GOZ_GORSEL_YUKLEME,AtlasYuklemeBilgi.IMAJ_SINIF:GozImaj,AtlasYuklemeBilgi.AKSIYON_SINIF:GozAksiyon,AtlasYuklemeBilgi.TIP_SINIF:GozTip,AtlasYuklemeBilgi.YON_SINIF:Yon}
+        reseptorAtlasYuklemeBilgi={AtlasYuklemeBilgi.ACIKLAMA:AnaPencereSabit.ACIKLAMA_RESEPTOR_GORSEL_YUKLEME,AtlasYuklemeBilgi.IMAJ_SINIF:ReseptorImaj}
         atlasDosyaBilgiler=[gozAtlasYuklemeBilgi,reseptorAtlasYuklemeBilgi]
 
         dosyaYuklemePencere=AcilirPencere()

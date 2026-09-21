@@ -216,16 +216,37 @@ class EkranSabit(metaclass=SabitMetaClass):
     #labirent çizimi ile alakalı değerler
     LABIRENT_KENARLIK_KALINLIK_ORAN=300
 
+    #labirent görseli için : alt-üst(2+2), sol-sağ(2+2) taraflardan kenarlık kalınlığının 2 katı kadar küçültme yapılacak
+    TEXTURE_KUCULTME_CARPAN_2_KENAR=4
+    TEXTURE_KUCULTME_CARPAN_1_KENAR=2
+
     #saha max boyutlarında iken, sahip olduğu ölçü ve koordinatlar
     MAX_SAHA_GENISLIK=MAX_GENISLIK*YARISMA_PANEL_GENISLIK_ORAN
     MAX_SAHA_YUKSEKLIK=MAX_YUKSEKLIK*SAHA_YUKSEKLIK_ORAN
     MAX_SAHA_KENARLIK_KALINLIK=MAX_GENISLIK*YARISMA_PANEL_GENISLIK_ORAN/LABIRENT_KENARLIK_KALINLIK_ORAN
 
+class LabirentSabit(metaclass=SabitMetaClass):
+    KENARLIK_RENK=(1,0,0,1)
+    MINIMUM_COZUM_UZUNLUGU_ORAN=0.5
+    SATIR_ANAHTAR="satir"
+    SUTUN_ANAHTAR="sutun"
 
 #Yarışmadaki animasyona ilişkin sabit değerler
-class YarisAnimasyon(metaclass=SabitMetaClass):
+class AnimasyonSabit(metaclass=SabitMetaClass):
     # Epsilon Değeri (Hassas Zamanlama Payı)
     EPSILON=1/120
 
     ANIMASYON_GECIKME=1/60
     GERI_SAYIM_GECIKME=1
+
+class AnaPencereSabit(metaclass=SabitMetaClass):
+    ACIKLAMA_GOZ_GORSEL_YUKLEME="Göz görselleri yükleniyor"
+    ACIKLAMA_RESEPTOR_GORSEL_YUKLEME="Reseptör görselleri yükleniyor"
+
+class AcilirPencereSabit(metaclass=SabitMetaClass):
+    PENCERE_GENISLIK_ORAN=.9     #Açılır pencerenin genişliğinin, ana pencerenin genişliğine oranı
+    PENCERE_YUKSEKLIK_ORAN=.9    #Açılır pencerenin yüksekliğinin, ana pencerenin yüksekliğine oranı
+    ETIKET_BOYUT_ORAN=.03         #Etiket yazı boyutunun, açılır pencerenin genişliğine oranı
+    ETIKET_RENK=[.694,.157,.157,1]       #etiketin yazı rengi
+    ARKAPLAN_RENK=[.8,.8,.8,.7]
+

@@ -9,7 +9,7 @@ from kivy.uix.image import Image
 from kivy.graphics import Color, Line, Ellipse, Fbo#, RenderContext, Scale, Translate
 
 from temel import Konum#,Denetle
-from sabitler import HucreSabit,LabirentTip,DuvarDurum,Yon,YarisAnimasyon,GozTip,GozAksiyon,Hareket,Yon,DuvarDurum,ReseptorKonum,EkranSabit
+from sabitler import EkranSabit,HucreSabit,LabirentSabit,AnimasyonSabit,LabirentTip,DuvarDurum,Yon,GozTip,GozAksiyon,Hareket,Yon,DuvarDurum,ReseptorKonum
 from yarismaci import BenimGozum
 from goz import Reseptor
 
@@ -86,12 +86,6 @@ class Duvar:
         self.__durum=DuvarDurum.KAPALI
 
 class Labirent:
-    #SABİTLER
-    __KENARLIK_RENK=(1,0,0,1)
-    __MINIMUM_COZUM_UZUNLUGU_ORAN=0.5
-    __SATIR_ANAHTAR="satir"
-    __SUTUN_ANAHTAR="sutun"
-
     def __init__(self,satirSayi,sutunSayi):
         #çizim ile ilgili özellikler
         self.__kenarlikKalinlik=None
@@ -109,7 +103,7 @@ class Labirent:
 
         self.__rastgeleBaslangicBitisBelirle()
 
-        self.__minimumCozumUzunlugu=self.__satirSayi*self.__sutunSayi*Labirent.__MINIMUM_COZUM_UZUNLUGU_ORAN
+        self.__minimumCozumUzunlugu=self.__satirSayi*self.__sutunSayi*LabirentSabit.MINIMUM_COZUM_UZUNLUGU_ORAN
         self.__cozumYolu=[]
         self.__olustur()
         
@@ -166,12 +160,12 @@ class Labirent:
                 
         if hucre1.satirNumara==hucre2.satirNumara:#aynı satırdaki hücreler arasındaki bir duvar ise
             if hucre2.sutunNumara<hucre1.sutunNumara:#hücre2 küçük indisli ise
-                return self.__duvarlar[Labirent.__SATIR_ANAHTAR][hucre2.satirNumara][hucre2.sutunNumara]
-            return self.__duvarlar[Labirent.__SATIR_ANAHTAR][hucre1.satirNumara][hucre1.sutunNumara]#hücre1 küçük indisli ise
+                return self.__duvarlar[LabirentSabit.SATIR_ANAHTAR][hucre2.satirNumara][hucre2.sutunNumara]
+            return self.__duvarlar[LabirentSabit.SATIR_ANAHTAR][hucre1.satirNumara][hucre1.sutunNumara]#hücre1 küçük indisli ise
         else:#aynı sütundaki hücreler arasındaki bir duvar ise
             if hucre2.satirNumara<hucre1.satirNumara:#hücre2 küçük indisli ise
-                return self.__duvarlar[Labirent.__SUTUN_ANAHTAR][hucre2.sutunNumara][hucre2.satirNumara]    
-            return self.__duvarlar[Labirent.__SUTUN_ANAHTAR][hucre1.sutunNumara][hucre1.satirNumara]#hücre1 küçük indisli ise
+                return self.__duvarlar[LabirentSabit.SUTUN_ANAHTAR][hucre2.sutunNumara][hucre2.satirNumara]    
+            return self.__duvarlar[LabirentSabit.SUTUN_ANAHTAR][hucre1.sutunNumara][hucre1.satirNumara]#hücre1 küçük indisli ise
 
     def hucreXY(self,hucre,saha):#konumu verilen hücreye, robotu çizebilmek için gerekli koordinatlar
         genislik,yukseklik=self.__hesaplaGenislikYukseklik(saha.width,saha.height)
@@ -196,14 +190,12 @@ class Labirent:
         canvasGenislik,canvasYukseklik=self.__hesaplaGenislikYukseklik(EkranSabit.MAX_SAHA_GENISLIK,EkranSabit.MAX_SAHA_YUKSEKLIK)#labirentin çizileceği alanın genişlik ve yükseklik
         
         # alt-üst(2+2), sol-sağ(2+2) taraflardan kenarlık kalınlığının 2 katı kadar küçültme yapılacak
-        kucultmeCarpan2Kenar=4
-        kucultmeCarpan1Kenar=2
         #texture ait  genişlik ve yükseklik, canvas'a göre küçültülecek. Fakat bu küçültmenin oranı genişlik ve yüksekliğe göre aynı olmalı (*canvasYukseklik/canvasGenislik)
-        textureGenislik=canvasGenislik-kucultmeCarpan2Kenar*self.__kenarlikKalinlik                                    #labirentin genişliği
-        textureYukseklik=canvasYukseklik-kucultmeCarpan2Kenar*self.__kenarlikKalinlik*canvasYukseklik/canvasGenislik   #labirentin yüksekliği
+        textureGenislik=canvasGenislik-EkranSabit.TEXTURE_KUCULTME_CARPAN_2_KENAR*self.__kenarlikKalinlik                                    #labirentin genişliği
+        textureYukseklik=canvasYukseklik-EkranSabit.TEXTURE_KUCULTME_CARPAN_2_KENAR*self.__kenarlikKalinlik*canvasYukseklik/canvasGenislik   #labirentin yüksekliği
 
-        solUstX=kucultmeCarpan1Kenar*self.__kenarlikKalinlik
-        solUstY=textureYukseklik+kucultmeCarpan1Kenar*self.__kenarlikKalinlik*canvasYukseklik/canvasGenislik 
+        solUstX=EkranSabit.TEXTURE_KUCULTME_CARPAN_1_KENAR*self.__kenarlikKalinlik
+        solUstY=textureYukseklik+EkranSabit.TEXTURE_KUCULTME_CARPAN_1_KENAR*self.__kenarlikKalinlik*canvasYukseklik/canvasGenislik 
 
         self.__hucreKenarUzunluk=self.__hesaplaHucreKenarUzunluk(textureGenislik,textureYukseklik)
 
@@ -216,9 +208,9 @@ class Labirent:
         with fbo:
             # Kenarlık rengi ve çerçeve çizimi
             textureX = solUstX
-            textureY = kucultmeCarpan1Kenar*self.__kenarlikKalinlik*canvasYukseklik/canvasGenislik
+            textureY = EkranSabit.TEXTURE_KUCULTME_CARPAN_1_KENAR*self.__kenarlikKalinlik*canvasYukseklik/canvasGenislik
 
-            Color(rgba=Labirent.__KENARLIK_RENK)
+            Color(rgba=LabirentSabit.KENARLIK_RENK)
             self.__cizCerceve(textureX,textureY,textureGenislik,textureYukseklik)
 
             # Duvarların çizimi
@@ -394,14 +386,14 @@ class Labirent:
         return hucreler
     
     def __olusturDuvarlar(self):
-        duvarlar={Labirent.__SATIR_ANAHTAR:[],Labirent.__SUTUN_ANAHTAR:[]}
+        duvarlar={LabirentSabit.SATIR_ANAHTAR:[],LabirentSabit.SUTUN_ANAHTAR:[]}
         #satırlarda bulunan duvarlar oluşturuluyor
         for satirNumara in range(self.__satirSayi):
             satirDuvarlar=[]
             for sutunNumara in range(self.__sutunSayi-1):
                 duvar=Duvar()
                 satirDuvarlar.append(duvar)
-            duvarlar[Labirent.__SATIR_ANAHTAR].append(satirDuvarlar)
+            duvarlar[LabirentSabit.SATIR_ANAHTAR].append(satirDuvarlar)
 
                 
         #sutunlarda bulunan duvarlar oluşturuluyor
@@ -410,7 +402,7 @@ class Labirent:
             for satirNumara in range(self.__satirSayi-1):
                 duvar=Duvar()
                 sutunDuvarlar.append(duvar)
-            duvarlar[Labirent.__SUTUN_ANAHTAR].append(sutunDuvarlar)
+            duvarlar[LabirentSabit.SUTUN_ANAHTAR].append(sutunDuvarlar)
 
         return duvarlar
     
@@ -425,7 +417,7 @@ class Labirent:
                 
         for sutunNumara in range(self.__sutunSayi):
             for satirNumara in range(self.__satirSayi-1):
-                self.__duvarlar[Labirent.__SUTUN_ANAHTAR][sutunNumara][satirNumara].kapat()
+                self.__duvarlar[LabirentSabit.SUTUN_ANAHTAR][sutunNumara][satirNumara].kapat()
     
     def __rastgeleBaslangicBitisBelirle(self):#labirentin başlangıç ve bitiş hücreleri rastgele belirleniyor
         if self.__tip==LabirentTip.KARE:
@@ -498,15 +490,15 @@ class Yarisma:
         self.__gozImaj.bekle()
 
         #animasyonSure=GozImaj.animasyonSure(GozAksiyon.BEKLE, self.__gozImaj.yon)
-        self.__yarismaSaat=Clock.schedule_once(self.geriSayim,YarisAnimasyon.GERI_SAYIM_GECIKME)
+        self.__yarismaSaat=Clock.schedule_once(self.geriSayim,AnimasyonSabit.GERI_SAYIM_GECIKME)
 
 
     def geriSayim(self,dt):
-        self.__yarismaSaat=Clock.schedule_once(self.yarisTikTak,YarisAnimasyon.ANIMASYON_GECIKME)
+        self.__yarismaSaat=Clock.schedule_once(self.yarisTikTak,AnimasyonSabit.ANIMASYON_GECIKME)
 
     def yarisTikTak(self,dt):          
         if self.__gozImaj.aksiyon!=GozAksiyon.BEKLE:
-            self.__yarismaSaat=Clock.schedule_once(self.yarisTikTak,YarisAnimasyon.ANIMASYON_GECIKME)
+            self.__yarismaSaat=Clock.schedule_once(self.yarisTikTak,AnimasyonSabit.ANIMASYON_GECIKME)
             return
         
         if self.__gozHucre==self.__labirent.bitisHucre:           
@@ -516,7 +508,7 @@ class Yarisma:
         
         if not self.__reseptorGuncellendi:
             animasyonSure=self.__reseptorGuncelle()
-            self.__yarismaSaat=Clock.schedule_once(self.yarisTikTak, animasyonSure+YarisAnimasyon.EPSILON if animasyonSure > 0 else YarisAnimasyon.ANIMASYON_GECIKME)
+            self.__yarismaSaat=Clock.schedule_once(self.yarisTikTak, animasyonSure+AnimasyonSabit.EPSILON if animasyonSure > 0 else AnimasyonSabit.ANIMASYON_GECIKME)
             return
 
         
@@ -531,10 +523,10 @@ class Yarisma:
             gozHareket = self.__goz.kararVer(self.__reseptor)
             animasyonSure=self.__gozHareketUygula(gozHareket)
             
-            self.__yarismaSaat=Clock.schedule_once(self.yarisTikTak, animasyonSure+YarisAnimasyon.EPSILON)
+            self.__yarismaSaat=Clock.schedule_once(self.yarisTikTak, animasyonSure+AnimasyonSabit.EPSILON)
             return
         
-        self.__yarismaSaat=Clock.schedule_once(self.yarisTikTak, YarisAnimasyon.animasyonGecikme())
+        self.__yarismaSaat=Clock.schedule_once(self.yarisTikTak, AnimasyonSabit.animasyonGecikme())
         
     def __gozHareketUygula(self,hareket):
         match hareket:
