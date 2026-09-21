@@ -5,11 +5,12 @@ import random
 #from kivy.uix.widget import Widget
 from kivy.clock import Clock
 from kivy.uix.image import Image
+from kivy.uix.widget import Widget
 
 from kivy.graphics import Color, Line, Ellipse, Fbo#, RenderContext, Scale, Translate
 
 from temel import Konum#,Denetle
-from sabitler import EkranSabit,HucreSabit,LabirentSabit,AnimasyonSabit,LabirentTip,DuvarDurum,Yon,GozTip,GozAksiyon,Hareket,Yon,DuvarDurum,ReseptorKonum
+from sabitler import EkranSabit,HucreSabit,LabirentSabit,AnimasyonSabit,DikdortgenTip,DuvarDurum,Yon,GozTip,GozAksiyon,Hareket,Yon,DuvarDurum,ReseptorKonum
 from yarismaci import BenimGozum
 from goz import Reseptor
 
@@ -95,11 +96,12 @@ class Labirent:
 
         self.__satirSayi=satirSayi
         self.__sutunSayi=sutunSayi
-        self.__tip=LabirentTip.belirle(self.__satirSayi,self.__sutunSayi)
+        self.__tip=DikdortgenTip.belirle(self.__sutunSayi,self.__satirSayi)
         self.__baslangicSatirNumara=None
         self.__baslangicSutunNumara=None
         self.__bitisSatirNumara=None
         self.__bitisSutunNumara=None
+
 
         self.__rastgeleBaslangicBitisBelirle()
 
@@ -129,6 +131,9 @@ class Labirent:
     @property
     def imaj(self):
         return self.__imaj
+    @property
+    def tip(self):
+        return self.__tip
     
     def hucre(self,satirNumara,sutunNumara):
         if satirNumara<0 or satirNumara>=self.__satirSayi or sutunNumara<0 or sutunNumara>=self.__sutunSayi:
@@ -183,11 +188,14 @@ class Labirent:
             return Hucre.tipYolKey()'''
 
     def __textureOlustur(self):
-        #labirent görselini, max boyutlara göre bir kez oluşturup, sonrasında ölçekleniyor
+        #labirent görselini, maks boyutlara göre bir kez oluşturup, sonrasında ölçekleniyor
         
-        self.__kenarlikKalinlik=EkranSabit.MAX_SAHA_KENARLIK_KALINLIK
+        maks=EkranSabit.maksSahaKenarlik(self.__tip)
+        maksSahaGenislik=maks[EkranSabit.MAKS_SAHA_GENISLIK_KEY]
+        maksSahaYukseklik=maks[EkranSabit.MAKS_SAHA_YUKSEKLIK_KEY]
+        self.__kenarlikKalinlik=maks[EkranSabit.MAKS_KENARLIK_KALINLIK_KEY]
 
-        canvasGenislik,canvasYukseklik=self.__hesaplaGenislikYukseklik(EkranSabit.MAX_SAHA_GENISLIK,EkranSabit.MAX_SAHA_YUKSEKLIK)#labirentin çizileceği alanın genişlik ve yükseklik
+        canvasGenislik,canvasYukseklik=self.__hesaplaGenislikYukseklik(maksSahaGenislik,maksSahaYukseklik)#labirentin çizileceği alanın genişlik ve yükseklik
         
         # alt-üst(2+2), sol-sağ(2+2) taraflardan kenarlık kalınlığının 2 katı kadar küçültme yapılacak
         #texture ait  genişlik ve yükseklik, canvas'a göre küçültülecek. Fakat bu küçültmenin oranı genişlik ve yüksekliğe göre aynı olmalı (*canvasYukseklik/canvasGenislik)
@@ -280,7 +288,7 @@ class Labirent:
         self.__imaj.pos=(solUstX,solUstY-yukseklik)
 
     def __hesaplaHucreKenarUzunluk(self,genislik,yukseklik):
-        if self.__tip==LabirentTip.YATAY:
+        if self.__tip==DikdortgenTip.YATAY:
             return genislik/self.__sutunSayi
         return yukseklik/self.__satirSayi
         
@@ -420,19 +428,19 @@ class Labirent:
                 self.__duvarlar[LabirentSabit.SUTUN_ANAHTAR][sutunNumara][satirNumara].kapat()
     
     def __rastgeleBaslangicBitisBelirle(self):#labirentin başlangıç ve bitiş hücreleri rastgele belirleniyor
-        if self.__tip==LabirentTip.KARE:
-            labirentTip=random.choice([LabirentTip.YATAY,LabirentTip.DIKEY])
+        if self.__tip==DikdortgenTip.KARE:
+            labirentTip=random.choice([DikdortgenTip.YATAY,DikdortgenTip.DIKEY])
         else:
             labirentTip=self.__tip
 
 
         match labirentTip:
-            case LabirentTip.YATAY:
+            case DikdortgenTip.YATAY:
                 self.__baslangicSutunNumara=0
                 self.__bitisSutunNumara=self.__sutunSayi-1
                 self.__baslangicSatirNumara=random.randint(0,self.__satirSayi-1)
                 self.__bitisSatirNumara=random.randint(0,self.__satirSayi-1)
-            case LabirentTip.DIKEY:
+            case DikdortgenTip.DIKEY:
                 self.__baslangicSatirNumara=0
                 self.__bitisSatirNumara=self.__satirSayi-1
                 self.__baslangicSutunNumara=random.randint(0,self.__sutunSayi-1)
@@ -445,6 +453,9 @@ class Labirent:
     
     #def __mesafeHesapla(self,satirNumara1,sutunNumara1,satirNumara2,sutunNumara2):
         #return abs(satirNumara1-satirNumara2)+abs(sutunNumara1-sutunNumara2)
+class Saha(Widget):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
 class Yarisma:
     def __init__(self,saha):
@@ -458,12 +469,13 @@ class Yarisma:
         self.__reseptor=None
         self.__reseptorImaj=None
         self.__reseptorGuncellendi=None
+
         
     def __baslangicIslemleri(self):
 
         self.__saha.bind(pos=self.guncelleOlculer, size=self.guncelleOlculer)
                 
-        self.__labirent=Labirent(5,5)
+        self.__labirent=Labirent(20,15)#Labirent(20,5)
         goz1=BenimGozum("ROBOT1")
         self.__goz=goz1
         self.__gozImaj=GozImaj(GozTip.GOZ1,Yon.baslangic())
@@ -496,7 +508,8 @@ class Yarisma:
     def geriSayim(self,dt):
         self.__yarismaSaat=Clock.schedule_once(self.yarisTikTak,AnimasyonSabit.ANIMASYON_GECIKME)
 
-    def yarisTikTak(self,dt):          
+    def yarisTikTak(self,dt):   
+               
         if self.__gozImaj.aksiyon!=GozAksiyon.BEKLE:
             self.__yarismaSaat=Clock.schedule_once(self.yarisTikTak,AnimasyonSabit.ANIMASYON_GECIKME)
             return
@@ -561,10 +574,9 @@ class Yarisma:
         return GozImaj.animasyonSure(self.__gozImaj.aksiyon, self.__gozImaj.yon)
 
     def guncelleOlculer(self,*args):
-
         if self.__labirent is None:
             return
-            
+        
         self.__labirent.guncelleOlculer(self.__saha)
         
         x,y=self.__labirent.hucreXY(self.__gozHucre,self.__saha)

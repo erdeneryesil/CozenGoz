@@ -16,6 +16,8 @@ class PencereYonetici(ScreenManager):
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
         
+
+       
 class AcilirPencere(ModalView):
     #logo='assets/sahne/logo.png'
     #logoOrijinalGenislik=2000
@@ -152,10 +154,10 @@ class AnaPencere(Screen):
     def __init__(self,**kwargs):
         super().__init__()
 
-        self.yarisma=Yarisma(self.ids.saha)
-        
+        self.__yarisma=Yarisma(self.ids.saha)
+
     def yarisBaslatClick(self):
-        self.yarisma.baslat() 
+        self.__yarisma.baslat() 
 
     def on_enter(self, *args):
         self.__dosyaYuklemeBaslat()

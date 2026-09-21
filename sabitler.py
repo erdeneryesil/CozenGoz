@@ -89,21 +89,21 @@ class AcilirPencereDurum(IntEnum):
     ISLEM_BITTI=5
     KAPALI=6
 
-class LabirentTip(IntEnum):
+class DikdortgenTip(IntEnum):#labirent ya da sahanın tipini belirlemek amacıyla kullanılıyor
     KARE=0
     YATAY=1
     DIKEY=2
     def __str__(self):
-        return f"Labirent Tipi : {self.name}"
+        return f"Tip : {self.name}"
     
     @staticmethod
-    def belirle(satirSayi,sutunSayi):
-        if satirSayi>sutunSayi:
-            return LabirentTip.DIKEY
-        elif sutunSayi>satirSayi:
-            return LabirentTip.YATAY
+    def belirle(genislik,yukseklik):#labirent için genislik:sütun sayısı, yukseklik=satır sayısı
+        if yukseklik>genislik:
+            return DikdortgenTip.DIKEY
+        elif genislik>yukseklik:
+            return DikdortgenTip.YATAY
         else:
-            return LabirentTip.KARE
+            return DikdortgenTip.KARE
         
 #SABİT DEĞERLERİ İÇEREN STATİK SINIFLAR
 class SabitMetaClass(type):#sadece sabit değerleri içerecek olan statik sınıflar, bu sınıftan metaclass ile kalıtım alacak
@@ -199,10 +199,19 @@ class HucreSabit(metaclass=SabitMetaClass):
         }
 
 class EkranSabit(metaclass=SabitMetaClass):
-    #uygulama ekranının max boyutları
-    MAX_GENISLIK=3840
-    MAX_YUKSEKLIK=2160
+
+    MAKS_SAHA_GENISLIK_KEY="MAKS_SAHA_GENISLIK"
+    MAKS_SAHA_YUKSEKLIK_KEY="MAKS_SAHA_YUKSEKLIK"
+    MAKS_KENARLIK_KALINLIK_KEY="MAKS_KENARLIK_KALINLIK"
     
+    #ekranın alabileceği maks genişlik, yükseklik değerleri
+    MAKS_EKRAN_GENISLIK_YATAY=3840
+    MAKS_EKRAN_YUKSEKLIK_YATAY=2160
+    MAKS_EKRAN_GENISLIK_DIKEY=2160
+    MAKS_EKRAN_YUKSEKLIK_DIKEY=3840
+    MAKS_EKRAN_GENISLIK_KARE=3840
+    MAKS_EKRAN_YUKSEKLIK_KARE=3840
+                
     #solPanel,yarismaPanel,sagPanel genişlik oranları
     SOL_PANEL_GENISLIK_ORAN=.15
     YARISMA_PANEL_GENISLIK_ORAN=.7 #aynı zamanda, sahanın; ekran genişliğine oranı.
@@ -220,10 +229,26 @@ class EkranSabit(metaclass=SabitMetaClass):
     TEXTURE_KUCULTME_CARPAN_2_KENAR=4
     TEXTURE_KUCULTME_CARPAN_1_KENAR=2
 
-    #saha max boyutlarında iken, sahip olduğu ölçü ve koordinatlar
-    MAX_SAHA_GENISLIK=MAX_GENISLIK*YARISMA_PANEL_GENISLIK_ORAN
-    MAX_SAHA_YUKSEKLIK=MAX_YUKSEKLIK*SAHA_YUKSEKLIK_ORAN
-    MAX_SAHA_KENARLIK_KALINLIK=MAX_GENISLIK*YARISMA_PANEL_GENISLIK_ORAN/LABIRENT_KENARLIK_KALINLIK_ORAN
+    def maksSahaKenarlik(labirentTip):#sahanın maks w-h, kenarlık kalınlık maks değerleri döndürür
+        match labirentTip:
+            case DikdortgenTip.YATAY:
+                maksEkranGenislik=EkranSabit.MAKS_EKRAN_GENISLIK_YATAY
+                maksEkranYukseklik=EkranSabit.MAKS_EKRAN_YUKSEKLIK_YATAY
+            case DikdortgenTip.DIKEY:
+                maksEkranGenislik=EkranSabit.MAKS_EKRAN_GENISLIK_DIKEY
+                maksEkranYukseklik=EkranSabit.MAKS_EKRAN_YUKSEKLIK_DIKEY
+            case DikdortgenTip.KARE:
+                maksEkranGenislik=EkranSabit.MAKS_EKRAN_GENISLIK_KARE
+                maksEkranYukseklik=EkranSabit.MAKS_EKRAN_YUKSEKLIK_KARE
+
+        maksKenarlikKalinlik=maksEkranGenislik*EkranSabit.YARISMA_PANEL_GENISLIK_ORAN/EkranSabit.LABIRENT_KENARLIK_KALINLIK_ORAN
+        maksSahaGenislik=maksEkranGenislik*EkranSabit.YARISMA_PANEL_GENISLIK_ORAN
+        maksSahaYukseklik=maksEkranYukseklik*EkranSabit.SAHA_YUKSEKLIK_ORAN
+
+        return {EkranSabit.MAKS_SAHA_GENISLIK_KEY:maksSahaGenislik,
+            EkranSabit.MAKS_SAHA_YUKSEKLIK_KEY:maksSahaYukseklik,
+            EkranSabit.MAKS_KENARLIK_KALINLIK_KEY:maksKenarlikKalinlik}
+    
 
 class LabirentSabit(metaclass=SabitMetaClass):
     KENARLIK_RENK=(1,0,0,1)
