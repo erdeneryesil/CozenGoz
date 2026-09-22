@@ -214,7 +214,7 @@ class EkranSabit(metaclass=SabitMetaClass):
                 
     #solPanel,yarismaPanel,sagPanel genişlik oranları
     SOL_PANEL_GENISLIK_ORAN=.15
-    YARISMA_PANEL_GENISLIK_ORAN=.7 #aynı zamanda, sahanın; ekran genişliğine oranı.
+    SAHA_GENISLIK_ORAN=.7 #aynı zamanda, sahanın; ekran genişliğine oranı.
     SAG_PANEL_GENISLIK_ORAN=.15
 
     #yarışma panelinde; sahanın altında ve üstünde alan bırakıldı
@@ -223,26 +223,29 @@ class EkranSabit(metaclass=SabitMetaClass):
     SAHA_ALT_YUKSEKLIK_ORAN=.1
 
     #labirent çizimi ile alakalı değerler
-    LABIRENT_KENARLIK_KALINLIK_ORAN=300
+    LABIRENT_KENARLIK_KALINLIK_ORAN=100
 
     #labirent görseli için : alt-üst(2+2), sol-sağ(2+2) taraflardan kenarlık kalınlığının 2 katı kadar küçültme yapılacak
-    TEXTURE_KUCULTME_CARPAN_2_KENAR=4
-    TEXTURE_KUCULTME_CARPAN_1_KENAR=2
+    TEXTURE_KUCULTME_CARPAN_2_KENAR=2
+    TEXTURE_KUCULTME_CARPAN_1_KENAR=1
 
     def maksSahaKenarlik(labirentTip):#sahanın maks w-h, kenarlık kalınlık maks değerleri döndürür
         match labirentTip:
             case DikdortgenTip.YATAY:
                 maksEkranGenislik=EkranSabit.MAKS_EKRAN_GENISLIK_YATAY
                 maksEkranYukseklik=EkranSabit.MAKS_EKRAN_YUKSEKLIK_YATAY
+                maksKenarlikKalinlik=maksEkranYukseklik*EkranSabit.SAHA_YUKSEKLIK_ORAN/EkranSabit.LABIRENT_KENARLIK_KALINLIK_ORAN
             case DikdortgenTip.DIKEY:
                 maksEkranGenislik=EkranSabit.MAKS_EKRAN_GENISLIK_DIKEY
                 maksEkranYukseklik=EkranSabit.MAKS_EKRAN_YUKSEKLIK_DIKEY
+                maksKenarlikKalinlik=maksEkranGenislik*EkranSabit.SAHA_GENISLIK_ORAN/EkranSabit.LABIRENT_KENARLIK_KALINLIK_ORAN
             case DikdortgenTip.KARE:
                 maksEkranGenislik=EkranSabit.MAKS_EKRAN_GENISLIK_KARE
                 maksEkranYukseklik=EkranSabit.MAKS_EKRAN_YUKSEKLIK_KARE
+                maksKenarlikKalinlik=maksEkranGenislik*EkranSabit.SAHA_GENISLIK_ORAN/EkranSabit.LABIRENT_KENARLIK_KALINLIK_ORAN
 
-        maksKenarlikKalinlik=maksEkranGenislik*EkranSabit.YARISMA_PANEL_GENISLIK_ORAN/EkranSabit.LABIRENT_KENARLIK_KALINLIK_ORAN
-        maksSahaGenislik=maksEkranGenislik*EkranSabit.YARISMA_PANEL_GENISLIK_ORAN
+        
+        maksSahaGenislik=maksEkranGenislik*EkranSabit.SAHA_GENISLIK_ORAN
         maksSahaYukseklik=maksEkranYukseklik*EkranSabit.SAHA_YUKSEKLIK_ORAN
 
         return {EkranSabit.MAKS_SAHA_GENISLIK_KEY:maksSahaGenislik,

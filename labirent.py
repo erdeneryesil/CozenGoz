@@ -196,14 +196,27 @@ class Labirent:
         self.__kenarlikKalinlik=maks[EkranSabit.MAKS_KENARLIK_KALINLIK_KEY]
 
         canvasGenislik,canvasYukseklik=self.__hesaplaGenislikYukseklik(maksSahaGenislik,maksSahaYukseklik)#labirentin çizileceği alanın genişlik ve yükseklik
-        
+
         # alt-üst(2+2), sol-sağ(2+2) taraflardan kenarlık kalınlığının 2 katı kadar küçültme yapılacak
         #texture ait  genişlik ve yükseklik, canvas'a göre küçültülecek. Fakat bu küçültmenin oranı genişlik ve yüksekliğe göre aynı olmalı (*canvasYukseklik/canvasGenislik)
-        textureGenislik=canvasGenislik-EkranSabit.TEXTURE_KUCULTME_CARPAN_2_KENAR*self.__kenarlikKalinlik                                    #labirentin genişliği
-        textureYukseklik=canvasYukseklik-EkranSabit.TEXTURE_KUCULTME_CARPAN_2_KENAR*self.__kenarlikKalinlik*canvasYukseklik/canvasGenislik   #labirentin yüksekliği
-
+        if self.__tip==DikdortgenTip.DIKEY:            
+            textureYukseklik=canvasYukseklik-EkranSabit.TEXTURE_KUCULTME_CARPAN_2_KENAR*self.__kenarlikKalinlik   
+            textureGenislik=textureYukseklik*canvasGenislik/canvasYukseklik
+            canvasGenislik+=(canvasYukseklik/canvasGenislik)/EkranSabit.TEXTURE_KUCULTME_CARPAN_2_KENAR*self.__kenarlikKalinlik
+        elif self.__tip==DikdortgenTip.YATAY:
+            textureGenislik=canvasGenislik-(EkranSabit.TEXTURE_KUCULTME_CARPAN_2_KENAR)*self.__kenarlikKalinlik
+            textureYukseklik=textureGenislik*canvasYukseklik/canvasGenislik
+            canvasYukseklik+=(canvasGenislik/canvasYukseklik)/EkranSabit.TEXTURE_KUCULTME_CARPAN_2_KENAR*self.__kenarlikKalinlik
+        elif self.__tip==DikdortgenTip.KARE:
+            textureGenislik=canvasGenislik-(EkranSabit.TEXTURE_KUCULTME_CARPAN_2_KENAR)*self.__kenarlikKalinlik
+            textureYukseklik=textureGenislik*canvasYukseklik/canvasGenislik
+            #canvasGenislik+=(canvasYukseklik/canvasGenislik)/EkranSabit.TEXTURE_KUCULTME_CARPAN_2_KENAR*self.__kenarlikKalinlik
+            #canvasYukseklik+=(canvasGenislik/canvasYukseklik)/EkranSabit.TEXTURE_KUCULTME_CARPAN_2_KENAR*self.__kenarlikKalinlik
+            
+        
         solUstX=EkranSabit.TEXTURE_KUCULTME_CARPAN_1_KENAR*self.__kenarlikKalinlik
-        solUstY=textureYukseklik+EkranSabit.TEXTURE_KUCULTME_CARPAN_1_KENAR*self.__kenarlikKalinlik*canvasYukseklik/canvasGenislik 
+        #solUstY=textureYukseklik+EkranSabit.TEXTURE_KUCULTME_CARPAN_1_KENAR*self.__kenarlikKalinlik*canvasYukseklik/canvasGenislik 
+        solUstY=textureYukseklik+EkranSabit.TEXTURE_KUCULTME_CARPAN_1_KENAR*self.__kenarlikKalinlik
 
         self.__hucreKenarUzunluk=self.__hesaplaHucreKenarUzunluk(textureGenislik,textureYukseklik)
 
@@ -216,7 +229,8 @@ class Labirent:
         with fbo:
             # Kenarlık rengi ve çerçeve çizimi
             textureX = solUstX
-            textureY = EkranSabit.TEXTURE_KUCULTME_CARPAN_1_KENAR*self.__kenarlikKalinlik*canvasYukseklik/canvasGenislik
+            textureY = EkranSabit.TEXTURE_KUCULTME_CARPAN_1_KENAR*self.__kenarlikKalinlik
+
 
             Color(rgba=LabirentSabit.KENARLIK_RENK)
             self.__cizCerceve(textureX,textureY,textureGenislik,textureYukseklik)
@@ -475,7 +489,7 @@ class Yarisma:
 
         self.__saha.bind(pos=self.guncelleOlculer, size=self.guncelleOlculer)
                 
-        self.__labirent=Labirent(20,15)#Labirent(20,5)
+        self.__labirent=Labirent(3,8)#Labirent(20,5)
         goz1=BenimGozum("ROBOT1")
         self.__goz=goz1
         self.__gozImaj=GozImaj(GozTip.GOZ1,Yon.baslangic())
@@ -539,7 +553,7 @@ class Yarisma:
             self.__yarismaSaat=Clock.schedule_once(self.yarisTikTak, animasyonSure+AnimasyonSabit.EPSILON)
             return
         
-        self.__yarismaSaat=Clock.schedule_once(self.yarisTikTak, AnimasyonSabit.animasyonGecikme())
+        self.__yarismaSaat=Clock.schedule_once(self.yarisTikTak, AnimasyonSabit.ANIMASYON_GECIKME)
         
     def __gozHareketUygula(self,hareket):
         match hareket:
