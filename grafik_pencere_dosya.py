@@ -51,12 +51,30 @@ class Yukle:
                             ImajSinif.kareEkle(hamKare)
 
         #ImajSinif.atlasYuklendiGuncelle(True)
-    
-# Kivy'nin Image sınıfının kullandığı metaclass'ı ve ABCMeta'yı birleştiriyoruz
-class ImajMeta(type(Image), ABCMeta):
-    pass
 
-class Imaj(Image,metaclass=ImajMeta):
+# Image nesneleri bir widget içerisinde görüntülenirken, içinde bulunduğu widget nesnesine göre boyutlandırılıp, konumlandırılabiliyor.
+# Fakat gerçek boyut(size,width,height) ve konum(pos,x,y) verileri yanıltıcı değerler içerebiliyor.
+# Bu sebeple Labirent gibi statik görsellerin; ölçeklendirme, konumlandırma gibi işlemlerden sonra boyut ve konum bilgilerine sağlıklı olarak ulaşabilmek için bu sınıf kullanılacak 
+class StatikImaj(Image):
+    def __init__(self,**kwargs):
+        super().__init__(**kwargs)
+        self.allow_stretch=True
+        self.keep_ratio=True
+
+    @property
+    def genislik(self):
+        return self.norm_image_size[0]
+    @property
+    def yukseklik(self):
+        return self.norm_image_size[1]
+    
+    def solX(self,ebeveyn):#ebeveyn:içinde bulunduğu widget
+        return ebeveyn.x+(ebeveyn.width-self.genislik)/2
+    
+    def ustY(self,ebeveyn):#ebeveyn:içinde bulunduğu widget
+        return self.yukseklik+ebeveyn.y+(ebeveyn.height-self.yukseklik)/2
+
+class AnimasyonImaj(Image):
     #SABİTLER
     _DIZIN = None
     _ATLAS_DOSYA = None
@@ -154,7 +172,7 @@ class Imaj(Image,metaclass=ImajMeta):
         if self._animasyonSaat is not None: 
             self._animasyonSaat.cancel()
 
-class ReseptorImaj(Imaj):
+class ReseptorImaj(AnimasyonImaj):
     #SABİTLER
     _DIZIN=ImajSabit.DIZIN[ImajTip.RESEPTOR_IMAJ]
     _ATLAS_DOSYA=ImajSabit.ATLAS_DOSYA[ImajTip.RESEPTOR_IMAJ]
@@ -246,7 +264,7 @@ class ReseptorImaj(Imaj):
                 self.center_x=hucreX+hucreBoyut/2
                 self.center_y=hucreY+hucreBoyut           
                     
-class GozImaj(Imaj):#animasyon ve çizim işlemlerinin yürütüleceğin sınıf
+class GozImaj(AnimasyonImaj):#animasyon ve çizim işlemlerinin yürütüleceğin sınıf
     _DIZIN=ImajSabit.DIZIN[ImajTip.GOZ_IMAJ]
     _ATLAS_DOSYA=ImajSabit.ATLAS_DOSYA[ImajTip.GOZ_IMAJ]
     _KARE_AD=ImajSabit.KARE_AD[ImajTip.GOZ_IMAJ]
@@ -364,12 +382,16 @@ class GozImaj(Imaj):#animasyon ve çizim işlemlerinin yürütüleceğin sınıf
                 
             self.__aksiyon=GozAksiyon.BEKLE
             self._animasyonHazirlik()
+        
 
-    def guncelleOlculer(self,hucreX,hucreY,hucreBoyut):#canvas içerisine çizilecek labirentin genişlik, yükseklik, x, y vs değerleri hesaplanıyor
+
+
+
+    def guncelleOlculer(self,hucreX,hucreY,hucreBoyut,kenarlikKalinlik):#canvas içerisine çizilecek labirentin genişlik, yükseklik, x, y vs değerleri hesaplanıyor
         self.width=hucreBoyut*GozImaj.boyutOran()
         self.height=self.width
-
-        self.konumla(hucreX,hucreY,hucreBoyut)
+        
+        self.konumla(hucreX,hucreY,hucreBoyut,kenarlikKalinlik)
 
         gitAdimSag=hucreBoyut/(GozImaj.kareSayi(GozAksiyon.GIT,Yon.SAG)*GozImaj.animasyonTekrar(GozAksiyon.GIT))
         gitAdimSol=hucreBoyut/(GozImaj.kareSayi(GozAksiyon.GIT,Yon.SOL)*GozImaj.animasyonTekrar(GozAksiyon.GIT))
@@ -378,6 +400,6 @@ class GozImaj(Imaj):#animasyon ve çizim işlemlerinin yürütüleceğin sınıf
 
         self.__gitAdim={Yon.SAG: (gitAdimSag, 0),Yon.SOL: (-gitAdimSol, 0),Yon.UST: (0, gitAdimUst),Yon.ALT: (0, -gitAdimAlt)}
 
-    def konumla(self,hucreX,hucreY,hucreBoyut):
-        self.center_x=hucreX+hucreBoyut/2
-        self.center_y=hucreY+hucreBoyut/2
+    def konumla(self,hucreX,hucreY,hucreBoyut,kenarlikKalinlik):
+        self.center_x=hucreX+hucreBoyut/2+kenarlikKalinlik/2
+        self.center_y=hucreY+hucreBoyut/2+kenarlikKalinlik/2
