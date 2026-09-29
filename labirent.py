@@ -6,49 +6,17 @@ import random
 from kivy.clock import Clock
 from kivy.uix.image import Image
 from kivy.uix.widget import Widget
+from kivy.graphics import Color, Line, Ellipse, Fbo
 
-from kivy.graphics import Color, Line, Ellipse, Fbo#, RenderContext, Scale, Translate
 
 from temel import Konum#,Denetle
 from sabitler import EkranSabit,HucreSabit,LabirentSabit,AnimasyonSabit,DikdortgenTip,DuvarDurum,Yon,GozTip,GozAksiyon,Hareket,Yon,DuvarDurum,ReseptorKonum
 from yarismaci import BenimGozum
 from goz import Reseptor
 
-from grafik_pencere_dosya import StatikImaj,GozImaj,ReseptorImaj
+from grafik_pencere_dosya import LabirentStatikImaj,GozImaj,ReseptorImaj
 
 class Hucre(Konum):
-    #SABİTLER
-    __TIP_BASLANGIC_KEY=HucreSabit.TIP_BASLANGIC_KEY
-    __TIP_BITIS_KEY=HucreSabit.TIP_BITIS_KEY
-    __TIP_YOL_KEY=HucreSabit.TIP_YOL_KEY
-    __TIP_RENK_KEY=HucreSabit.TIP_RENK_KEY
-    __TIP_UZUNLUK_CARPAN_KEY=HucreSabit.TIP_UZUNLUK_CARPAN_KEY
-    __SAYI_KEY=HucreSabit.SAYI_KEY
-    __TIP=HucreSabit.TIP
-
-    @staticmethod
-    def tipBaslangicKey():
-        return Hucre.__TIP_BASLANGIC_KEY
-    @staticmethod
-    def tipBitisKey():
-        return Hucre.__TIP_BITIS_KEY
-    @staticmethod
-    def tipYolKey():
-        return Hucre.__TIP_YOL_KEY
-    @staticmethod
-    def tipRenkKey():
-        return Hucre.__TIP_RENK_KEY
-    @staticmethod
-    def tipUzunlukCarpanKey():
-        return Hucre.__TIP_UZUNLUK_CARPAN_KEY
-    @staticmethod
-    def sayiKey():
-        return Hucre.__SAYI_KEY
-    @staticmethod
-    def tip(tipKey):
-        return Hucre.__TIP[tipKey]
-
-
     def __init__(self,satirNumara,sutunNumara):
         super().__init__(satirNumara,sutunNumara)
 
@@ -88,45 +56,62 @@ class Duvar:
 
 class Labirent:
     def __init__(self,satirSayi,sutunSayi):
-        #çizim ile ilgili özellikler
-        self.__kenarlikKalinlik=None
-        self.__hucreKenarUzunluk=None
-        self.__texture=None
-        self.__imaj=None
-
         self.__satirSayi=satirSayi
         self.__sutunSayi=sutunSayi
-        self.__tip=DikdortgenTip.belirle(self.__sutunSayi,self.__satirSayi)
-        self.__baslangicSatirNumara=None
-        self.__baslangicSutunNumara=None
-        self.__bitisSatirNumara=None
-        self.__bitisSutunNumara=None
-
-
-        self.__rastgeleBaslangicBitisBelirle()
 
         self.__minimumCozumUzunlugu=self.__satirSayi*self.__sutunSayi*LabirentSabit.MINIMUM_COZUM_UZUNLUGU_ORAN
+        self.__tip=DikdortgenTip.belirle(self.__sutunSayi,self.__satirSayi)
+
+        self.__kenarlikKalinlik=-1
+        self.__hucreKenarUzunluk=-1
+        self.__baslangicSatirNumara=-1
+        self.__baslangicSutunNumara=-1
+        self.__bitisSatirNumara=-1
+        self.__bitisSutunNumara=-1
         self.__cozumYolu=[]
-        self.__olustur()
+        self.__hucreler=[]
+        self.__imaj=None
+
+        rastgeleDeger=self.__rastgeleBaslangicBitisBelirle()
+        self.__baslangicSatirNumara=rastgeleDeger[LabirentSabit.BASLANGIC_SATIR_NUMARA_ANAHTAR]
+        self.__baslangicSutunNumara=rastgeleDeger[LabirentSabit.BASLANGIC_SUTUN_NUMARA_ANAHTAR]
+        self.__bitisSatirNumara=rastgeleDeger[LabirentSabit.BITIS_SATIR_NUMARA_ANAHTAR]
+        self.__bitisSutunNumara=rastgeleDeger[LabirentSabit.BITIS_SUTUN_NUMARA_ANAHTAR]
         
+        self.__cozumYolu=self.__olusturCozumYolu()
         self.__hucreler=self.__olusturHucreler()
 
-        self.__texture=self.__textureOlustur()
-        self.__imaj=StatikImaj()
-        #self.__imaj = Image(allow_stretch=True,keep_ratio=True)
-        #self.__imaj = Image()
-
-        #self.__imaj.size_hint=(None,None)
-        self.__imaj.texture = self.__texture
-
-        self.__texture.save("labirent_sablonu.png")
-        
+        self.__imaj=LabirentStatikImaj(self)
+        self.__imaj.texture.save("labirent_sablonu.png")
+    
+    @property
+    def satirSayi(self):
+        return self.__satirSayi
+    @property
+    def sutunSayi(self):
+        return self.__sutunSayi
+    @property
+    def baslangicSatirNumara(self):
+        return self.__baslangicSatirNumara
+    @property
+    def baslangicSutunNumara(self):
+        return self.__baslangicSutunNumara
+    @property
+    def bitisSatirNumara(self):
+        return self.__bitisSatirNumara
+    @property
+    def bitisSutunNumara(self):
+        return self.__bitisSutunNumara
+    
     @property
     def baslangicHucre(self):
         return self.__hucreler[self.__baslangicSatirNumara][self.__baslangicSutunNumara]
     @property
     def bitisHucre(self):
         return self.__hucreler[self.__bitisSatirNumara][self.__bitisSutunNumara]
+    @property
+    def cozumYoluUzunluk(self):#çözüm yolu kaç tane Hücre içeriyor
+        return len(self.__cozumYolu)
     @property
     def hucreKenarUzunluk(self):
         return self.__hucreKenarUzunluk
@@ -142,33 +127,35 @@ class Labirent:
     @property
     def imajYukseklik(self):#height ile imajın gerçek boyutu dönmüyor, norm_image_size ile gerçek değeri alabiliyoruz
         return self.__imaj.norm_image_size[1]
-
     @property
     def tip(self):
         return self.__tip
     
+    def cozumYoluHucre(self,numara):
+        return self.__cozumYolu[numara]
+
     def hucre(self,satirNumara,sutunNumara):
         if satirNumara<0 or satirNumara>=self.__satirSayi or sutunNumara<0 or sutunNumara>=self.__sutunSayi:
             return None
         return self.__hucreler[satirNumara][sutunNumara]
     
     def komsuHucreler(self,hucre):
-        komsuHucreler={Yon.SOL:None,Yon.ALT:None,Yon.SAG:None,Yon.UST:None,Hucre.sayiKey():0}
+        komsuHucreler={Yon.SOL:None,Yon.ALT:None,Yon.SAG:None,Yon.UST:None,HucreSabit.SAYI_ANAHTAR:0}
         if hucre.satirNumara+1<self.__satirSayi:#altında komşu var mı
             komsuHucreler[Yon.ALT]=self.__hucreler[hucre.satirNumara+1][hucre.sutunNumara]
-            komsuHucreler[Hucre.sayiKey()]+=1
+            komsuHucreler[HucreSabit.SAYI_ANAHTAR]+=1
         
         if hucre.satirNumara-1>=0:#üstünde satir var mı
             komsuHucreler[Yon.UST]=self.__hucreler[hucre.satirNumara-1][hucre.sutunNumara]
-            komsuHucreler[Hucre.sayiKey()]+=1
+            komsuHucreler[HucreSabit.SAYI_ANAHTAR]+=1
         
         if hucre.sutunNumara+1<self.__sutunSayi:#sağında komşu var mı
             komsuHucreler[Yon.SAG]=self.__hucreler[hucre.satirNumara][hucre.sutunNumara+1]
-            komsuHucreler[Hucre.sayiKey()]+=1
+            komsuHucreler[HucreSabit.SAYI_ANAHTAR]+=1
 
         if hucre.sutunNumara-1>=0:#solunda komşu var mı
             komsuHucreler[Yon.SOL]=self.__hucreler[hucre.satirNumara][hucre.sutunNumara-1]
-            komsuHucreler[Hucre.sayiKey()]+=1
+            komsuHucreler[HucreSabit.SAYI_ANAHTAR]+=1
         return komsuHucreler
 
     def duvar(self,hucre1,hucre2):
@@ -185,160 +172,50 @@ class Labirent:
             return self.__duvarlar[LabirentSabit.SUTUN_ANAHTAR][hucre1.sutunNumara][hucre1.satirNumara]#hücre1 küçük indisli ise
 
     def hucreXY(self,hucre,saha):#konumu verilen hücreye, robotu çizebilmek için gerekli koordinatlar   
-        genislik,yukseklik=self.__olcekle(saha.width,saha.height)
-        solX,ustY=self.__hesaplaSolUstXY(saha,genislik,yukseklik)
+        genislik,yukseklik=self.olcekle(saha.width,saha.height)
+        solX=self.imaj.solXRender(saha)
+        ustY=self.imaj.ustYRender(saha)
         x=solX+self.__kenarlikKalinlik/2+(self.__hucreKenarUzunluk-self.__kenarlikKalinlik/2)*hucre.sutunNumara   
         y=ustY-self.__hucreKenarUzunluk*(1+hucre.satirNumara)+self.__kenarlikKalinlik+self.__hucreKenarUzunluk/2-self.__hucreKenarUzunluk/2
 
         return (x,y)
-    
-    '''def __hucreTipKey(self,hucre):# hucrenin tip key (__TIP_BASLANGIC_KEY="baslangic",__TIP_BITIS_KEY="bitis",__TIP_YOL_KEY="yol") bilgisini döndürür
-        if hucre==self.baslangicHucre:
-            return Hucre.tipBaslangicKey()
-        elif hucre==self.bitisHucre:
-            return Hucre.tipBitisKey()
-        else:
-            return Hucre.tipYolKey()'''
 
-    def __textureOlustur(self):
-        #labirent görselini, maks boyutlara göre bir kez oluşturup, sonrasında ölçekleniyor
-        
-        maks=EkranSabit.maksSahaKenarlik(self.__tip)
-        maksSahaGenislik=maks[EkranSabit.MAKS_SAHA_GENISLIK_KEY]
-        maksSahaYukseklik=maks[EkranSabit.MAKS_SAHA_YUKSEKLIK_KEY]
-        self.__kenarlikKalinlik=maks[EkranSabit.MAKS_KENARLIK_KALINLIK_KEY]
-
-        canvasGenislik,canvasYukseklik=self.__olcekle(maksSahaGenislik,maksSahaYukseklik)#labirentin çizileceği alanın genişlik ve yükseklik
-
-        # alt-üst(2+2), sol-sağ(2+2) taraflardan kenarlık kalınlığının 2 katı kadar küçültme yapılacak
-        #texture ait  genişlik ve yükseklik, canvas'a göre küçültülecek. Fakat bu küçültmenin oranı genişlik ve yüksekliğe göre aynı olmalı (*canvasYukseklik/canvasGenislik)
-        if self.__tip==DikdortgenTip.DIKEY:            
-            textureYukseklik=canvasYukseklik-EkranSabit.TEXTURE_KUCULTME_CARPAN_2_KENAR*self.__kenarlikKalinlik   
-            textureGenislik=textureYukseklik*canvasGenislik/canvasYukseklik
-            canvasGenislik+=(canvasYukseklik/canvasGenislik)/EkranSabit.TEXTURE_KUCULTME_CARPAN_2_KENAR*self.__kenarlikKalinlik
-        elif self.__tip==DikdortgenTip.YATAY:
-            textureGenislik=canvasGenislik-(EkranSabit.TEXTURE_KUCULTME_CARPAN_2_KENAR)*self.__kenarlikKalinlik
-            textureYukseklik=textureGenislik*canvasYukseklik/canvasGenislik
-            canvasYukseklik+=(canvasGenislik/canvasYukseklik)/EkranSabit.TEXTURE_KUCULTME_CARPAN_2_KENAR*self.__kenarlikKalinlik
-        elif self.__tip==DikdortgenTip.KARE:
-            textureGenislik=canvasGenislik-(EkranSabit.TEXTURE_KUCULTME_CARPAN_2_KENAR)*self.__kenarlikKalinlik
-            textureYukseklik=textureGenislik*canvasYukseklik/canvasGenislik
-            #canvasGenislik+=(canvasYukseklik/canvasGenislik)/EkranSabit.TEXTURE_KUCULTME_CARPAN_2_KENAR*self.__kenarlikKalinlik
-            #canvasYukseklik+=(canvasGenislik/canvasYukseklik)/EkranSabit.TEXTURE_KUCULTME_CARPAN_2_KENAR*self.__kenarlikKalinlik
-            
-        
-        solX=EkranSabit.TEXTURE_KUCULTME_CARPAN_1_KENAR*self.__kenarlikKalinlik
-        #ustY=textureYukseklik+EkranSabit.TEXTURE_KUCULTME_CARPAN_1_KENAR*self.__kenarlikKalinlik*canvasYukseklik/canvasGenislik 
-        ustY=textureYukseklik+EkranSabit.TEXTURE_KUCULTME_CARPAN_1_KENAR*self.__kenarlikKalinlik
-
-        self.__hucreKenarUzunluk=self.__hesaplaHucreKenarUzunluk(textureGenislik,textureYukseklik)
-
-        fbo = Fbo(size=(canvasGenislik, canvasYukseklik))
-
-        # Kivy Fbo varsayılan olarak transparan gelebilir. Arka planı temizliyoruz.
-        fbo.clear_buffer()
-
-        # 2. Çizim komutlarını Fbo canvas'ına ekliyoruz
-        with fbo:
-            # Kenarlık rengi ve çerçeve çizimi
-            textureX = solX
-            textureY = EkranSabit.TEXTURE_KUCULTME_CARPAN_1_KENAR*self.__kenarlikKalinlik
-
-
-            Color(rgba=LabirentSabit.KENARLIK_RENK)
-            self.__cizCerceve(textureX,textureY,textureGenislik,textureYukseklik)
-
-            # Duvarların çizimi
-            self.__cizDuvar(solX,ustY)
-            
-            # Çözüm yolu veya Başlangıç/Bitiş hücrelerinin boyanması
-            hucreTip=Hucre.tip(Hucre.tipYolKey())
-            for hucre in self.__cozumYolu:
-                self.__boyaHucre(solX,ustY,hucre,hucreTip[Hucre.tipUzunlukCarpanKey()],hucreTip[Hucre.tipRenkKey()])
-
-
-            hucreTip=Hucre.tip(Hucre.tipBaslangicKey())
-            self.__boyaHucre(solX,ustY,Konum(self.__baslangicSatirNumara,self.__baslangicSutunNumara),hucreTip[Hucre.tipUzunlukCarpanKey()],hucreTip[Hucre.tipRenkKey()])
-            
-            hucreTip=Hucre.tip(Hucre.tipBitisKey())
-            self.__boyaHucre(solX,ustY,Konum(self.__bitisSatirNumara,self.__bitisSutunNumara),hucreTip[Hucre.tipUzunlukCarpanKey()],hucreTip[Hucre.tipRenkKey()])
-
-        # 3. Fbo üzerindeki çizimleri ekrana yansıtılmaya hazır bir doku (texture) olarak çekiyoruz
-        fbo.draw()
-        return fbo.texture
-
-    
-    def __cizCerceve(self,x,y,genislik,yukseklik):        
-        Line(close="True", width=self.__kenarlikKalinlik,rectangle=(x,y, genislik, yukseklik))
-
-    def __cizDuvar(self,solX,ustY):
-        for satirNumara in range(self.__satirSayi):
-            for sutunNumara in range(self.__sutunSayi-1):
-                duvar=self.duvar(self.__hucreler[satirNumara][sutunNumara],self.__hucreler[satirNumara][sutunNumara+1])
-                if duvar.durum==DuvarDurum.KAPALI:
-                    x=solX+self.__hucreKenarUzunluk*(sutunNumara+1)
-                    y1=ustY-self.__hucreKenarUzunluk*satirNumara
-                    y2=y1-self.__hucreKenarUzunluk
-                    Line(width=self.__kenarlikKalinlik,points=(x,y1,x,y2))
-
-        for sutunNumara in range(self.__sutunSayi):
-            for satirNumara in range(self.__satirSayi-1):
-                duvar=self.duvar(self.__hucreler[satirNumara][sutunNumara],self.__hucreler[satirNumara+1][sutunNumara])
-                if duvar.durum==DuvarDurum.KAPALI:
-                    x1=solX+self.__hucreKenarUzunluk*sutunNumara
-                    y=ustY-self.__hucreKenarUzunluk*(satirNumara+1)
-                    x2=x1+self.__hucreKenarUzunluk
-                    Line(width=self.__kenarlikKalinlik,points=(x1,y,x2,y))
-
-    def __boyaHucre(self,solX,ustY,konum,uzunlukCarpan,renk):
-        Color(renk["r"],renk["g"],renk["b"],renk["a"])
-        
-        hucre=self.__hucreler[konum.satirNumara][konum.sutunNumara]
-
-        x=solX+self.__hucreKenarUzunluk*hucre.sutunNumara+self.__kenarlikKalinlik+self.__hucreKenarUzunluk/2-uzunlukCarpan*self.__hucreKenarUzunluk/2
-        y=ustY-self.__hucreKenarUzunluk*(1+hucre.satirNumara)+self.__kenarlikKalinlik+self.__hucreKenarUzunluk/2-uzunlukCarpan*self.__hucreKenarUzunluk/2
-
-        boyut=uzunlukCarpan*self.__hucreKenarUzunluk-2*self.__kenarlikKalinlik
-        Ellipse(size=(boyut,boyut),pos=(x,y))
-
-
-    def guncelleOlculer(self,saha):#canvas içerisine çizilecek labirentin genişlik, yükseklik, x, y vs değerleri hesaplanıyor        
-        
-        genislik,yukseklik=self.__olcekle(saha.width,saha.height)
-
-        solX,ustY=self.__hesaplaSolUstXY(saha,genislik,yukseklik)
-
-        self.__kenarlikKalinlik=int(genislik/EkranSabit.LABIRENT_KENARLIK_KALINLIK_ORAN)
-        self.__hucreKenarUzunluk=int(self.__hesaplaHucreKenarUzunluk(genislik,yukseklik))
-        
-        self.__imaj.size=(genislik,yukseklik)
-        self.__imaj.pos=(solX,ustY-yukseklik)
-
-        print(solX,self.__imaj.solX(saha))
-        print(genislik,self.__imaj.genislik,self.__imaj.width)
-        
-        
-        
-    def __hesaplaHucreKenarUzunluk(self,genislik,yukseklik):
+    def hesaplaHucreKenarUzunluk(self,genislik,yukseklik):
         if self.__tip==DikdortgenTip.YATAY:
             return genislik/self.__sutunSayi
         return yukseklik/self.__satirSayi
         
-    
-    def __hesaplaKenarlikKalinlik(self):
-        pass
-
-    def __olcekle(self,sahaGenislik,sahaYukseklik):#sahanın boyutlarına göre ölçeklenmiş genişlik, yükseklik değerlerini döndürür
+    def olcekle(self,sahaGenislik,sahaYukseklik):#sahanın boyutlarına göre ölçeklenmiş genişlik, yükseklik değerlerini döndürür
         genislikOlcek=sahaGenislik/self.__sutunSayi
         yukseklikOlcek=sahaYukseklik/self.__satirSayi
         olcekFaktor=min(genislikOlcek,yukseklikOlcek)
 
         return (self.__sutunSayi*olcekFaktor,self.__satirSayi*olcekFaktor)
-    
-    def __hesaplaSolUstXY(self,saha,labirentGenislik,labirentYukseklik):
-        return (saha.x+saha.width/2-labirentGenislik/2,saha.y+saha.height/2 + labirentYukseklik / 2)
 
-    def __olustur(self):
+    def guncelleOlculer(self,saha):#canvas içerisine çizilecek labirentin genişlik, yükseklik, x, y vs değerleri hesaplanıyor        
+        
+        genislik,yukseklik=self.olcekle(saha.width,saha.height)
+
+        self.__imaj.size=(genislik,yukseklik)
+        self.__imaj.pos=(self.__imaj.solXImageWidget(saha),self.__imaj.ustYImageWidget(saha)-yukseklik)
+        
+        self.__kenarlikKalinlik=(saha.height/EkranSabit.LABIRENT_KENARLIK_KALINLIK_ORAN)*(self.__imaj.yukseklikRender/self.__imaj.orijinalYukseklikRender)
+
+        self.__hucreKenarUzunluk=self.hesaplaHucreKenarUzunluk(self.__imaj.genislikRender,self.__imaj.yukseklikRender)
+        
+        
+        #print("asd",saha.height/self.__kenarlikKalinlik)
+
+        #print(self.__kenarlikKalinlik,self.__imaj.genislikRender)
+        #print(solX,self.__imaj.solX(saha))
+        #print(saha.width,genislik,saha.height,yukseklik)
+        #print(genislik,self.__imaj.genislik,self.__imaj.width)
+        #print(yukseklik,self.__imaj.yukseklik,self.__imaj.height)
+        
+    def __hesaplaKenarlikKalinlik(self):
+        pass
+     
+    def __olusturCozumYolu(self):
          
         while(len(self.__cozumYolu)<self.__minimumCozumUzunlugu):
             #self.__butunDuvarlariKapat()
@@ -368,12 +245,12 @@ class Labirent:
                 else:
                     hucreYigin.pop()
         
-            #print("bitiş : ",len(self.__cozumYolu))
-
+        return hucreYigin
+    
     def __secRastgeleKomsuHucre(self,hucre):
         komsuHucreler=self.komsuHucreler(hucre)
         
-        if komsuHucreler[Hucre.sayiKey()]==0:
+        if komsuHucreler[HucreSabit.SAYI_ANAHTAR]==0:
             return None
         
         tumKomsuHucrelerIsaretli=True
@@ -465,19 +342,23 @@ class Labirent:
         else:
             labirentTip=self.__tip
 
-
         match labirentTip:
             case DikdortgenTip.YATAY:
-                self.__baslangicSutunNumara=0
-                self.__bitisSutunNumara=self.__sutunSayi-1
-                self.__baslangicSatirNumara=random.randint(0,self.__satirSayi-1)
-                self.__bitisSatirNumara=random.randint(0,self.__satirSayi-1)
+                baslangicSutunNumara=0
+                bitisSutunNumara=self.__sutunSayi-1
+                baslangicSatirNumara=random.randint(0,self.__satirSayi-1)
+                bitisSatirNumara=random.randint(0,self.__satirSayi-1)
             case DikdortgenTip.DIKEY:
-                self.__baslangicSatirNumara=0
-                self.__bitisSatirNumara=self.__satirSayi-1
-                self.__baslangicSutunNumara=random.randint(0,self.__sutunSayi-1)
-                self.__bitisSutunNumara=random.randint(0,self.__sutunSayi-1)
+                baslangicSatirNumara=0
+                bitisSatirNumara=self.__satirSayi-1
+                baslangicSutunNumara=random.randint(0,self.__sutunSayi-1)
+                bitisSutunNumara=random.randint(0,self.__sutunSayi-1)
 
+        return {LabirentSabit.BASLANGIC_SATIR_NUMARA_ANAHTAR:baslangicSatirNumara,
+            LabirentSabit.BASLANGIC_SUTUN_NUMARA_ANAHTAR:baslangicSutunNumara,
+            LabirentSabit.BITIS_SATIR_NUMARA_ANAHTAR:bitisSatirNumara,
+            LabirentSabit.BITIS_SUTUN_NUMARA_ANAHTAR:bitisSutunNumara}
+    
 
         
     #def __maksimumMesafe(self):#labirentin birbirlerine en uzak olan hücrelerin arasındaki mesafe
@@ -485,6 +366,7 @@ class Labirent:
     
     #def __mesafeHesapla(self,satirNumara1,sutunNumara1,satirNumara2,sutunNumara2):
         #return abs(satirNumara1-satirNumara2)+abs(sutunNumara1-sutunNumara2)
+
 class Saha(Widget):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -506,7 +388,7 @@ class Yarisma:
 
         self.__saha.bind(pos=self.guncelleOlculer, size=self.guncelleOlculer)
                 
-        self.__labirent=Labirent(3,8)#Labirent(20,5)
+        self.__labirent=Labirent(2,8)#Labirent(20,5)
         goz1=BenimGozum("ROBOT1")
         self.__goz=goz1
         self.__gozImaj=GozImaj(GozTip.GOZ1,Yon.baslangic())
@@ -568,9 +450,31 @@ class Yarisma:
                 Color(0,0,0,1)
                 boyut=self.__labirent.kenarlikKalinlik
                 kenarlik=self.__labirent.kenarlikKalinlik
-                Rectangle(size=(boyut,boyut),pos=(self.__labirent.imaj.solX(self.__saha),self.__labirent.imaj.ustY(self.__saha)))
-            
-            
+                solX=self.__labirent.imaj.solXRender(self.__saha)
+                ustY=self.__labirent.imaj.ustYRender(self.__saha)
+                sagX=solX+self.__labirent.imaj.genislikRender
+                altY=ustY-self.__labirent.imaj.yukseklikRender
+                
+                Rectangle(size=(boyut,boyut),pos=(self.__labirent.imaj.solXImageWidget(self.__saha),self.__labirent.imaj.ustYImageWidget(self.__saha)))
+
+                print(self.__labirent.kenarlikKalinlik)
+                #Rectangle(size=(boyut,boyut),pos=(solX-boyut/2,ustY-boyut/2))
+                #Rectangle(size=(boyut,boyut),pos=(sagX-boyut/2,ustY-boyut/2))
+                #Rectangle(size=(boyut,boyut),pos=(solX-boyut/2,altY-boyut/2))
+                #Rectangle(size=(boyut,boyut),pos=(sagX-boyut/2,altY-boyut/2))
+
+
+                x=solX+self.__labirent.kenarlikKalinlik/2
+                y=ustY-self.__labirent.kenarlikKalinlik/2
+                #Rectangle(size=(boyut,boyut),pos=(x-boyut/2,y-boyut/2))
+
+                x=solX+self.__labirent.kenarlikKalinlik+self.__labirent.hucreKenarUzunluk
+                y=ustY-self.__labirent.kenarlikKalinlik
+                Rectangle(size=(boyut,boyut),pos=(x-boyut/2,y-boyut/2))
+
+
+
+                
             gozHareket = self.__goz.kararVer(self.__reseptor)
             animasyonSure=self.__gozHareketUygula(gozHareket)
             

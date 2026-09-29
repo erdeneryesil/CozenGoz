@@ -180,29 +180,29 @@ class ImajSabit(metaclass=SabitMetaClass):
             }
 
 class HucreSabit(metaclass=SabitMetaClass):
-    TIP_BASLANGIC_KEY="baslangic"
-    TIP_BITIS_KEY="bitis"
-    TIP_YOL_KEY="yol"
-    TIP_RENK_KEY="renk"
-    TIP_UZUNLUK_CARPAN_KEY="uzunlukCarpan"
-    SAYI_KEY="sayı"
+    TIP_BASLANGIC_ANAHTAR="baslangic"
+    TIP_BITIS_ANAHTAR="bitis"
+    TIP_YOL_ANAHTAR="yol"
+    TIP_RENK_ANAHTAR="renk"
+    TIP_UZUNLUK_CARPAN_ANAHTAR="uzunlukCarpan"
+    SAYI_ANAHTAR="sayı"
     TIP={
-        TIP_BASLANGIC_KEY:{
-            TIP_RENK_KEY:{"r":245/255,"g":73/255,"b":39/255,"a":1},
-            TIP_UZUNLUK_CARPAN_KEY:1},
-        TIP_BITIS_KEY:{
-            TIP_RENK_KEY:{"r":219/255,"g":88/255,"b":88/255,"a":1},
-            TIP_UZUNLUK_CARPAN_KEY:1},
-        TIP_YOL_KEY:{
-            TIP_RENK_KEY:{"r":255/255,"g":247/255,"b":173/255,"a":0.5},
-            TIP_UZUNLUK_CARPAN_KEY:1.0}
+        TIP_BASLANGIC_ANAHTAR:{
+            TIP_RENK_ANAHTAR:{"r":245/255,"g":73/255,"b":39/255,"a":1},
+            TIP_UZUNLUK_CARPAN_ANAHTAR:1},
+        TIP_BITIS_ANAHTAR:{
+            TIP_RENK_ANAHTAR:{"r":219/255,"g":88/255,"b":88/255,"a":1},
+            TIP_UZUNLUK_CARPAN_ANAHTAR:1},
+        TIP_YOL_ANAHTAR:{
+            TIP_RENK_ANAHTAR:{"r":255/255,"g":247/255,"b":173/255,"a":0.5},
+            TIP_UZUNLUK_CARPAN_ANAHTAR:1.0}
         }
 
 class EkranSabit(metaclass=SabitMetaClass):
 
-    MAKS_SAHA_GENISLIK_KEY="MAKS_SAHA_GENISLIK"
-    MAKS_SAHA_YUKSEKLIK_KEY="MAKS_SAHA_YUKSEKLIK"
-    MAKS_KENARLIK_KALINLIK_KEY="MAKS_KENARLIK_KALINLIK"
+    MAKS_SAHA_GENISLIK_ANAHTAR="MAKS_SAHA_GENISLIK"
+    MAKS_SAHA_YUKSEKLIK_ANAHTAR="MAKS_SAHA_YUKSEKLIK"
+    MAKS_KENARLIK_KALINLIK_ANAHTAR="MAKS_KENARLIK_KALINLIK"
     
     #ekranın alabileceği maks genişlik, yükseklik değerleri
     MAKS_EKRAN_GENISLIK_YATAY=3840
@@ -223,7 +223,7 @@ class EkranSabit(metaclass=SabitMetaClass):
     SAHA_ALT_YUKSEKLIK_ORAN=.1
 
     #labirent çizimi ile alakalı değerler
-    LABIRENT_KENARLIK_KALINLIK_ORAN=100
+    LABIRENT_KENARLIK_KALINLIK_ORAN=50#100
 
     #labirent görseli için : alt-üst(2+2), sol-sağ(2+2) taraflardan kenarlık kalınlığının 2 katı kadar küçültme yapılacak
     TEXTURE_KUCULTME_CARPAN_2_KENAR=2
@@ -248,16 +248,20 @@ class EkranSabit(metaclass=SabitMetaClass):
         maksSahaGenislik=maksEkranGenislik*EkranSabit.SAHA_GENISLIK_ORAN
         maksSahaYukseklik=maksEkranYukseklik*EkranSabit.SAHA_YUKSEKLIK_ORAN
 
-        return {EkranSabit.MAKS_SAHA_GENISLIK_KEY:maksSahaGenislik,
-            EkranSabit.MAKS_SAHA_YUKSEKLIK_KEY:maksSahaYukseklik,
-            EkranSabit.MAKS_KENARLIK_KALINLIK_KEY:maksKenarlikKalinlik}
+        return {EkranSabit.MAKS_SAHA_GENISLIK_ANAHTAR:maksSahaGenislik,
+            EkranSabit.MAKS_SAHA_YUKSEKLIK_ANAHTAR:maksSahaYukseklik,
+            EkranSabit.MAKS_KENARLIK_KALINLIK_ANAHTAR:maksKenarlikKalinlik}
     
 
 class LabirentSabit(metaclass=SabitMetaClass):
     KENARLIK_RENK=(1,0,0,1)
     MINIMUM_COZUM_UZUNLUGU_ORAN=0.5
-    SATIR_ANAHTAR="satir"
-    SUTUN_ANAHTAR="sutun"
+    SATIR_ANAHTAR="SATIR"
+    SUTUN_ANAHTAR="SUTUN"
+    BASLANGIC_SATIR_NUMARA_ANAHTAR="BASLANGIC_SATIR_NUMARA"
+    BASLANGIC_SUTUN_NUMARA_ANAHTAR="BASLANGIC_SUTUN_NUMARA"
+    BITIS_SATIR_NUMARA_ANAHTAR="BITIS_SATIR_NUMARA"
+    BITIS_SUTUN_NUMARA_ANAHTAR="BITIS_SUTUN_NUMARA"
 
 #Yarışmadaki animasyona ilişkin sabit değerler
 class AnimasyonSabit(metaclass=SabitMetaClass):

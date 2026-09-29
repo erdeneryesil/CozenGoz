@@ -5,8 +5,10 @@ from abc import ABCMeta, abstractmethod
 from kivy.uix.image import Image,CoreImage
 from kivy.clock import Clock
 from kivy.atlas import Atlas
+from kivy.graphics import Color, Line, Ellipse, Fbo
 
-from sabitler import ImajTip,ImajSabit,GozTip,GozAksiyon,Yon,AcilirPencereTip,AcilirPencereDurum,AtlasYuklemeBilgi
+from sabitler import DuvarDurum,HucreSabit,EkranSabit,LabirentSabit,ImajTip,ImajSabit,GozTip,GozAksiyon,Yon,DikdortgenTip
+from temel import Konum
 
 class Yukle:
     @staticmethod
@@ -52,27 +54,224 @@ class Yukle:
 
         #ImajSinif.atlasYuklendiGuncelle(True)
 
-# Image nesneleri bir widget içerisinde görüntülenirken, içinde bulunduğu widget nesnesine göre boyutlandırılıp, konumlandırılabiliyor.
-# Fakat gerçek boyut(size,width,height) ve konum(pos,x,y) verileri yanıltıcı değerler içerebiliyor.
-# Bu sebeple Labirent gibi statik görsellerin; ölçeklendirme, konumlandırma gibi işlemlerden sonra boyut ve konum bilgilerine sağlıklı olarak ulaşabilmek için bu sınıf kullanılacak 
+
 class StatikImaj(Image):
+    '''Image nesneleri bir widget içerisinde görüntülenirken, içinde bulunduğu widget nesnesine göre boyutlandırılıp, konumlandırılabiliyor.
+    Fakat gerçek boyut(size,width,height) ve konum(pos,x,y) verileri yanıltıcı değerler içerebiliyor.
+
+    size Niteliği (Widget Boyutu)
+    Tanım: Image nesnesinin (yani UI üzerindeki widget sınırlarının) genişlik ve yükseklik değeridir.
+    Davranış: Bu, Image nesnesinin arayüzde kapladığı toplam kutu boyutudur.
+    Özellik: İstediğiniz gibi manuel olarak (size: 400, 300 şeklinde) değiştirebilirsiniz. Resmin en-boy oranına (aspect ratio) uyup uymadığına bakılmaksızın doğrudan widget'ın sınırlarını belirler.
+
+    norm_image_size Niteliği (Normalize Edilmiş Resim Boyutu)
+    Tanım: Resmin, allow_stretch=True ve keep_ratio=True (varsayılan değerlerdir) kurallarına bağlı kalarak, widget sınırları (size) içine sığdırıldığı gerçek render (çizim) boyutudur.
+    Davranış:
+    Kivy, resmin orijinal oranını (en/boy oranını) bozmamak için resmi ölçeklendirir.
+    Eğer widget'ınızın en-boy oranı ile resmin orijinal en-boy oranı birebir aynı değilse, norm_image_size değeri size değerinden küçük olacaktır.
+    Boş kalan kısımlar ise şeffaf alanlar olarak kalır (veya resim bu boyutta çizilir).
+
+    Bu sebeple Labirent gibi statik görsellerin; ölçeklendirme, konumlandırma gibi işlemlerden sonra boyut ve konum bilgilerine sağlıklı olarak ulaşabilmek için bu sınıf kullanılacak '''
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
         self.allow_stretch=True
         self.keep_ratio=True
 
+    #genislikImageWidget,yukseklikImageWidget,solXImageWidget,ustYImageWidget değerleri; görselin bir Widget olarak sahip olduğu değerlerdir. Kenar boşlukları dahildir
     @property
-    def genislik(self):
+    def genislikImageWidget(self):
+        return self.size[0]
+    @property
+    def yukseklikImageWidget(self):
+        return self.size[1]
+    def solXImageWidget(self,ebeveyn):#ebeveyn:içinde bulunduğu widget
+        return ebeveyn.x+(ebeveyn.width-self.genislikImageWidget)/2
+    def ustYImageWidget(self,ebeveyn):#ebeveyn:içinde bulunduğu widget
+        return self.yukseklikImageWidget+ebeveyn.y+(ebeveyn.height-self.yukseklikImageWidget)/2
+    
+    #genislikRender,yukseklikRender,solXRender,ustYRender değerleri; görselin gerçek çizim değerleridir. Kenar boşluklarından arındırılmıştır
+    @property
+    def genislikRender(self):
         return self.norm_image_size[0]
     @property
-    def yukseklik(self):
+    def yukseklikRender(self):
         return self.norm_image_size[1]
+    def solXRender(self,ebeveyn):
+        return ebeveyn.x+(ebeveyn.width-self.genislikRender)/2
+    def ustYRender(self,ebeveyn):
+        return self.yukseklikRender+ebeveyn.y+(ebeveyn.height-self.yukseklikRender)/2
     
-    def solX(self,ebeveyn):#ebeveyn:içinde bulunduğu widget
-        return ebeveyn.x+(ebeveyn.width-self.genislik)/2
+
+    def ebeveynX(self,ebeveyn):#ebeveyn:içinde bulunduğu widget
+        return ebeveyn.x
+    def ebeveynW(self,ebeveyn):#ebeveyn:içinde bulunduğu widget
+        return ebeveyn.width
+    def ebeveynY(self,ebeveyn):#ebeveyn:içinde bulunduğu widget
+        return ebeveyn.y
+    def ebeveynH(self,ebeveyn):#ebeveyn:içinde bulunduğu widget
+        return ebeveyn.height
     
-    def ustY(self,ebeveyn):#ebeveyn:içinde bulunduğu widget
-        return self.yukseklik+ebeveyn.y+(ebeveyn.height-self.yukseklik)/2
+
+class LabirentStatikImaj(StatikImaj):
+    def __init__(self,labirent,**kwargs):
+        super().__init__(**kwargs)
+
+        #ilk oluşturulan Labirent görseline ait nitelikler
+        self.__orijinalGenislikImageWidget=-1
+        self.__orijinalYukseklikImageWidget=-1
+        self.__orijinalGenislikRender=-1
+        self.__orijinalYukseklikRender=-1
+        self.__orijinalKenarlikKalinlik=-1
+        self.__orijinalHucreKenarUzunluk=-1
+        
+        self.__orijinalDegerlerHesapla(labirent)
+
+        self.texture=self.__textureOlustur(labirent)
+
+
+    @property
+    def orijinalGenislikImageWidget(self):
+        return self.__orijinalGenislikImageWidget
+    @property
+    def orijinalYukseklikImageWidget(self):
+        return self.__orijinalYukseklikImageWidget
+    @property
+    def orijinalGenislikRender(self):
+        return self.__orijinalGenislikRender
+    @property
+    def orijinalYukseklikRender(self):
+        return self.__orijinalYukseklikRender
+    @property
+    def orijinalKenarlikKalinlik(self):
+        return self.__orijinalKenarlikKalinlik
+    @property
+    def orijinalHucreKenarUzunluk(self):
+        return self.__orijinalHucreKenarUzunluk
+
+    
+    def __orijinalDegerlerHesapla(self,labirent):#niteliklerin değerleri hesaplanıyor
+        maks=EkranSabit.maksSahaKenarlik(labirent.tip)
+        maksSahaGenislik=maks[EkranSabit.MAKS_SAHA_GENISLIK_ANAHTAR]
+        maksSahaYukseklik=maks[EkranSabit.MAKS_SAHA_YUKSEKLIK_ANAHTAR]
+        self.__orijinalKenarlikKalinlik=maks[EkranSabit.MAKS_KENARLIK_KALINLIK_ANAHTAR]
+
+        '''__orijinalGenislikImageWidget,__orijinalYukseklikImageWidget ve __orijinalGenislikRender,__orijinalYukseklikRender değişkenleri ile alakalı açıklama:
+
+        Image nesneleri bir widget içerisinde görüntülenirken, içinde bulunduğu widget nesnesine göre boyutlandırılıp, konumlandırılabiliyor.
+        Fakat gerçek boyut(size,width,height) ve konum(pos,x,y) verileri yanıltıcı değerler içerebiliyor.
+
+        size Niteliği (Widget(Image) Boyutu) (__orijinalGenislikImageWidget,__orijinalYukseklikImageWidget değişkenleri)
+        Tanım: Image nesnesinin (yani UI üzerindeki widget sınırlarının) genişlik ve yükseklik değeridir.
+        Davranış: Bu, Image nesnesinin arayüzde kapladığı toplam kutu boyutudur.
+        Özellik: İstediğiniz gibi manuel olarak (size: 400, 300 şeklinde) değiştirebilirsiniz. Resmin en-boy oranına (aspect ratio) uyup uymadığına bakılmaksızın doğrudan widget'ın sınırlarını belirler.
+
+        norm_image_size Niteliği (Normalize Edilmiş Resim Boyutu) (__orijinalGenislikRender,__orijinalYukseklikRender değişkenleri)
+        Tanım: Resmin, allow_stretch=True ve keep_ratio=True (varsayılan değerlerdir) kurallarına bağlı kalarak, widget sınırları (size) içine sığdırıldığı gerçek render (çizim) boyutudur.
+        Davranış:
+        Kivy, resmin orijinal oranını (en/boy oranını) bozmamak için resmi ölçeklendirir.
+        Eğer widget'ınızın en-boy oranı ile resmin orijinal en-boy oranı birebir aynı değilse, norm_image_size değeri size değerinden küçük olacaktır.
+        Boş kalan kısımlar ise şeffaf alanlar olarak kalır (veya resim bu boyutta çizilir).'''
+        
+
+        self.__orijinalGenislikImageWidget,self.__orijinalYukseklikImageWidget=labirent.olcekle(maksSahaGenislik,maksSahaYukseklik)#labirentin çizileceği alanın genişlik ve yükseklik
+
+        # alt-üst(2+2), sol-sağ(2+2) taraflardan kenarlık kalınlığının 2 katı kadar küçültme yapılacak
+        #texture ait  genişlik ve yükseklik, canvas'a göre küçültülecek. Fakat bu küçültmenin oranı genişlik ve yüksekliğe göre aynı olmalı (*self.__orijinalYukseklikImageWidget/canvasGenislik)
+        if labirent.tip==DikdortgenTip.DIKEY:            
+            self.__orijinalYukseklikRender=self.__orijinalYukseklikImageWidget-EkranSabit.TEXTURE_KUCULTME_CARPAN_2_KENAR*self.__orijinalKenarlikKalinlik   
+            self.__orijinalGenislikRender=self.__orijinalYukseklikRender*self.__orijinalGenislikImageWidget/self.__orijinalYukseklikImageWidget
+            self.__orijinalGenislikImageWidget+=(self.__orijinalYukseklikImageWidget/self.__orijinalGenislikImageWidget)/EkranSabit.TEXTURE_KUCULTME_CARPAN_2_KENAR*self.__orijinalKenarlikKalinlik
+        elif labirent.tip==DikdortgenTip.YATAY:
+            self.__orijinalGenislikRender=self.__orijinalGenislikImageWidget-(EkranSabit.TEXTURE_KUCULTME_CARPAN_2_KENAR)*self.__orijinalKenarlikKalinlik
+            self.__orijinalYukseklikRender=self.__orijinalGenislikRender*self.__orijinalYukseklikImageWidget/self.__orijinalGenislikImageWidget
+            self.__orijinalYukseklikImageWidget+=(self.__orijinalGenislikImageWidget/self.__orijinalYukseklikImageWidget)/EkranSabit.TEXTURE_KUCULTME_CARPAN_2_KENAR*self.__orijinalKenarlikKalinlik
+        elif labirent.tip==DikdortgenTip.KARE:
+            self.__orijinalGenislikRender=self.__orijinalGenislikImageWidget-(EkranSabit.TEXTURE_KUCULTME_CARPAN_2_KENAR)*self.__orijinalKenarlikKalinlik
+            self.__orijinalYukseklikRender=self.__orijinalGenislikRender*self.__orijinalYukseklikImageWidget/self.__orijinalGenislikImageWidget
+            #self.__orijinalGenislikImageWidget+=(self.__orijinalYukseklikImageWidget/self.__orijinalGenislikImageWidget)/EkranSabit.TEXTURE_KUCULTME_CARPAN_2_KENAR*self.__orijinalKenarlikKalinlik
+            #self.__orijinalYukseklikImageWidget+=(self.__orijinalGenislikImageWidget/self.__orijinalYukseklikImageWidget)/EkranSabit.TEXTURE_KUCULTME_CARPAN_2_KENAR*self.__orijinalKenarlikKalinlik
+
+        self.__orijinalHucreKenarUzunluk=labirent.hesaplaHucreKenarUzunluk(self.__orijinalGenislikRender,self.__orijinalYukseklikRender)
+
+    def __textureOlustur(self,labirent):
+        #labirent görselini, maks boyutlara göre bir kez oluşturup, sonrasında ölçekleniyor
+
+        solX=EkranSabit.TEXTURE_KUCULTME_CARPAN_1_KENAR*self.__orijinalKenarlikKalinlik
+        #ustY=self.__orijinalYukseklikRender+EkranSabit.TEXTURE_KUCULTME_CARPAN_1_KENAR*self.__orijinalKenarlikKalinlik*self.__orijinalYukseklikImageWidget/self.__orijinalGenislikImageWidget 
+        ustY=self.__orijinalYukseklikRender+EkranSabit.TEXTURE_KUCULTME_CARPAN_1_KENAR*self.__orijinalKenarlikKalinlik
+
+        
+        fbo = Fbo(size=(self.__orijinalGenislikImageWidget, self.__orijinalYukseklikImageWidget))
+
+        # Kivy Fbo varsayılan olarak transparan gelebilir. Arka planı temizliyoruz.
+        fbo.clear_buffer()
+
+        # 2. Çizim komutlarını Fbo canvas'ına ekliyoruz
+        with fbo:
+            # Kenarlık rengi ve çerçeve çizimi
+            textureX = solX
+            textureY = EkranSabit.TEXTURE_KUCULTME_CARPAN_1_KENAR*self.__orijinalKenarlikKalinlik
+
+
+            Color(rgba=LabirentSabit.KENARLIK_RENK)
+            self.__cizCerceve(textureX,textureY,self.__orijinalGenislikRender,self.__orijinalYukseklikRender)
+
+            # Duvarların çizimi
+            self.__cizDuvar(labirent,solX,ustY)
+            
+            # Çözüm yolu veya Başlangıç/Bitiş hücrelerinin boyanması
+            hucreTip=HucreSabit.TIP[HucreSabit.TIP_YOL_ANAHTAR]
+            #for hucre in self.__cozumYolu:
+                #self.__boyaHucre(labirent,solX,ustY,hucre,hucreTip[HucreSabit.TIP_UZUNLUK_CARPAN_ANAHTAR],hucreTip[HucreSabit.TIP_RENK_ANAHTAR])
+            for hucreNumara in range(labirent.cozumYoluUzunluk):
+                self.__boyaHucre(labirent,solX,ustY,labirent.cozumYoluHucre(hucreNumara),hucreTip[HucreSabit.TIP_UZUNLUK_CARPAN_ANAHTAR],hucreTip[HucreSabit.TIP_RENK_ANAHTAR])
+
+
+            hucreTip=HucreSabit.TIP[HucreSabit.TIP_BASLANGIC_ANAHTAR]
+            self.__boyaHucre(labirent,solX,ustY,Konum(labirent.baslangicSatirNumara,labirent.baslangicSutunNumara),hucreTip[HucreSabit.TIP_UZUNLUK_CARPAN_ANAHTAR],hucreTip[HucreSabit.TIP_RENK_ANAHTAR])
+            
+            hucreTip=HucreSabit.TIP[HucreSabit.TIP_BITIS_ANAHTAR]
+            self.__boyaHucre(labirent,solX,ustY,Konum(labirent.bitisSatirNumara,labirent.bitisSutunNumara),hucreTip[HucreSabit.TIP_UZUNLUK_CARPAN_ANAHTAR],hucreTip[HucreSabit.TIP_RENK_ANAHTAR])
+
+        # 3. Fbo üzerindeki çizimleri ekrana yansıtılmaya hazır bir doku (texture) olarak çekiyoruz
+        fbo.draw()
+
+        return fbo.texture
+
+    def __cizCerceve(self,x,y,genislik,yukseklik):        
+        Line(close="True", width=self.__orijinalKenarlikKalinlik,rectangle=(x,y, genislik, yukseklik))
+
+    def __cizDuvar(self,labirent,solX,ustY):
+        for satirNumara in range(labirent.satirSayi):
+            for sutunNumara in range(labirent.sutunSayi-1):
+                duvar=labirent.duvar(labirent.hucre(satirNumara,sutunNumara),labirent.hucre(satirNumara,sutunNumara+1))
+                if duvar.durum==DuvarDurum.KAPALI:
+                    x=solX+self.__orijinalHucreKenarUzunluk*(sutunNumara+1)
+                    y1=ustY-self.__orijinalHucreKenarUzunluk*satirNumara
+                    y2=y1-self.__orijinalHucreKenarUzunluk
+                    Line(width=self.__orijinalKenarlikKalinlik,points=(x,y1,x,y2))
+
+        for sutunNumara in range(labirent.sutunSayi):
+            for satirNumara in range(labirent.satirSayi-1):
+                duvar=labirent.duvar(labirent.hucre(satirNumara,sutunNumara),labirent.hucre(satirNumara+1,sutunNumara))
+                if duvar.durum==DuvarDurum.KAPALI:
+                    x1=solX+self.__orijinalHucreKenarUzunluk*sutunNumara
+                    y=ustY-self.__orijinalHucreKenarUzunluk*(satirNumara+1)
+                    x2=x1+self.__orijinalHucreKenarUzunluk
+                    Line(width=self.__orijinalKenarlikKalinlik,points=(x1,y,x2,y))
+
+    def __boyaHucre(self,labirent,solX,ustY,konum,uzunlukCarpan,renk):
+        Color(renk["r"],renk["g"],renk["b"],renk["a"])
+        
+        hucre=labirent.hucre(konum.satirNumara,konum.sutunNumara)
+
+        x=solX+self.__orijinalHucreKenarUzunluk*hucre.sutunNumara+self.__orijinalKenarlikKalinlik+self.__orijinalHucreKenarUzunluk/2-uzunlukCarpan*self.__orijinalHucreKenarUzunluk/2
+        y=ustY-self.__orijinalHucreKenarUzunluk*(1+hucre.satirNumara)+self.__orijinalKenarlikKalinlik+self.__orijinalHucreKenarUzunluk/2-uzunlukCarpan*self.__orijinalHucreKenarUzunluk/2
+
+        boyut=uzunlukCarpan*self.__orijinalHucreKenarUzunluk-2*self.__orijinalKenarlikKalinlik
+        Ellipse(size=(boyut,boyut),pos=(x,y))
+
+
 
 class AnimasyonImaj(Image):
     #SABİTLER
