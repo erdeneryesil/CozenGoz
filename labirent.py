@@ -199,12 +199,18 @@ class Labirent:
         self.__imaj.size=(genislik,yukseklik)
         self.__imaj.pos=(self.__imaj.solXImageWidget(saha),self.__imaj.ustYImageWidget(saha)-yukseklik)
         
-        self.__kenarlikKalinlik=(saha.height/EkranSabit.LABIRENT_KENARLIK_KALINLIK_ORAN)*(self.__imaj.yukseklikRender/self.__imaj.orijinalYukseklikRender)
+        self.__kenarlikKalinlik=self.__imaj.guncelGenislikRender/EkranSabit.LABIRENT_KENARLIK_KALINLIK_ORAN
+        
+        
+        self.__hucreKenarUzunluk=self.hesaplaHucreKenarUzunluk(self.__imaj.guncelGenislikRender,self.__imaj.guncelYukseklikRender)
+        
+        #from grafik_pencere_dosya import StatikImaj
+        #i=StatikImaj()
+        #i._gercekDegerlerHesapla()
+        #self.__orijinalKenarlikKalinlik=self.__orijinalGenislikImageWidget/EkranSabit.LABIRENT_KENARLIK_KALINLIK_ORAN
+        #print(self.__imaj.orijinalKenarlikKalinlik,self.__kenarlikKalinlik)
+        #print(self.__imaj.genislikImageWidget/self.kenarlikKalinlik)
 
-        self.__hucreKenarUzunluk=self.hesaplaHucreKenarUzunluk(self.__imaj.genislikRender,self.__imaj.yukseklikRender)
-        
-        
-        #print("asd",saha.height/self.__kenarlikKalinlik)
 
         #print(self.__kenarlikKalinlik,self.__imaj.genislikRender)
         #print(solX,self.__imaj.solX(saha))
@@ -388,7 +394,7 @@ class Yarisma:
 
         self.__saha.bind(pos=self.guncelleOlculer, size=self.guncelleOlculer)
                 
-        self.__labirent=Labirent(2,8)#Labirent(20,5)
+        self.__labirent=Labirent(7,8)#Labirent(20,5)
         goz1=BenimGozum("ROBOT1")
         self.__goz=goz1
         self.__gozImaj=GozImaj(GozTip.GOZ1,Yon.baslangic())
@@ -449,15 +455,18 @@ class Yarisma:
                 from kivy.graphics import Color, Line, Ellipse,Rectangle, Fbo#, RenderContext, Scale, Translate
                 Color(0,0,0,1)
                 boyut=self.__labirent.kenarlikKalinlik
-                kenarlik=self.__labirent.kenarlikKalinlik
                 solX=self.__labirent.imaj.solXRender(self.__saha)
                 ustY=self.__labirent.imaj.ustYRender(self.__saha)
-                sagX=solX+self.__labirent.imaj.genislikRender
-                altY=ustY-self.__labirent.imaj.yukseklikRender
+                sagX=solX+self.__labirent.imaj.guncelGenislikRender
+                altY=ustY-self.__labirent.imaj.guncelYukseklikRender
                 
-                Rectangle(size=(boyut,boyut),pos=(self.__labirent.imaj.solXImageWidget(self.__saha),self.__labirent.imaj.ustYImageWidget(self.__saha)))
+                #Rectangle(size=(boyut,boyut),pos=(self.__labirent.imaj.solXImageWidget(self.__saha),self.__labirent.imaj.ustYImageWidget(self.__saha)))
+                x=self.__labirent.imaj.solXImageWidget(self.__saha)
+                y=self.__labirent.imaj.ustYImageWidget(self.__saha)
+                Line(width=boyut,points=(x,y-100,x+100,y-100))
+                
 
-                print(self.__labirent.kenarlikKalinlik)
+                #print(self.__labirent.kenarlikKalinlik)
                 #Rectangle(size=(boyut,boyut),pos=(solX-boyut/2,ustY-boyut/2))
                 #Rectangle(size=(boyut,boyut),pos=(sagX-boyut/2,ustY-boyut/2))
                 #Rectangle(size=(boyut,boyut),pos=(solX-boyut/2,altY-boyut/2))
@@ -470,7 +479,8 @@ class Yarisma:
 
                 x=solX+self.__labirent.kenarlikKalinlik+self.__labirent.hucreKenarUzunluk
                 y=ustY-self.__labirent.kenarlikKalinlik
-                Rectangle(size=(boyut,boyut),pos=(x-boyut/2,y-boyut/2))
+                #Line(width=(boyut),points=(x-boyut/2,y-boyut/2,x+boyut/2,y-boyut/2))
+                #Rectangle(size=(10,10),pos=(x,y))
 
 
 
