@@ -229,28 +229,24 @@ class EkranSabit(metaclass=SabitMetaClass):
     TEXTURE_KUCULTME_CARPAN_2_KENAR=2
     TEXTURE_KUCULTME_CARPAN_1_KENAR=1
 
-    def maksSahaKenarlik(labirentTip):#sahanın maks w-h, kenarlık kalınlık maks değerleri döndürür
+    def maksSahaBoyut(labirentTip):#sahanın maks w-h, kenarlık kalınlık maks değerleri döndürür
         match labirentTip:
             case DikdortgenTip.YATAY:
                 maksEkranGenislik=EkranSabit.MAKS_EKRAN_GENISLIK_YATAY
                 maksEkranYukseklik=EkranSabit.MAKS_EKRAN_YUKSEKLIK_YATAY
-                maksKenarlikKalinlik=maksEkranYukseklik*EkranSabit.SAHA_YUKSEKLIK_ORAN/EkranSabit.LABIRENT_KENARLIK_KALINLIK_ORAN
             case DikdortgenTip.DIKEY:
                 maksEkranGenislik=EkranSabit.MAKS_EKRAN_GENISLIK_DIKEY
                 maksEkranYukseklik=EkranSabit.MAKS_EKRAN_YUKSEKLIK_DIKEY
-                maksKenarlikKalinlik=maksEkranGenislik*EkranSabit.SAHA_GENISLIK_ORAN/EkranSabit.LABIRENT_KENARLIK_KALINLIK_ORAN
             case DikdortgenTip.KARE:
                 maksEkranGenislik=EkranSabit.MAKS_EKRAN_GENISLIK_KARE
                 maksEkranYukseklik=EkranSabit.MAKS_EKRAN_YUKSEKLIK_KARE
-                maksKenarlikKalinlik=maksEkranGenislik*EkranSabit.SAHA_GENISLIK_ORAN/EkranSabit.LABIRENT_KENARLIK_KALINLIK_ORAN
 
         
         maksSahaGenislik=maksEkranGenislik*EkranSabit.SAHA_GENISLIK_ORAN
         maksSahaYukseklik=maksEkranYukseklik*EkranSabit.SAHA_YUKSEKLIK_ORAN
 
         return {EkranSabit.MAKS_SAHA_GENISLIK_ANAHTAR:maksSahaGenislik,
-            EkranSabit.MAKS_SAHA_YUKSEKLIK_ANAHTAR:maksSahaYukseklik,
-            EkranSabit.MAKS_KENARLIK_KALINLIK_ANAHTAR:maksKenarlikKalinlik}
+            EkranSabit.MAKS_SAHA_YUKSEKLIK_ANAHTAR:maksSahaYukseklik}
     
 
 class LabirentSabit(metaclass=SabitMetaClass):

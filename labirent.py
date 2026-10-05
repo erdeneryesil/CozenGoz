@@ -81,9 +81,11 @@ class Labirent:
         self.__cozumYolu=self.__olusturCozumYolu()
         self.__hucreler=self.__olusturHucreler()
 
+
         self.__imaj=LabirentStatikImaj(self)
         self.__imaj.texture.save("labirent_sablonu.png")
-    
+
+
     @property
     def satirSayi(self):
         return self.__satirSayi
@@ -180,7 +182,14 @@ class Labirent:
 
         return (x,y)
 
-    def hesaplaHucreKenarUzunluk(self,genislik,yukseklik):
+    def hesaplaHucreKenarUzunluk(self,genislik=None,yukseklik=None):
+        if genislik is None:
+            genislik=self.__imaj.guncelGenislikRender
+        
+        if yukseklik is None:
+            yukseklik=self.__imaj.guncelYukseklikRender
+
+            
         if self.__tip==DikdortgenTip.YATAY:
             return genislik/self.__sutunSayi
         return yukseklik/self.__satirSayi
@@ -199,10 +208,11 @@ class Labirent:
         self.__imaj.size=(genislik,yukseklik)
         self.__imaj.pos=(self.__imaj.solXImageWidget(saha),self.__imaj.ustYImageWidget(saha)-yukseklik)
         
-        self.__kenarlikKalinlik=self.__imaj.guncelGenislikRender/EkranSabit.LABIRENT_KENARLIK_KALINLIK_ORAN
+        self.__kenarlikKalinlik=self.__guncelleKenarlikKalinlik(saha.width,saha.height)
         
-        
-        self.__hucreKenarUzunluk=self.hesaplaHucreKenarUzunluk(self.__imaj.guncelGenislikRender,self.__imaj.guncelYukseklikRender)
+        self.__hucreKenarUzunluk=self.hesaplaHucreKenarUzunluk()
+
+        print(self.__hucreKenarUzunluk/self.__kenarlikKalinlik)
         
         #from grafik_pencere_dosya import StatikImaj
         #i=StatikImaj()
@@ -218,9 +228,16 @@ class Labirent:
         #print(genislik,self.__imaj.genislik,self.__imaj.width)
         #print(yukseklik,self.__imaj.yukseklik,self.__imaj.height)
         
-    def __hesaplaKenarlikKalinlik(self):
-        pass
-     
+    def __guncelleKenarlikKalinlik(self,sahaGenislik,sahaYukseklik):
+        if self.__tip==DikdortgenTip.YATAY:
+            return self.__imaj.guncelYukseklikRender/EkranSabit.LABIRENT_KENARLIK_KALINLIK_ORAN
+        elif self.__tip==DikdortgenTip.DIKEY:
+            return self.__imaj.guncelGenislikRender/EkranSabit.LABIRENT_KENARLIK_KALINLIK_ORAN
+        else:
+            if sahaGenislik>sahaYukseklik:
+                return (self.satirSayi/sahaYukseklik)*(self.__imaj.guncelGenislikRender/EkranSabit.LABIRENT_KENARLIK_KALINLIK_ORAN)
+            else:
+                return (self.satirSayi/sahaGenislik)*(self.__imaj.guncelGenislikRender/EkranSabit.LABIRENT_KENARLIK_KALINLIK_ORAN)/sahaGenislik
     def __olusturCozumYolu(self):
          
         while(len(self.__cozumYolu)<self.__minimumCozumUzunlugu):
@@ -343,22 +360,17 @@ class Labirent:
                 self.__duvarlar[LabirentSabit.SUTUN_ANAHTAR][sutunNumara][satirNumara].kapat()
     
     def __rastgeleBaslangicBitisBelirle(self):#labirentin başlangıç ve bitiş hücreleri rastgele belirleniyor
-        if self.__tip==DikdortgenTip.KARE:
-            labirentTip=random.choice([DikdortgenTip.YATAY,DikdortgenTip.DIKEY])
-        else:
-            labirentTip=self.__tip
 
-        match labirentTip:
-            case DikdortgenTip.YATAY:
-                baslangicSutunNumara=0
-                bitisSutunNumara=self.__sutunSayi-1
-                baslangicSatirNumara=random.randint(0,self.__satirSayi-1)
-                bitisSatirNumara=random.randint(0,self.__satirSayi-1)
-            case DikdortgenTip.DIKEY:
-                baslangicSatirNumara=0
-                bitisSatirNumara=self.__satirSayi-1
-                baslangicSutunNumara=random.randint(0,self.__sutunSayi-1)
-                bitisSutunNumara=random.randint(0,self.__sutunSayi-1)
+        if self.__tip==DikdortgenTip.YATAY:
+            baslangicSutunNumara=0
+            bitisSutunNumara=self.__sutunSayi-1
+            baslangicSatirNumara=random.randint(0,self.__satirSayi-1)
+            bitisSatirNumara=random.randint(0,self.__satirSayi-1)
+        else:
+            baslangicSatirNumara=0
+            bitisSatirNumara=self.__satirSayi-1
+            baslangicSutunNumara=random.randint(0,self.__sutunSayi-1)
+            bitisSutunNumara=random.randint(0,self.__sutunSayi-1)
 
         return {LabirentSabit.BASLANGIC_SATIR_NUMARA_ANAHTAR:baslangicSatirNumara,
             LabirentSabit.BASLANGIC_SUTUN_NUMARA_ANAHTAR:baslangicSutunNumara,
@@ -394,7 +406,7 @@ class Yarisma:
 
         self.__saha.bind(pos=self.guncelleOlculer, size=self.guncelleOlculer)
                 
-        self.__labirent=Labirent(7,8)#Labirent(20,5)
+        self.__labirent=Labirent(8,8)#Labirent(20,5)
         goz1=BenimGozum("ROBOT1")
         self.__goz=goz1
         self.__gozImaj=GozImaj(GozTip.GOZ1,Yon.baslangic())

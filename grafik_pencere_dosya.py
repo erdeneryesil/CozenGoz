@@ -85,7 +85,7 @@ class StatikImaj(Image):
         self._gercekHucreKenarUzunluk=-1
 
     def _gercekDegerlerHesapla(self):
-        raise NotImplementedError("_gercek... değerler, alt sınıflarda hesaplanmalıdır!")
+        raise NotImplementedError("_gercek değerler, alt sınıflarda hesaplanmalıdır!")
     def _textureOlustur(self):
         raise NotImplementedError("texture oluşturma işlemi alt sınıflarda yapılmalıdır")
     
@@ -142,10 +142,9 @@ class LabirentStatikImaj(StatikImaj):
 
 
     def _gercekDegerlerHesapla(self,labirent):#niteliklerin değerleri hesaplanıyor
-        maks=EkranSabit.maksSahaKenarlik(labirent.tip)
+        maks=EkranSabit.maksSahaBoyut(labirent.tip)
         maksSahaGenislik=maks[EkranSabit.MAKS_SAHA_GENISLIK_ANAHTAR]
         maksSahaYukseklik=maks[EkranSabit.MAKS_SAHA_YUKSEKLIK_ANAHTAR]
-        #self.__gercekKenarlikKalinlik=maks[EkranSabit.MAKS_KENARLIK_KALINLIK_ANAHTAR]
 
         '''__gercekGenislikImageWidget,__gercekYukseklikImageWidget ve __gercekGenislikRender,__gercekYukseklikRender değişkenleri ile alakalı açıklama:
 
@@ -171,22 +170,22 @@ class LabirentStatikImaj(StatikImaj):
 
         # alt-üst(2+2), sol-sağ(2+2) taraflardan kenarlık kalınlığının 2 katı kadar küçültme yapılacak
         #texture ait  genişlik ve yükseklik, canvas'a göre küçültülecek. Fakat bu küçültmenin oranı genişlik ve yüksekliğe göre aynı olmalı (*self.__gercekYukseklikImageWidget/canvasGenislik)
-        if labirent.tip==DikdortgenTip.DIKEY:            
+        if labirent.tip==DikdortgenTip.YATAY:
             self.__gercekKenarlikKalinlik=self.__gercekYukseklikImageWidget/EkranSabit.LABIRENT_KENARLIK_KALINLIK_ORAN
+            self.__gercekGenislikRender=self.__gercekGenislikImageWidget-EkranSabit.TEXTURE_KUCULTME_CARPAN_2_KENAR*self.__gercekKenarlikKalinlik
+            self.__gercekYukseklikRender=self.__gercekGenislikRender*self.__gercekYukseklikImageWidget/self.__gercekGenislikImageWidget
+            self.__gercekYukseklikImageWidget+=(self.__gercekGenislikImageWidget/self.__gercekYukseklikImageWidget)/EkranSabit.TEXTURE_KUCULTME_CARPAN_2_KENAR*self.__gercekKenarlikKalinlik
+        elif labirent.tip==DikdortgenTip.DIKEY:            
+            self.__gercekKenarlikKalinlik=self.__gercekGenislikImageWidget/EkranSabit.LABIRENT_KENARLIK_KALINLIK_ORAN
             self.__gercekYukseklikRender=self.__gercekYukseklikImageWidget-EkranSabit.TEXTURE_KUCULTME_CARPAN_2_KENAR*self.__gercekKenarlikKalinlik   
             self.__gercekGenislikRender=self.__gercekYukseklikRender*self.__gercekGenislikImageWidget/self.__gercekYukseklikImageWidget
             self.__gercekGenislikImageWidget+=(self.__gercekYukseklikImageWidget/self.__gercekGenislikImageWidget)/EkranSabit.TEXTURE_KUCULTME_CARPAN_2_KENAR*self.__gercekKenarlikKalinlik
-        elif labirent.tip==DikdortgenTip.YATAY:
-            self.__gercekKenarlikKalinlik=self.__gercekGenislikImageWidget/EkranSabit.LABIRENT_KENARLIK_KALINLIK_ORAN
-            self.__gercekGenislikRender=self.__gercekGenislikImageWidget-(EkranSabit.TEXTURE_KUCULTME_CARPAN_2_KENAR)*self.__gercekKenarlikKalinlik
-            self.__gercekYukseklikRender=self.__gercekGenislikRender*self.__gercekYukseklikImageWidget/self.__gercekGenislikImageWidget
-            self.__gercekYukseklikImageWidget+=(self.__gercekGenislikImageWidget/self.__gercekYukseklikImageWidget)/EkranSabit.TEXTURE_KUCULTME_CARPAN_2_KENAR*self.__gercekKenarlikKalinlik
         elif labirent.tip==DikdortgenTip.KARE:
-            self.__gercekKenarlikKalinlik=9999
-            self.__gercekGenislikRender=self.__gercekGenislikImageWidget-(EkranSabit.TEXTURE_KUCULTME_CARPAN_2_KENAR)*self.__gercekKenarlikKalinlik
-            self.__gercekYukseklikRender=self.__gercekGenislikRender*self.__gercekYukseklikImageWidget/self.__gercekGenislikImageWidget
+            self.__gercekKenarlikKalinlik=self.__gercekGenislikImageWidget/EkranSabit.LABIRENT_KENARLIK_KALINLIK_ORAN
+            self.__gercekYukseklikRender=self.__gercekYukseklikImageWidget-EkranSabit.TEXTURE_KUCULTME_CARPAN_2_KENAR*self.__gercekKenarlikKalinlik   
+            self.__gercekGenislikRender=self.__gercekYukseklikRender*self.__gercekGenislikImageWidget/self.__gercekYukseklikImageWidget
             #self.__gercekGenislikImageWidget+=(self.__gercekYukseklikImageWidget/self.__gercekGenislikImageWidget)/EkranSabit.TEXTURE_KUCULTME_CARPAN_2_KENAR*self.__gercekKenarlikKalinlik
-            #self.__gercekYukseklikImageWidget+=(self.__gercekGenislikImageWidget/self.__gercekYukseklikImageWidget)/EkranSabit.TEXTURE_KUCULTME_CARPAN_2_KENAR*self.__gercekKenarlikKalinlik
+
 
         print(self.__gercekGenislikImageWidget,self.__gercekYukseklikImageWidget)
         self.__gercekHucreKenarUzunluk=labirent.hesaplaHucreKenarUzunluk(self.__gercekGenislikRender,self.__gercekYukseklikRender)
