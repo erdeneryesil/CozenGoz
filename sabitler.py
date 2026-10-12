@@ -223,7 +223,9 @@ class EkranSabit(metaclass=SabitMetaClass):
     SAHA_ALT_YUKSEKLIK_ORAN=.1
 
     #labirent çizimi ile alakalı değerler
-    LABIRENT_KENARLIK_KALINLIK_ORAN=50#100
+    LABIRENT_KENARLIK_KALINLIK_ORAN=100
+    LABIRENT_KENARLIK_KALINLIK_KATSAYI_1=1
+    #LABIRENT_KENARLIK_KALINLIK_KATSAYI_05=0.5
 
     #labirent görseli için : alt-üst(2+2), sol-sağ(2+2) taraflardan kenarlık kalınlığının 2 katı kadar küçültme yapılacak
     TEXTURE_KUCULTME_CARPAN_2_KENAR=2
