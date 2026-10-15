@@ -326,7 +326,7 @@ class Yarisma:
 
         self.__saha.bind(pos=self.guncelleOlculer, size=self.guncelleOlculer)
                 
-        self.__labirent=Labirent(8,10)#Labirent(20,5)
+        self.__labirent=Labirent(3,8)#Labirent(20,5)
         self.__labirentImaj=LabirentStatikImaj(self.__labirent)
         self.__labirentImaj.texture.save("labirent_sablonu.png")
 
@@ -389,33 +389,71 @@ class Yarisma:
 
             with self.__saha.canvas:
                 from kivy.graphics import Color, Line, Ellipse,Rectangle, Fbo#, RenderContext, Scale, Translate
+
                 Color(0,0,0,1)
-                boyut=self.__labirentImaj.guncelKenarlikKalinlik
-                solX=self.__labirentImaj.solXRender(self.__saha)
-                ustY=self.__labirentImaj.ustYRender(self.__saha)
-                sagX=solX+self.__labirentImaj.guncelGenislikRender
-                altY=ustY-self.__labirentImaj.guncelYukseklikRender
+                olcu=self.__labirentImaj.guncelKenarlikKalinlik
+                solXRender=self.__labirentImaj.solXRender(self.__saha)
+                ustYRender=self.__labirentImaj.ustYRender(self.__saha)
+                x1=solXRender
+                y1=(ustYRender-self.__labirentImaj.guncelKenarlikKalinlik)-3*self.__labirentImaj.guncelHucreKenarUzunluk
+                x2=solXRender+100
+                y2=y1
+                Line(width=(olcu),points=(x1,y1,x2,y2))
+
+                Color(0,0,0,1)
+                olcu=self.__labirentImaj.guncelKenarlikKalinlik*2
                 
-                #Rectangle(size=(boyut,boyut),pos=(self.__labirentImaj.solXImageWidget(self.__saha),self.__labirentImaj.ustYImageWidget(self.__saha)))
-                x=self.__labirentImaj.solXImageWidget(self.__saha)
-                y=self.__labirentImaj.ustYImageWidget(self.__saha)
-                Line(width=boyut,points=(x,y-100,x+100,y-100))
+                solXRender=self.__labirentImaj.solXRender(self.__saha)
+                ustYRender=self.__labirentImaj.ustYRender(self.__saha)
+                Ellipse(size=(olcu,olcu),pos=(solXRender-olcu/2,ustYRender-olcu/2))
                 
+                x=solXRender
+                y=ustYRender-self.__labirentImaj.guncelYukseklikRender
+                Ellipse(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))
 
-                #print(self.__labirentImaj.guncelKenarlikKalinlik)
-                #Rectangle(size=(boyut,boyut),pos=(solX-boyut/2,ustY-boyut/2))
-                #Rectangle(size=(boyut,boyut),pos=(sagX-boyut/2,ustY-boyut/2))
-                #Rectangle(size=(boyut,boyut),pos=(solX-boyut/2,altY-boyut/2))
-                #Rectangle(size=(boyut,boyut),pos=(sagX-boyut/2,altY-boyut/2))
+                x+=self.__labirentImaj.guncelGenislikRender
+                y=ustYRender-self.__labirentImaj.guncelYukseklikRender
+                Ellipse(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))
+
+                y=ustYRender
+                Ellipse(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))
+
+                Color(0,0,1,1)
+                olcu=self.__labirentImaj.guncelKenarlikKalinlik
+
+                solXImageWidget=self.__labirentImaj.solXImageWidget(self.__saha)
+                ustYImageWidget=self.__labirentImaj.ustYImageWidget(self.__saha)
+                Ellipse(size=(olcu,olcu),pos=(solXImageWidget-olcu/2,ustYImageWidget-olcu/2))
+
+                x=solXImageWidget
+                y=ustYImageWidget-self.__labirentImaj.guncelYukseklikImageWidget
+                Ellipse(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))
+
+                x+=self.__labirentImaj.guncelGenislikImageWidget
+                Ellipse(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))
+
+                y+=self.__labirentImaj.guncelYukseklikImageWidget
+                Ellipse(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))
 
 
-                x=solX+self.__labirentImaj.guncelKenarlikKalinlik/2
-                y=ustY-self.__labirentImaj.guncelKenarlikKalinlik/2
-                #Rectangle(size=(boyut,boyut),pos=(x-boyut/2,y-boyut/2))
+                Color(0,1,0,1)
+                olcu*=2
+                for i in range(self.__labirent.sutunSayi):
+                    for j in range(self.__labirent.satirSayi):
 
-                x=solX+self.__labirentImaj.guncelKenarlikKalinlik+self.__labirentImaj.guncelHucreKenarUzunluk
-                y=ustY-self.__labirentImaj.guncelKenarlikKalinlik
-                #Line(width=(boyut),points=(x-boyut/2,y-boyut/2,x+boyut/2,y-boyut/2))
+                        x,y=self.__labirentImaj.hucreXY(Hucre(j,i),self.__saha)
+                        #Ellipse(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))
+                        Line(width=olcu/2,points=(x,y+20,x,y-20))
+
+
+
+                #x=solX+self.__labirentImaj.guncelKenarlikKalinlik/2
+                #y=ustY-self.__labirentImaj.guncelKenarlikKalinlik/2
+                #Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))
+
+                #x=solX+self.__labirentImaj.guncelKenarlikKalinlik+self.__labirentImaj.guncelHucreKenarUzunluk
+                #y=ustY-self.__labirentImaj.guncelKenarlikKalinlik
+                #Line(width=(olcu),points=(x-olcu/2,y-olcu/2,x+olcu/2,y-olcu/2))
                 #Rectangle(size=(10,10),pos=(x,y))
 
 
