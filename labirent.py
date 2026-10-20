@@ -371,7 +371,7 @@ class Yarisma:
         
         if self.__gozHucre==self.__labirent.bitisHucre:           
             print("bitti")
-            return
+            #return
                     
         
         if not self.__reseptorGuncellendi:
@@ -389,51 +389,53 @@ class Yarisma:
 
             with self.__saha.canvas:
                 from kivy.graphics import Color, Line, Ellipse,Rectangle, Fbo#, RenderContext, Scale, Translate
-
-                Color(0,0,0,1)
-                olcu=self.__labirentImaj.guncelKenarlikKalinlik
-                solXRender=self.__labirentImaj.solXRender(self.__saha)
-                ustYRender=self.__labirentImaj.ustYRender(self.__saha)
-                x1=solXRender
-                y1=(ustYRender-self.__labirentImaj.guncelKenarlikKalinlik)-3*self.__labirentImaj.guncelHucreKenarUzunluk
-                x2=solXRender+100
-                y2=y1
-                Line(width=(olcu),points=(x1,y1,x2,y2))
-
-                Color(0,0,0,1)
-                olcu=self.__labirentImaj.guncelKenarlikKalinlik*2
                 
-                solXRender=self.__labirentImaj.solXRender(self.__saha)
-                ustYRender=self.__labirentImaj.ustYRender(self.__saha)
-                Ellipse(size=(olcu,olcu),pos=(solXRender-olcu/2,ustYRender-olcu/2))
-                
-                x=solXRender
-                y=ustYRender-self.__labirentImaj.guncelYukseklikRender
-                Ellipse(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))
+                Color(0,0,0,1)
 
-                x+=self.__labirentImaj.guncelGenislikRender
-                y=ustYRender-self.__labirentImaj.guncelYukseklikRender
-                Ellipse(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))
-
-                y=ustYRender
-                Ellipse(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))
-
-                Color(0,0,1,1)
+                #imajın-canvasın köşeleri
                 olcu=self.__labirentImaj.guncelKenarlikKalinlik
-
-                solXImageWidget=self.__labirentImaj.solXImageWidget(self.__saha)
-                ustYImageWidget=self.__labirentImaj.ustYImageWidget(self.__saha)
-                Ellipse(size=(olcu,olcu),pos=(solXImageWidget-olcu/2,ustYImageWidget-olcu/2))
-
+                solXImageWidget=self.__labirentImaj.guncelSolXCanvas(self.__saha)
+                ustYImageWidget=self.__labirentImaj.guncelUstYCanvas(self.__saha)
+                altYImageWidget=self.__labirentImaj.guncelAltYCanvas(self.__saha)
+                
                 x=solXImageWidget
-                y=ustYImageWidget-self.__labirentImaj.guncelYukseklikImageWidget
-                Ellipse(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))
+                y=ustYImageWidget
+                Rectangle(size=(olcu,olcu),pos=(x,y-2*olcu))#sol-üst (siyah dikdörtgenin sol-üst köşesi doğru noktayı gösteriyor)
 
-                x+=self.__labirentImaj.guncelGenislikImageWidget
-                Ellipse(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))
+                y=altYImageWidget
+                Rectangle(size=(olcu,olcu),pos=(x,y+olcu))#sol-alt (siyah dikdörtgenin sol-alt köşesi doğru noktayı gösteriyor)
 
-                y+=self.__labirentImaj.guncelYukseklikImageWidget
-                Ellipse(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))
+                x=solXImageWidget+self.__labirentImaj.guncelGenislikCanvas
+                Rectangle(size=(olcu,olcu),pos=(x-olcu,y+olcu))#sağ-alt (siyah dikdörtgenin sağ-alt köşesi doğru noktayı gösteriyor)
+
+                y=ustYImageWidget
+                Rectangle(size=(olcu,olcu),pos=(x-olcu,y-2*olcu))#sağ-üst (siyah dikdörtgenin sağ-alt köşesi doğru noktayı gösteriyor)
+
+                #labirentin köşeleri
+                olcu=self.__labirentImaj.guncelKenarlikKalinlik
+                solXRender=self.__labirentImaj.guncelSolXRender(self.__saha)
+                ustYRender=self.__labirentImaj.guncelUstYRender(self.__saha)
+                altYRender=self.__labirentImaj.guncelAltYRender(self.__saha)
+                kenarlikKalinlik=self.__labirentImaj.guncelKenarlikKalinlik
+
+                x=solXRender
+                y=ustYRender
+                Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))#sol-üst
+
+                x=solXRender
+                y=altYRender
+                Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))#sol-alt
+
+                x=solXRender+self.__labirentImaj.guncelGenislikRender
+                y=altYRender
+                Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))#sağ-alt
+
+                x=solXRender+self.__labirentImaj.guncelGenislikRender
+                y=ustYRender
+                Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))#sağ-üst
+
+
+                
 
 
                 Color(0,1,0,1)
@@ -443,7 +445,7 @@ class Yarisma:
 
                         x,y=self.__labirentImaj.hucreXY(Hucre(j,i),self.__saha)
                         #Ellipse(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))
-                        Line(width=olcu/2,points=(x,y+20,x,y-20))
+                        #Line(width=olcu/2,points=(x,y+20,x,y-20))
 
 
 

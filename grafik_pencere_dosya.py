@@ -76,14 +76,14 @@ class StatikImaj(Image):
         self.allow_stretch=True
         self.keep_ratio=True
 
-        #ilk oluşturulan görsele ait nitelikler
-        self._gercekGenislikImageWidget=-1
-        self._gercekYukseklikImageWidget=-1
+        #ilk oluşturulan görsele ait nitelikler. Canvas çizim alanı(kenar boşlukları içerir), Render çizimin kendisi(kenar boşlukları içermez)
+        self._gercekGenislikCanvas=-1
+        self._gercekYukseklikCanvas=-1
         self._gercekGenislikRender=-1
         self._gercekYukseklikRender=-1
-        self._gercekSolX=-1
-        self._gercekAltY=-1
-        self._gercekUstY=-1
+        self._gercekSolXRender=-1
+        self._gercekAltYRender=-1
+        self._gercekUstYRender=-1
 
     def _gercekDegerlerHesapla(self):
         raise NotImplementedError("_gercek değerler, alt sınıflarda hesaplanmalıdır!")
@@ -91,42 +91,59 @@ class StatikImaj(Image):
         raise NotImplementedError("texture oluşturma işlemi alt sınıflarda yapılmalıdır")
     
     @property
-    def gercekGenislikImageWidget(self):
-        return self._gercekGenislikImageWidget
+    def gercekGenislikCanvas(self):
+        return self._gercekGenislikCanvas
     @property
-    def gercekYukseklikImageWidget(self):
-        return self._gercekYukseklikImageWidget
+    def gercekYukseklikCanvas(self):
+        return self._gercekYukseklikCanvas
+
+    
+    #guncelGenislikCanvas,guncelYukseklikCanvas,guncelSolXCanvas,guncelUstYCanvas değerleri; görselin bir Widget olarak sahip olduğu değerlerdir. Kenar boşlukları dahildir
+    @property
+    def guncelGenislikCanvas(self):
+        return self.size[0]
+    @property
+    def guncelYukseklikCanvas(self):
+        return self.size[1]
+    def guncelSolXCanvas(self,ebeveyn):#ebeveyn:içinde bulunduğu widget
+        return ebeveyn.x+(ebeveyn.width-self.guncelGenislikCanvas)/2
+    def guncelAltYCanvas(self,ebeveyn):#ebeveyn:içinde bulunduğu widget
+        return ebeveyn.y+(ebeveyn.height-self.guncelYukseklikCanvas)/2
+    def guncelUstYCanvas(self,ebeveyn):#ebeveyn:içinde bulunduğu widget
+        return ebeveyn.y+self.guncelYukseklikCanvas+(ebeveyn.height-self.guncelYukseklikCanvas)/2
+    
     @property
     def gercekGenislikRender(self):
         return self._gercekGenislikRender
     @property
     def gercekYukseklikRender(self):
         return self._gercekYukseklikRender
-    
-    #guncelGenislikImageWidget,guncelYukseklikImageWidget,solXImageWidget,ustYImageWidget değerleri; görselin bir Widget olarak sahip olduğu değerlerdir. Kenar boşlukları dahildir
+
     @property
-    def guncelGenislikImageWidget(self):
-        return self.size[0]
+    def gercekSolXRender(self):#labirentin sol kenarının ortası (kenarlığın ortası)
+        return self._gercekSolXRender
     @property
-    def guncelYukseklikImageWidget(self):
-        return self.size[1]
-    def solXImageWidget(self,ebeveyn):#ebeveyn:içinde bulunduğu widget
-        return ebeveyn.x+(ebeveyn.width-self.guncelGenislikImageWidget)/2
-    def ustYImageWidget(self,ebeveyn):#ebeveyn:içinde bulunduğu widget
-        return self.guncelYukseklikImageWidget+ebeveyn.y+(ebeveyn.height-self.guncelYukseklikImageWidget)/2
+    def gercekAltYRender(self):#labirentin alt kenarının ortası (kenarlığın ortası)
+        return self._gercekAltYRender
+    @property
+    def gercekUstYRender(self):#labirentin üst kenarının ortası (kenarlığın ortası)
+        return self._gercekUstYRender
     
-    #guncelGenislikRender,guncelYukseklikRender,solXRender,ustYRender değerleri; görselin gerçek çizim değerleridir. Kenar boşluklarından arındırılmıştır
+    #guncelGenislikRender,guncelYukseklikRender,guncelSolXRender,guncelUstYRender değerleri; görselin gerçek çizim değerleridir. Kenar boşluklarından arındırılmıştır
     @property
     def guncelGenislikRender(self):
-        return self.norm_image_size[0]
+        return self.guncelGenislikCanvas*(self.gercekGenislikRender/self.gercekGenislikCanvas)
     @property
     def guncelYukseklikRender(self):
-        return self.norm_image_size[1]
+        return self.guncelYukseklikCanvas*(self.gercekYukseklikRender/self.gercekYukseklikCanvas)
     
-    def solXRender(self,ebeveyn):
-        return ebeveyn.x+(ebeveyn.width-self.guncelGenislikRender)/2
-    def ustYRender(self,ebeveyn):
-        return self.guncelYukseklikRender+ebeveyn.y+(ebeveyn.height-self.guncelYukseklikRender)/2
+    def guncelSolXRender(self,ebeveyn):
+        return self.guncelSolXCanvas(ebeveyn)+(self.guncelGenislikCanvas-self.guncelGenislikRender)/2#kenarlık kalınlığı hesaba dahil edilmiyor
+    def guncelAltYRender(self,ebeveyn):
+        return self.guncelAltYCanvas(ebeveyn)+(self.guncelYukseklikCanvas-self.guncelYukseklikRender)/2#kenarlık kalınlığı hesaba dahil edilmiyor
+    def guncelUstYRender(self,ebeveyn):
+        return self.guncelUstYCanvas(ebeveyn)-(self.guncelYukseklikCanvas-self.guncelYukseklikRender)/2#kenarlık kalınlığı hesaba dahil edilmiyor
+    
     
 
 class LabirentStatikImaj(StatikImaj):
@@ -161,20 +178,19 @@ class LabirentStatikImaj(StatikImaj):
         genislik,yukseklik=self.__olcekle(saha.width,saha.height)
 
         self.size=(genislik,yukseklik)
-        self.pos=(self.solXImageWidget(saha),self.ustYImageWidget(saha)-yukseklik)
+        self.pos=(self.guncelSolXCanvas(saha),self.guncelUstYCanvas(saha)-yukseklik)
         
         
         
         match self.__labirent.tip:
             case DikdortgenTip.YATAY:
-                self.__guncelKenarlikKalinlik=self.__hesaplaKenarlikKalinlik(self.guncelYukseklikRender)
+                self.__guncelKenarlikKalinlik=self.__hesaplaKenarlikKalinlik(self.guncelYukseklikCanvas)
                 self.__guncelHucreKenarUzunluk=self.__hesaplaHucreKenarUzunluk(self.guncelGenislikRender,self.__labirent.sutunSayi,self.__guncelKenarlikKalinlik)
-
             case DikdortgenTip.DIKEY:
-                self.__guncelKenarlikKalinlik=self.__hesaplaKenarlikKalinlik(self.guncelGenislikRender)
+                self.__guncelKenarlikKalinlik=self.__hesaplaKenarlikKalinlik(self.guncelGenislikCanvas)
                 self.__guncelHucreKenarUzunluk=self.__hesaplaHucreKenarUzunluk(self.guncelYukseklikRender,self.__labirent.satirSayi,self.__guncelKenarlikKalinlik)
             case DikdortgenTip.KARE:
-                self.__guncelKenarlikKalinlik=self.__hesaplaKenarlikKalinlik(self.guncelGenislikRender)
+                self.__guncelKenarlikKalinlik=self.__hesaplaKenarlikKalinlik(self.guncelGenislikCanvas)
                 self.__guncelHucreKenarUzunluk=self.__hesaplaHucreKenarUzunluk(self.guncelYukseklikRender,self.__labirent.satirSayi,self.__guncelKenarlikKalinlik)
 
         #print(self.__guncelHucreKenarUzunluk/self.__guncelKenarlikKalinlik)
@@ -182,9 +198,9 @@ class LabirentStatikImaj(StatikImaj):
         #from grafik_pencere_dosya import StatikImaj
         #i=StatikImaj()
         #i._gercekDegerlerHesapla()
-        #self.__orijinalKenarlikKalinlik=self.__orijinalGenislikImageWidget/EkranSabit.LABIRENT_KENARLIK_KALINLIK_ORAN
+        #self.__orijinalKenarlikKalinlik=self.__orijinalGenislikCanvas/EkranSabit.LABIRENT_KENARLIK_KALINLIK_ORAN
         #print(self.orijinalKenarlikKalinlik,self.__guncelKenarlikKalinlik)
-        #print(self.genislikImageWidget/self.kenarlikKalinlik)
+        #print(self.genislikCanvas/self.kenarlikKalinlik)
 
 
         #print(self.__guncelKenarlikKalinlik,self.genislikRender)
@@ -194,8 +210,8 @@ class LabirentStatikImaj(StatikImaj):
         #print(yukseklik,self.yukseklik,self.height)
 
     def hucreXY(self,hucre,saha):#konumu verilen hücreye, robotu çizebilmek için gerekli koordinatlar   
-        solX=self.solXRender(saha)
-        ustY=self.ustYRender(saha)
+        solX=self.guncelSolXRender(saha)
+        ustY=self.guncelUstYRender(saha)
         x=solX+self.__guncelKenarlikKalinlik+hucre.sutunNumara*(self.__guncelHucreKenarUzunluk)   
         y=ustY-self.__guncelKenarlikKalinlik-self.__guncelHucreKenarUzunluk
         
@@ -207,12 +223,12 @@ class LabirentStatikImaj(StatikImaj):
         maksSahaGenislik=maks[EkranSabit.MAKS_SAHA_GENISLIK_ANAHTAR]
         maksSahaYukseklik=maks[EkranSabit.MAKS_SAHA_YUKSEKLIK_ANAHTAR]
 
-        '''_gercekGenislikImageWidget,_gercekYukseklikImageWidget ve _gercekGenislikRender,_gercekYukseklikRender değişkenleri ile alakalı açıklama:
+        '''_gercekGenislikCanvas,_gercekYukseklikCanvas ve _gercekGenislikRender,_gercekYukseklikRender değişkenleri ile alakalı açıklama:
 
         Image nesneleri bir widget içerisinde görüntülenirken, içinde bulunduğu widget nesnesine göre boyutlandırılıp, konumlandırılabiliyor.
         Fakat gerçek boyut(size,width,height) ve konum(pos,x,y) verileri yanıltıcı değerler içerebiliyor.
 
-        size Niteliği (Widget(Image) Boyutu) (_gercekGenislikImageWidget,_gercekYukseklikImageWidget değişkenleri)
+        size Niteliği (Widget(Image) Boyutu) (_gercekGenislikCanvas,_gercekYukseklikCanvas değişkenleri)
         Tanım: Image nesnesinin (yani UI üzerindeki widget sınırlarının) genişlik ve yükseklik değeridir.
         Davranış: Bu, Image nesnesinin arayüzde kapladığı toplam kutu boyutudur.
         Özellik: İstediğiniz gibi manuel olarak (size: 400, 300 şeklinde) değiştirebilirsiniz. Resmin en-boy oranına (aspect ratio) uyup uymadığına bakılmaksızın doğrudan widget'ın sınırlarını belirler.
@@ -225,52 +241,38 @@ class LabirentStatikImaj(StatikImaj):
         Boş kalan kısımlar ise şeffaf alanlar olarak kalır (veya resim bu boyutta çizilir).'''
         
 
-        self._gercekGenislikImageWidget,self._gercekYukseklikImageWidget=self.__olcekle(maksSahaGenislik,maksSahaYukseklik)#labirentin çizileceği alanın genişlik ve yükseklik
+        self._gercekGenislikCanvas,self._gercekYukseklikCanvas=self.__olcekle(maksSahaGenislik,maksSahaYukseklik)#labirentin çizileceği alanın genişlik ve yükseklik
         
         # alt-üst(2+2), sol-sağ(2+2) taraflardan kenarlık kalınlığının 2 katı kadar küçültme yapılacak
-        #texture ait  genişlik ve yükseklik, canvas'a göre küçültülecek. Fakat bu küçültmenin oranı genişlik ve yüksekliğe göre aynı olmalı (*self._gercekYukseklikImageWidget/canvasGenislik)
+        #texture ait  genişlik ve yükseklik, canvas'a göre küçültülecek. Fakat bu küçültmenin oranı genişlik ve yüksekliğe göre aynı olmalı (*self._gercekYukseklikCanvas/canvasGenislik)
         if self.__labirent.tip==DikdortgenTip.YATAY:
-            self.__gercekKenarlikKalinlik=self.__hesaplaKenarlikKalinlik(self._gercekYukseklikImageWidget)
+            self.__gercekKenarlikKalinlik=self.__hesaplaKenarlikKalinlik(self._gercekYukseklikCanvas)
         elif self.__labirent.tip==DikdortgenTip.DIKEY:   
-            self.__gercekKenarlikKalinlik=self.__hesaplaKenarlikKalinlik(self._gercekGenislikImageWidget)
+            self.__gercekKenarlikKalinlik=self.__hesaplaKenarlikKalinlik(self._gercekGenislikCanvas)
         elif self.__labirent.tip==DikdortgenTip.KARE:
-            self.__gercekKenarlikKalinlik=self.__hesaplaKenarlikKalinlik(self._gercekGenislikImageWidget)
+            self.__gercekKenarlikKalinlik=self.__hesaplaKenarlikKalinlik(self._gercekGenislikCanvas)
 
-
-
-
-
-        hucreBoyutGenisligeGore=self.__hesaplaHucreKenarUzunluk(self._gercekGenislikImageWidget,self.__labirent.sutunSayi,self.__gercekKenarlikKalinlik)
-        hucreBoyutYuksekligeGore=self.__hesaplaHucreKenarUzunluk(self._gercekYukseklikImageWidget,self.__labirent.satirSayi,self.__gercekKenarlikKalinlik)            
+        hucreBoyutGenisligeGore=self.__hesaplaHucreKenarUzunluk(self._gercekGenislikCanvas,self.__labirent.sutunSayi,self.__gercekKenarlikKalinlik)
+        hucreBoyutYuksekligeGore=self.__hesaplaHucreKenarUzunluk(self._gercekYukseklikCanvas,self.__labirent.satirSayi,self.__gercekKenarlikKalinlik)            
 
         if hucreBoyutYuksekligeGore<hucreBoyutGenisligeGore:
             self.__gercekHucreKenarUzunluk=hucreBoyutYuksekligeGore
-            self._gercekYukseklikRender=self._gercekYukseklikImageWidget-EkranSabit.TEXTURE_KUCULTME_CARPAN_2_KENAR*self.__gercekKenarlikKalinlik
-            self._gercekGenislikRender=self._gercekYukseklikRender*self._gercekGenislikImageWidget/self._gercekYukseklikImageWidget
+            self._gercekYukseklikRender=self._gercekYukseklikCanvas-EkranSabit.TEXTURE_KUCULTME_CARPAN_2_KENAR*self.__gercekKenarlikKalinlik
+            self._gercekGenislikRender=self._gercekYukseklikRender*self._gercekGenislikCanvas/self._gercekYukseklikCanvas
         else:
             self.__gercekHucreKenarUzunluk=hucreBoyutGenisligeGore
-            self._gercekGenislikRender=self._gercekGenislikImageWidget-EkranSabit.TEXTURE_KUCULTME_CARPAN_2_KENAR*self.__gercekKenarlikKalinlik
-            self._gercekYukseklikRender=self._gercekGenislikRender*self._gercekYukseklikImageWidget/self._gercekGenislikImageWidget
+            self._gercekGenislikRender=self._gercekGenislikCanvas-EkranSabit.TEXTURE_KUCULTME_CARPAN_2_KENAR*self.__gercekKenarlikKalinlik
+            self._gercekYukseklikRender=self._gercekGenislikRender*self._gercekYukseklikCanvas/self._gercekGenislikCanvas
 
-        self._gercekSolX=self.__gercekKenarlikKalinlik+(self._gercekGenislikImageWidget-self._gercekGenislikRender)/2
-        self._gercekAltY=((self._gercekYukseklikImageWidget-self.gercekYukseklikRender)/2)+self.__gercekKenarlikKalinlik
-        self._gercekUstY=self._gercekYukseklikImageWidget-self.__gercekKenarlikKalinlik-((self._gercekYukseklikImageWidget-self.gercekYukseklikRender)/2)
-
-
+        self._gercekSolXRender=(self._gercekGenislikCanvas-self._gercekGenislikRender)/2    #labirentin sol kenarının ortası (kenarlığın ortası)   
+        self._gercekAltYRender=((self._gercekYukseklikCanvas-self.gercekYukseklikRender)/2) #labirentin alt kenarının ortası (kenarlığın ortası)
+        self._gercekUstYRender=self._gercekYukseklikCanvas-((self._gercekYukseklikCanvas-self.gercekYukseklikRender)/2) #labirentin üst kenarının ortası (kenarlığın ortası)
 
     def _textureOlustur(self):
         #labirent görselini, maks boyutlara göre bir kez oluşturup, sonrasında ölçekleniyor
-
-        #solX=EkranSabit.TEXTURE_KUCULTME_CARPAN_2_KENAR*self.__gercekKenarlikKalinlik+self.__gercekKenarlikKalinlik#self.__gercekKenarlikKalinlik#EkranSabit.TEXTURE_KUCULTME_CARPAN_1_KENAR*self.__gercekKenarlikKalinlik
-        #ustY=self._gercekYukseklikRender-self.__gercekKenarlikKalinlik
-
-        
-        fbo = Fbo(size=(self._gercekGenislikImageWidget, self._gercekYukseklikImageWidget))
+        fbo = Fbo(size=(self._gercekGenislikCanvas, self._gercekYukseklikCanvas))
         #fbo = Fbo(size=(self._gercekGenislikRender, self._gercekYukseklikRender))
         
-
-
-
         # Kivy Fbo varsayılan olarak transparan gelebilir. Arka planı temizliyoruz.
         fbo.clear_buffer()
 
@@ -278,18 +280,15 @@ class LabirentStatikImaj(StatikImaj):
         # 2. Çizim komutlarını Fbo canvas'ına ekliyoruz
         with fbo:
 
-
             
             # Kenarlık rengi ve çerçeve çizimi
-            textureX = self._gercekSolX
-            textureY = self._gercekUstY-self._gercekYukseklikRender+2*self.__gercekKenarlikKalinlik
 
 
             Color(rgba=LabirentSabit.KENARLIK_RENK)
-            self.__cizCerceve(self._gercekSolX,self._gercekAltY,self._gercekGenislikRender,self._gercekYukseklikRender)
+            self.__cizCerceve(self._gercekSolXRender,self._gercekAltYRender,self._gercekGenislikRender,self._gercekYukseklikRender)
 
             # Duvarların çizimi
-            self.__cizDuvar(self._gercekSolX,self._gercekUstY)
+            self.__cizDuvar(self._gercekSolXRender,self._gercekUstYRender)
             
             # Çözüm yolu veya Başlangıç/Bitiş hücrelerinin boyanması
             hucreTip=HucreSabit.TIP[HucreSabit.TIP_YOL_ANAHTAR]
@@ -308,14 +307,44 @@ class LabirentStatikImaj(StatikImaj):
 
 
             Color(1,1,1,1)
-            #Rectangle(size=(self.__gercekKenarlikKalinlik,self.__gercekKenarlikKalinlik),pos=(self._gercekSolX-self.__gercekKenarlikKalinlik/2,self._gercekUstY-self.__gercekKenarlikKalinlik))
-            x=self._gercekSolX
-            y=self._gercekUstY
-            Line(width=self.__gercekKenarlikKalinlik,points=(x,self._gercekUstY,x+self.__gercekKenarlikKalinlik,self._gercekUstY))
-            Line(width=self.__gercekKenarlikKalinlik,points=(x,self._gercekAltY,x+self.__gercekKenarlikKalinlik,self._gercekAltY))
+            #labirentin köşeleri
+            olcu=2*self.__gercekKenarlikKalinlik
 
-            Color(0,0,0,1)
-            Rectangle(size=(2*self.__gercekKenarlikKalinlik,2*self.__gercekKenarlikKalinlik),pos=(self._gercekSolX-self.__gercekKenarlikKalinlik,self._gercekUstY-self.__gercekKenarlikKalinlik))
+            x=self._gercekSolXRender
+            y=self._gercekUstYRender
+            Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))#sol-üst
+
+            x=self._gercekSolXRender
+            y=self._gercekAltYRender
+            Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))#sol-alt
+
+            x=self._gercekSolXRender+self._gercekGenislikRender
+            y=self._gercekAltYRender
+            Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))#sağ-alt
+            
+            x=self._gercekSolXRender+self._gercekGenislikRender
+            y=self._gercekUstYRender
+            Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))#sağ-üst
+
+            #imajın köşeleri
+            x=0
+            y=0
+            Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))#sol-alt
+
+            x=self._gercekGenislikCanvas
+            y=0
+            Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))#sağ-alt
+
+            x=self._gercekGenislikCanvas
+            y=self._gercekYukseklikCanvas
+            Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))#sağ-üst
+
+            x=0
+            y=self._gercekYukseklikCanvas
+            Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))#sol-üst
+            
+
+
 
         # 3. Fbo üzerindeki çizimleri ekrana yansıtılmaya hazır bir doku (texture) olarak çekiyoruz
         fbo.draw()
@@ -330,24 +359,27 @@ class LabirentStatikImaj(StatikImaj):
         return (self.__labirent.sutunSayi*olcekFaktor,self.__labirent.satirSayi*olcekFaktor)
 
     def __cizCerceve(self,x,y,genislik,yukseklik):
-                
-        Line(close="True", width=self.__gercekKenarlikKalinlik,rectangle=(x,y, genislik-2*self.__gercekKenarlikKalinlik, yukseklik-2*self.__gercekKenarlikKalinlik))
+        Line(close="True", width=self.__gercekKenarlikKalinlik,rectangle=(x,y, genislik, yukseklik))
 
     def __cizDuvar(self,solX,ustY):
-
-
-
-        Color(0,0,0,1)
+        Color(0,0,1,1)
         for satirNumara in range(self.__labirent.satirSayi):
             for sutunNumara in range(self.__labirent.sutunSayi-1):
                 duvar=self.__labirent.duvar(self.__labirent.hucre(satirNumara,sutunNumara),self.__labirent.hucre(satirNumara,sutunNumara+1))
                 if duvar.durum==DuvarDurum.KAPALI:
                     #x=solX+self.__gercekHucreKenarUzunluk*(sutunNumara+1)
                     
-                    x=solX+1*self.__gercekKenarlikKalinlik+(self.__gercekHucreKenarUzunluk+2*self.__gercekKenarlikKalinlik)*(sutunNumara+1)                    
+                    x=solX+2*self.__gercekKenarlikKalinlik+(self.__gercekHucreKenarUzunluk+2*self.__gercekKenarlikKalinlik)*(sutunNumara+1)                    
                     y1=ustY-(1*self.__gercekKenarlikKalinlik)-(2*self.__gercekKenarlikKalinlik+self.__gercekHucreKenarUzunluk)*satirNumara
                     y2=y1-self.__gercekKenarlikKalinlik-self.__gercekHucreKenarUzunluk
                     #Line(width=self.__gercekKenarlikKalinlik,points=(x,y1,x,y2))
+
+                    olcu=self.__gercekKenarlikKalinlik*2
+                    x=solX
+                    y=ustY
+                    #Rectangle(size=(olcu,olcu),pos=(solX,self._gercekUstYRender-self.__gercekKenarlikKalinlik))
+                    Rectangle(size=(olcu,olcu),pos=(self._gercekSolXRender,self._gercekUstYRender))
+
 
         for sutunNumara in range(self.__labirent.sutunSayi):
             for satirNumara in range(self.__labirent.satirSayi-1):
@@ -356,7 +388,7 @@ class LabirentStatikImaj(StatikImaj):
                     x1=solX+1*self.__gercekKenarlikKalinlik+(self.__gercekHucreKenarUzunluk+2*self.__gercekKenarlikKalinlik)*sutunNumara
                     y=ustY-(1*self.__gercekKenarlikKalinlik)-(2*self.__gercekKenarlikKalinlik+self.__gercekHucreKenarUzunluk)*(satirNumara+1)
                     x2=x1+self.__gercekHucreKenarUzunluk+self.__gercekKenarlikKalinlik
-                    Line(width=self.__gercekKenarlikKalinlik,points=(x1,y,x2,y))
+                    #Line(width=self.__gercekKenarlikKalinlik,points=(x1,y,x2,y))
 
 
     def __boyaHucre(self,solX,ustY,konum,uzunlukCarpan,renk):

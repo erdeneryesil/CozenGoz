@@ -228,7 +228,7 @@ class EkranSabit(metaclass=SabitMetaClass):
     #LABIRENT_KENARLIK_KALINLIK_KATSAYI_05=0.5
 
     #labirent görseli için : alt-üst(2+2), sol-sağ(2+2) taraflardan kenarlık kalınlığının 2 katı kadar küçültme yapılacak
-    TEXTURE_KUCULTME_CARPAN_2_KENAR=2
+    TEXTURE_KUCULTME_CARPAN_2_KENAR=8#2
     TEXTURE_KUCULTME_CARPAN_1_KENAR=1
 
     def maksSahaBoyut(labirentTip):#sahanın maks w-h, kenarlık kalınlık maks değerleri döndürür
