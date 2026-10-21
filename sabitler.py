@@ -104,7 +104,15 @@ class DikdortgenTip(IntEnum):#labirent ya da sahanın tipini belirlemek amacıyl
             return DikdortgenTip.YATAY
         else:
             return DikdortgenTip.KARE
-        
+
+class HucreNokta(IntEnum):#hücrelerin sağ,sol,alt,üst kenarları ve merkez noktası. göz ve reseptörün hücre içinde konumlandırılabilmesinde kullanılıyor
+    MERKEZ=0
+    SOL=1
+    ALT=2
+    SAG=3
+    UST=4
+    
+
 #SABİT DEĞERLERİ İÇEREN STATİK SINIFLAR
 class SabitMetaClass(type):#sadece sabit değerleri içerecek olan statik sınıflar, bu sınıftan metaclass ile kalıtım alacak
     """Sınıf seviyesindeki özniteliklerin değiştirilmesini veya silinmesini engeller."""
@@ -228,8 +236,8 @@ class EkranSabit(metaclass=SabitMetaClass):
     #LABIRENT_KENARLIK_KALINLIK_KATSAYI_05=0.5
 
     #labirent görseli için : alt-üst(2+2), sol-sağ(2+2) taraflardan kenarlık kalınlığının 2 katı kadar küçültme yapılacak
-    TEXTURE_KUCULTME_CARPAN_2_KENAR=8#2
-    TEXTURE_KUCULTME_CARPAN_1_KENAR=1
+    RENDER_KUCULTME_CARPAN_2_KENAR=8#2
+    RENDER_KUCULTME_CARPAN_1_KENAR=1
 
     def maksSahaBoyut(labirentTip):#sahanın maks w-h, kenarlık kalınlık maks değerleri döndürür
         match labirentTip:

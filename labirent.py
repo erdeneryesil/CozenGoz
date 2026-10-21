@@ -10,7 +10,7 @@ from kivy.graphics import Color, Line, Ellipse, Fbo
 
 
 from temel import Konum#,Denetle
-from sabitler import EkranSabit,HucreSabit,LabirentSabit,AnimasyonSabit,DikdortgenTip,DuvarDurum,Yon,GozTip,GozAksiyon,Hareket,Yon,DuvarDurum,ReseptorKonum
+from sabitler import HucreSabit,HucreNokta,LabirentSabit,AnimasyonSabit,DikdortgenTip,DuvarDurum,Yon,GozTip,GozAksiyon,Hareket,Yon,DuvarDurum,ReseptorKonum
 from yarismaci import BenimGozum
 from goz import Reseptor
 
@@ -383,7 +383,7 @@ class Yarisma:
         if self.__gozImaj.animasyonTamamlandi:
             self.__gozImaj.animasyonBasladiResetle()
             self.__gozImaj.animasyonTamamlandiResetle()
-            x, y = self.__labirentImaj.hucreXY(self.__gozHucre,self.__saha)
+            x, y = self.__labirentImaj.hucreXY(HucreNokta.MERKEZ,self.__gozHucre,self.__saha)
             self.__gozImaj.konumla(x, y, self.__labirentImaj.guncelHucreKenarUzunluk,self.__labirentImaj.guncelKenarlikKalinlik)
             self.__reseptorGuncellendi = False
 
@@ -433,20 +433,34 @@ class Yarisma:
                 x=solXRender+self.__labirentImaj.guncelGenislikRender
                 y=ustYRender
                 Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))#sağ-üst
-
+                
 
                 
 
 
                 Color(0,1,0,1)
-                olcu*=2
-                for i in range(self.__labirent.sutunSayi):
-                    for j in range(self.__labirent.satirSayi):
+                for i in range(self.__labirent.satirSayi):
+                    for j in range(self.__labirent.sutunSayi):
+                        Color(1,0,0,1)
+                        x,y=self.__labirentImaj.hucreXY(HucreNokta.MERKEZ,Hucre(i,j),self.__saha)
+                        Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))
 
-                        x,y=self.__labirentImaj.hucreXY(Hucre(j,i),self.__saha)
-                        #Ellipse(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))
-                        #Line(width=olcu/2,points=(x,y+20,x,y-20))
+                        Color(0,1,0,1)
+                        x,y=self.__labirentImaj.hucreXY(HucreNokta.SOL,Hucre(i,j),self.__saha)
+                        Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))
 
+                        Color(0,0,1,1)
+                        x,y=self.__labirentImaj.hucreXY(HucreNokta.ALT,Hucre(i,j),self.__saha)
+                        Rectangle(size=(olcu*1.25,olcu*1.25),pos=(x-olcu*1.25/2,y-olcu*1.25/2))
+
+                        Color(1,1,0,1)
+                        x,y=self.__labirentImaj.hucreXY(HucreNokta.SAG,Hucre(i,j),self.__saha)
+                        Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))
+
+                        Color(1,0,1,1)
+                        x,y=self.__labirentImaj.hucreXY(HucreNokta.UST,Hucre(i,j),self.__saha)
+                        Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))
+                
 
 
                 #x=solX+self.__labirentImaj.guncelKenarlikKalinlik/2
@@ -507,7 +521,7 @@ class Yarisma:
         
         self.__labirentImaj.guncelleOlculer(self.__saha)
         
-        x,y=self.__labirentImaj.hucreXY(self.__gozHucre,self.__saha)
+        x,y=self.__labirentImaj.hucreXY(HucreNokta.MERKEZ,self.__gozHucre,self.__saha)
         
         self.__gozImaj.guncelleOlculer(x,y,self.__labirentImaj.guncelHucreKenarUzunluk,self.__labirentImaj.guncelKenarlikKalinlik)
         self.__reseptorImaj.guncelleOlculer(self.__labirentImaj.guncelHucreKenarUzunluk)
@@ -516,7 +530,7 @@ class Yarisma:
                
         yonFark = self.__gozImaj.yon - Yon.baslangic()
         gercekReseptorKonum=ReseptorKonum((self.__reseptor.konumIndis+yonFark)%len(ReseptorKonum))
-        hucreX,hucreY=self.__labirentImaj.hucreXY(self.__gozHucre,self.__saha)
+        hucreX,hucreY=self.__labirentImaj.hucreXY(HucreNokta.MERKEZ,self.__gozHucre,self.__saha)
 
         komsuHucreler = self.__labirent.komsuHucreler(self.__gozHucre)
         hedefHucre = komsuHucreler.get(Yon(gercekReseptorKonum))
