@@ -441,25 +441,42 @@ class Yarisma:
                 Color(0,1,0,1)
                 for i in range(self.__labirent.satirSayi):
                     for j in range(self.__labirent.sutunSayi):
+                        
+                        olcu=self.__labirentImaj.guncelKenarlikKalinlik
+
                         Color(1,0,0,1)
                         x,y=self.__labirentImaj.hucreXY(HucreNokta.MERKEZ,Hucre(i,j),self.__saha)
-                        Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))
+                        #Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))
 
                         Color(0,1,0,1)
                         x,y=self.__labirentImaj.hucreXY(HucreNokta.SOL,Hucre(i,j),self.__saha)
-                        Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))
+                        #Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))
 
                         Color(0,0,1,1)
                         x,y=self.__labirentImaj.hucreXY(HucreNokta.ALT,Hucre(i,j),self.__saha)
-                        Rectangle(size=(olcu*1.25,olcu*1.25),pos=(x-olcu*1.25/2,y-olcu*1.25/2))
+                        #Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))
 
-                        Color(1,1,0,1)
-                        x,y=self.__labirentImaj.hucreXY(HucreNokta.SAG,Hucre(i,j),self.__saha)
-                        Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))
+                        Color(.5,.5,0,1)
+                        x,y=self.__labirentImaj.hucreXY(HucreNokta.SOL_ALT,Hucre(i,j),self.__saha)
+                        #Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))
+
+                        olcu=self.__labirentImaj.guncelKenarlikKalinlik*1.25
+
+
 
                         Color(1,0,1,1)
                         x,y=self.__labirentImaj.hucreXY(HucreNokta.UST,Hucre(i,j),self.__saha)
-                        Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))
+                        #Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))
+
+                        Color(1,1,0,1)
+                        x,y=self.__labirentImaj.hucreXY(HucreNokta.SAG,Hucre(i,j),self.__saha)
+                        #Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))
+
+
+
+                        Color(.75,.75,0,1)
+                        x,y=self.__labirentImaj.hucreXY(HucreNokta.SAG_ALT,Hucre(i,j),self.__saha)
+                        #Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))
                 
 
 

@@ -183,30 +183,47 @@ class LabirentStatikImaj(StatikImaj):
                 self.__guncelKenarlikKalinlik=self.__hesaplaKenarlikKalinlik(self.guncelGenislikCanvas)
                 self.__guncelHucreKenarUzunluk=self.__hesaplaHucreKenarUzunluk(self.guncelYukseklikRender,self.labirent.satirSayi,self.guncelKenarlikKalinlik)
 
-    def hucreXY(self,hucreNokta,hucre,saha):#konumu verilen hücreye, robotu çizebilmek için gerekli koordinatlar   
-        solX=self.guncelSolXRender(saha)
-        ustY=self.guncelUstYRender(saha)
-        altY=self.guncelAltYRender(saha)
-        x=solX+(hucre.sutunNumara)*(self.guncelGenislikRender/self.labirent.sutunSayi)   
-        y=ustY-(hucre.satirNumara+1)*(self.guncelYukseklikRender/self.labirent.satirSayi)
-        
+    def hucreXY(self,hucreNokta,hucre,saha=None):#konumu verilen hücreye; robotu, sensörleri vs. çizebilmek için gerekli koordinatlar   
+        if saha is None:#texture oluşturulur iken
+            solX=self.gercekSolXRender
+            ustY=self.gercekUstYRender
+            altY=self.gercekAltYRender
+            genislik=self.gercekGenislikRender
+            yukselik=self.gercekYukseklikRender
+            hucreKenarUzunluk=self.gercekHucreKenarUzunluk
+            kenarlikKalinlik=self.gercekKenarlikKalinlik
+        else:        
+            solX=self.guncelSolXRender(saha)
+            ustY=self.guncelUstYRender(saha)
+            altY=self.guncelAltYRender(saha)
+            genislik=self.guncelGenislikRender
+            yukselik=self.guncelYukseklikRender
+            hucreKenarUzunluk=self.guncelHucreKenarUzunluk
+            kenarlikKalinlik=self.guncelKenarlikKalinlik
+            
         match hucreNokta:
             case HucreNokta.MERKEZ:
-                x=solX+(hucre.sutunNumara)*(self.guncelGenislikRender/self.labirent.sutunSayi)+self.guncelHucreKenarUzunluk/2+self.guncelKenarlikKalinlik
-                y=ustY-(hucre.satirNumara+1)*(self.guncelYukseklikRender/self.labirent.satirSayi)+self.guncelHucreKenarUzunluk/2+self.guncelKenarlikKalinlik
+                x=solX+(hucre.sutunNumara)*(genislik/self.labirent.sutunSayi)+hucreKenarUzunluk/2+kenarlikKalinlik
+                y=ustY-(hucre.satirNumara+1)*(yukselik/self.labirent.satirSayi)+hucreKenarUzunluk/2+kenarlikKalinlik
             case HucreNokta.SOL:
-                x=solX+(hucre.sutunNumara)*(self.guncelGenislikRender/self.labirent.sutunSayi)
-                y=ustY-(hucre.satirNumara+1)*(self.guncelYukseklikRender/self.labirent.satirSayi)+self.guncelHucreKenarUzunluk/2+self.guncelKenarlikKalinlik
+                x=solX+(hucre.sutunNumara)*(genislik/self.labirent.sutunSayi)
+                y=ustY-(hucre.satirNumara+1)*(yukselik/self.labirent.satirSayi)+hucreKenarUzunluk/2+kenarlikKalinlik
             case HucreNokta.ALT:
-                x=solX+(hucre.sutunNumara)*(self.guncelGenislikRender/self.labirent.sutunSayi)+self.guncelHucreKenarUzunluk/2+self.guncelKenarlikKalinlik
-                y=ustY-(hucre.satirNumara+1)*(self.guncelYukseklikRender/self.labirent.satirSayi)
+                x=solX+(hucre.sutunNumara)*(genislik/self.labirent.sutunSayi)+hucreKenarUzunluk/2+kenarlikKalinlik
+                y=ustY-(hucre.satirNumara+1)*(yukselik/self.labirent.satirSayi)
             case HucreNokta.SAG:
-                return (x+self.guncelHucreKenarUzunluk+2*self.guncelKenarlikKalinlik,y+self.guncelHucreKenarUzunluk/2+self.guncelKenarlikKalinlik)
+                x=solX+(hucre.sutunNumara+1)*(genislik/self.labirent.sutunSayi)
+                y=ustY-(hucre.satirNumara+1)*(yukselik/self.labirent.satirSayi)+hucreKenarUzunluk/2+kenarlikKalinlik
             case HucreNokta.UST:
-                x=solX+(hucre.sutunNumara)*(self.guncelGenislikRender/self.labirent.sutunSayi)+self.guncelHucreKenarUzunluk/2+self.guncelKenarlikKalinlik
-                y=altY+(hucre.satirNumara)*(self.guncelYukseklikRender/self.labirent.satirSayi)
-                print(hucre.satirNumara)
-                
+                x=solX+(hucre.sutunNumara)*(genislik/self.labirent.sutunSayi)+hucreKenarUzunluk/2+kenarlikKalinlik
+                y=altY+(hucre.satirNumara+1)*(yukselik/self.labirent.satirSayi)
+            case HucreNokta.SOL_ALT:
+                x=solX+(hucre.sutunNumara)*(genislik/self.labirent.sutunSayi)+kenarlikKalinlik
+                y=ustY-(hucre.satirNumara+1)*(yukselik/self.labirent.satirSayi)+kenarlikKalinlik
+            case HucreNokta.SAG_ALT:
+                x=solX+(hucre.sutunNumara+1)*(genislik/self.labirent.sutunSayi)-kenarlikKalinlik
+                y=ustY-(hucre.satirNumara+1)*(yukselik/self.labirent.satirSayi)+kenarlikKalinlik
+
         return (x,y)
         
 
@@ -316,12 +333,8 @@ class LabirentStatikImaj(StatikImaj):
         # Kivy Fbo varsayılan olarak transparan gelebilir. Arka planı temizliyoruz.
         fbo.clear_buffer()
 
-
-        # 2. Çizim komutlarını Fbo canvas'ına ekliyoruz
         with fbo:
             self.__izgaraCiz()
-
-            # Kenarlık rengi ve çerçeve çizimi
 
             Color(rgba=LabirentSabit.KENARLIK_RENK)
             self.__cizCerceve()
@@ -331,20 +344,15 @@ class LabirentStatikImaj(StatikImaj):
             
             # Çözüm yolu veya Başlangıç/Bitiş hücrelerinin boyanması
             hucreTip=HucreSabit.TIP[HucreSabit.TIP_YOL_ANAHTAR]
-            #for hucre in self.cozumYolu:
-                #self.__boyaHucre(labirent,solX,ustY,hucre,hucreTip[HucreSabit.TIP_UZUNLUK_CARPAN_ANAHTAR],hucreTip[HucreSabit.TIP_RENK_ANAHTAR])
             for hucreNumara in range(self.labirent.cozumYoluUzunluk):
-                pass#self.__boyaHucre(solX,ustY,self.labirent.cozumYoluHucre(hucreNumara),hucreTip[HucreSabit.TIP_UZUNLUK_CARPAN_ANAHTAR],hucreTip[HucreSabit.TIP_RENK_ANAHTAR])
-
+                self.__boyaHucre(self.labirent.cozumYoluHucre(hucreNumara),hucreTip[HucreSabit.TIP_UZUNLUK_CARPAN_ANAHTAR],hucreTip[HucreSabit.TIP_RENK_ANAHTAR])
 
             hucreTip=HucreSabit.TIP[HucreSabit.TIP_BASLANGIC_ANAHTAR]
-            pass#self.__boyaHucre(solX,ustY,Konum(self.labirent.baslangicSatirNumara,self.labirent.baslangicSutunNumara),hucreTip[HucreSabit.TIP_UZUNLUK_CARPAN_ANAHTAR],hucreTip[HucreSabit.TIP_RENK_ANAHTAR])
-            
+            self.__boyaHucre(Konum(self.labirent.baslangicSatirNumara,self.labirent.baslangicSutunNumara),hucreTip[HucreSabit.TIP_UZUNLUK_CARPAN_ANAHTAR],hucreTip[HucreSabit.TIP_RENK_ANAHTAR])
+
             hucreTip=HucreSabit.TIP[HucreSabit.TIP_BITIS_ANAHTAR]
-            pass#self.__boyaHucre(solX,ustY,Konum(self.labirent.bitisSatirNumara,self.labirent.bitisSutunNumara),hucreTip[HucreSabit.TIP_UZUNLUK_CARPAN_ANAHTAR],hucreTip[HucreSabit.TIP_RENK_ANAHTAR])
+            self.__boyaHucre(Konum(self.labirent.bitisSatirNumara,self.labirent.bitisSutunNumara),hucreTip[HucreSabit.TIP_UZUNLUK_CARPAN_ANAHTAR],hucreTip[HucreSabit.TIP_RENK_ANAHTAR])
 
-
-        # 3. Fbo üzerindeki çizimleri ekrana yansıtılmaya hazır bir doku (texture) olarak çekiyoruz
         fbo.draw()
 
         return fbo.texture
@@ -363,9 +371,10 @@ class LabirentStatikImaj(StatikImaj):
         for satirNumara in range(self.labirent.satirSayi):
             for sutunNumara in range(self.labirent.sutunSayi-1):
                 duvar=self.labirent.duvar(self.labirent.hucre(satirNumara,sutunNumara),self.labirent.hucre(satirNumara,sutunNumara+1))
-                if duvar.durum==DuvarDurum.KAPALI:                    
-                    x=self.gercekSolXRender+self.gercekHucreKenarUzunluk*(sutunNumara+1)                    
-                    y1=self.gercekUstYRender-(self.gercekHucreKenarUzunluk)*satirNumara
+                if duvar.durum==DuvarDurum.KAPALI:
+                    x,y1=self.hucreXY(HucreNokta.SAG_ALT,self.labirent.hucre(satirNumara,sutunNumara))    
+                    x+=self.gercekKenarlikKalinlik           
+                    y1+=self.gercekHucreKenarUzunluk-self.gercekKenarlikKalinlik
                     y2=y1-self.gercekHucreKenarUzunluk
                     Line(width=self.gercekKenarlikKalinlik,points=(x,y1,x,y2))
 
@@ -373,20 +382,20 @@ class LabirentStatikImaj(StatikImaj):
             for satirNumara in range(self.labirent.satirSayi-1):
                 duvar=self.labirent.duvar(self.labirent.hucre(satirNumara,sutunNumara),self.labirent.hucre(satirNumara+1,sutunNumara))
                 if duvar.durum==DuvarDurum.KAPALI:
-                    x1=self.gercekSolXRender+self.gercekHucreKenarUzunluk*sutunNumara
-                    y=self.gercekUstYRender-self.gercekHucreKenarUzunluk*(satirNumara+1)
+                    x1,y=self.hucreXY(HucreNokta.SOL_ALT,self.labirent.hucre(satirNumara,sutunNumara))
+                    x1-=self.gercekKenarlikKalinlik
+                    y-=self.gercekKenarlikKalinlik
                     x2=x1+self.gercekHucreKenarUzunluk
                     Line(width=self.gercekKenarlikKalinlik,points=(x1,y,x2,y))
 
-    def __boyaHucre(self,solX,ustY,konum,uzunlukCarpan,renk):
+    def __boyaHucre(self,konum,uzunlukCarpan,renk):
         Color(renk["r"],renk["g"],renk["b"],renk["a"])
         
-        hucre=self.labirent.hucre(konum.satirNumara,konum.sutunNumara)
-
-        x=solX+self.gercekHucreKenarUzunluk*hucre.sutunNumara+self.gercekKenarlikKalinlik+self.gercekHucreKenarUzunluk/2-uzunlukCarpan*self.gercekHucreKenarUzunluk/2
-        y=ustY-self.gercekKenarlikKalinlik*2-self.gercekHucreKenarUzunluk*(1+hucre.satirNumara)+self.gercekKenarlikKalinlik+self.gercekHucreKenarUzunluk/2-uzunlukCarpan*self.gercekHucreKenarUzunluk/2
-
+        hucre=self.labirent.hucre(konum.satirNumara,konum.sutunNumara)        
+        x,y=self.hucreXY(HucreNokta.SOL_ALT,hucre)
+        
         olcu=uzunlukCarpan*self.gercekHucreKenarUzunluk-2*self.gercekKenarlikKalinlik
+
         Ellipse(size=(olcu,olcu),pos=(x,y))
 
     def __hesaplaKenarlikKalinlik(self,olcu):#olcu; genişlik ya da yükseklik olacaktır

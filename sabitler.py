@@ -111,6 +111,8 @@ class HucreNokta(IntEnum):#hücrelerin sağ,sol,alt,üst kenarları ve merkez no
     ALT=2
     SAG=3
     UST=4
+    SOL_ALT=5
+    SAG_ALT=6
     
 
 #SABİT DEĞERLERİ İÇEREN STATİK SINIFLAR
