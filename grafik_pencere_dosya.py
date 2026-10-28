@@ -200,29 +200,35 @@ class LabirentStatikImaj(StatikImaj):
             yukselik=self.guncelYukseklikRender
             hucreKenarUzunluk=self.guncelHucreKenarUzunluk
             kenarlikKalinlik=self.guncelKenarlikKalinlik
+
+        temelSolX=solX+(hucre.sutunNumara)*(genislik/self.labirent.sutunSayi)
+        temelSagX=solX+(hucre.sutunNumara+1)*(genislik/self.labirent.sutunSayi)
+        temelUstY=ustY-(hucre.satirNumara+1)*(yukselik/self.labirent.satirSayi)
+        temelAltY=altY+(hucre.satirNumara+1)*(yukselik/self.labirent.satirSayi)
+
             
         match hucreNokta:
             case HucreNokta.MERKEZ:
-                x=solX+(hucre.sutunNumara)*(genislik/self.labirent.sutunSayi)+hucreKenarUzunluk/2+kenarlikKalinlik
-                y=ustY-(hucre.satirNumara+1)*(yukselik/self.labirent.satirSayi)+hucreKenarUzunluk/2+kenarlikKalinlik
+                x=temelSolX+hucreKenarUzunluk/2+kenarlikKalinlik
+                y=temelUstY+hucreKenarUzunluk/2+kenarlikKalinlik
             case HucreNokta.SOL:
-                x=solX+(hucre.sutunNumara)*(genislik/self.labirent.sutunSayi)
-                y=ustY-(hucre.satirNumara+1)*(yukselik/self.labirent.satirSayi)+hucreKenarUzunluk/2+kenarlikKalinlik
+                x=temelSolX
+                y=temelUstY+hucreKenarUzunluk/2+kenarlikKalinlik
             case HucreNokta.ALT:
-                x=solX+(hucre.sutunNumara)*(genislik/self.labirent.sutunSayi)+hucreKenarUzunluk/2+kenarlikKalinlik
-                y=ustY-(hucre.satirNumara+1)*(yukselik/self.labirent.satirSayi)
+                x=temelSolX+hucreKenarUzunluk/2+kenarlikKalinlik
+                y=temelUstY
             case HucreNokta.SAG:
-                x=solX+(hucre.sutunNumara+1)*(genislik/self.labirent.sutunSayi)
-                y=ustY-(hucre.satirNumara+1)*(yukselik/self.labirent.satirSayi)+hucreKenarUzunluk/2+kenarlikKalinlik
+                x=temelSagX
+                y=temelUstY+hucreKenarUzunluk/2+kenarlikKalinlik
             case HucreNokta.UST:
-                x=solX+(hucre.sutunNumara)*(genislik/self.labirent.sutunSayi)+hucreKenarUzunluk/2+kenarlikKalinlik
-                y=altY+(hucre.satirNumara+1)*(yukselik/self.labirent.satirSayi)
+                x=temelSolX+hucreKenarUzunluk/2+kenarlikKalinlik
+                y=temelAltY
             case HucreNokta.SOL_ALT:
-                x=solX+(hucre.sutunNumara)*(genislik/self.labirent.sutunSayi)+kenarlikKalinlik
-                y=ustY-(hucre.satirNumara+1)*(yukselik/self.labirent.satirSayi)+kenarlikKalinlik
+                x=temelSolX+kenarlikKalinlik
+                y=temelUstY+kenarlikKalinlik
             case HucreNokta.SAG_ALT:
-                x=solX+(hucre.sutunNumara+1)*(genislik/self.labirent.sutunSayi)-kenarlikKalinlik
-                y=ustY-(hucre.satirNumara+1)*(yukselik/self.labirent.satirSayi)+kenarlikKalinlik
+                x=temelSolX-kenarlikKalinlik
+                y=temelUstY+kenarlikKalinlik
 
         return (x,y)
         
