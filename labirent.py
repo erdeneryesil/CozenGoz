@@ -371,7 +371,7 @@ class Yarisma:
         
         if self.__gozHucre==self.__labirent.bitisHucre:           
             print("bitti")
-            #return
+            return
                     
         
         if not self.__reseptorGuncellendi:
@@ -383,8 +383,9 @@ class Yarisma:
         if self.__gozImaj.animasyonTamamlandi:
             self.__gozImaj.animasyonBasladiResetle()
             self.__gozImaj.animasyonTamamlandiResetle()
-            x, y = self.__labirentImaj.hucreXY(HucreNokta.MERKEZ,self.__gozHucre,self.__saha)
-            self.__gozImaj.konumla(x, y, self.__labirentImaj.guncelHucreKenarUzunluk,self.__labirentImaj.guncelKenarlikKalinlik)
+            gozX, gozY = self.__labirentImaj.hucreXY(HucreNokta.MERKEZ,self.__gozHucre,self.__saha)
+            self.__gozImaj.konumla(gozX, gozY)
+
             self.__reseptorGuncellendi = False
 
             with self.__saha.canvas:
@@ -400,16 +401,16 @@ class Yarisma:
                 
                 x=solXImageWidget
                 y=ustYImageWidget
-                Rectangle(size=(olcu,olcu),pos=(x,y-2*olcu))#sol-üst (siyah dikdörtgenin sol-üst köşesi doğru noktayı gösteriyor)
+                #Rectangle(size=(olcu,olcu),pos=(x,y-2*olcu))#sol-üst (siyah dikdörtgenin sol-üst köşesi doğru noktayı gösteriyor)
 
                 y=altYImageWidget
-                Rectangle(size=(olcu,olcu),pos=(x,y+olcu))#sol-alt (siyah dikdörtgenin sol-alt köşesi doğru noktayı gösteriyor)
+                #Rectangle(size=(olcu,olcu),pos=(x,y+olcu))#sol-alt (siyah dikdörtgenin sol-alt köşesi doğru noktayı gösteriyor)
 
                 x=solXImageWidget+self.__labirentImaj.guncelGenislikCanvas
-                Rectangle(size=(olcu,olcu),pos=(x-olcu,y+olcu))#sağ-alt (siyah dikdörtgenin sağ-alt köşesi doğru noktayı gösteriyor)
+                #Rectangle(size=(olcu,olcu),pos=(x-olcu,y+olcu))#sağ-alt (siyah dikdörtgenin sağ-alt köşesi doğru noktayı gösteriyor)
 
                 y=ustYImageWidget
-                Rectangle(size=(olcu,olcu),pos=(x-olcu,y-2*olcu))#sağ-üst (siyah dikdörtgenin sağ-alt köşesi doğru noktayı gösteriyor)
+                #Rectangle(size=(olcu,olcu),pos=(x-olcu,y-2*olcu))#sağ-üst (siyah dikdörtgenin sağ-alt köşesi doğru noktayı gösteriyor)
 
                 #labirentin köşeleri
                 olcu=self.__labirentImaj.guncelKenarlikKalinlik
@@ -420,19 +421,19 @@ class Yarisma:
 
                 x=solXRender
                 y=ustYRender
-                Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))#sol-üst
+                #Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))#sol-üst
 
                 x=solXRender
                 y=altYRender
-                Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))#sol-alt
+                #Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))#sol-alt
 
                 x=solXRender+self.__labirentImaj.guncelGenislikRender
                 y=altYRender
-                Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))#sağ-alt
+                #Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))#sağ-alt
 
                 x=solXRender+self.__labirentImaj.guncelGenislikRender
                 y=ustYRender
-                Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))#sağ-üst
+                #Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))#sağ-üst
                 
 
                 
@@ -445,19 +446,19 @@ class Yarisma:
                         olcu=self.__labirentImaj.guncelKenarlikKalinlik
 
                         Color(1,0,0,1)
-                        x,y=self.__labirentImaj.hucreXY(HucreNokta.MERKEZ,Hucre(i,j),self.__saha)
+                        #x,y=self.__labirentImaj.hucreXY(HucreNokta.MERKEZ,Hucre(i,j),self.__saha)
                         #Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))
 
                         Color(0,1,0,1)
-                        x,y=self.__labirentImaj.hucreXY(HucreNokta.SOL,Hucre(i,j),self.__saha)
+                        #x,y=self.__labirentImaj.hucreXY(HucreNokta.SOL,Hucre(i,j),self.__saha)
                         #Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))
 
                         Color(0,0,1,1)
-                        x,y=self.__labirentImaj.hucreXY(HucreNokta.ALT,Hucre(i,j),self.__saha)
+                        #x,y=self.__labirentImaj.hucreXY(HucreNokta.ALT,Hucre(i,j),self.__saha)
                         #Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))
 
                         Color(.5,.5,0,1)
-                        x,y=self.__labirentImaj.hucreXY(HucreNokta.SOL_ALT,Hucre(i,j),self.__saha)
+                        #x,y=self.__labirentImaj.hucreXY(HucreNokta.SOL_ALT,Hucre(i,j),self.__saha)
                         #Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))
 
                         olcu=self.__labirentImaj.guncelKenarlikKalinlik*1.25
@@ -469,13 +470,13 @@ class Yarisma:
                         #Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))
 
                         Color(1,1,0,1)
-                        x,y=self.__labirentImaj.hucreXY(HucreNokta.SAG,Hucre(i,j),self.__saha)
+                        #x,y=self.__labirentImaj.hucreXY(HucreNokta.SAG,Hucre(i,j),self.__saha)
                         #Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))
 
 
 
                         Color(.75,.75,0,1)
-                        x,y=self.__labirentImaj.hucreXY(HucreNokta.SAG_ALT,Hucre(i,j),self.__saha)
+                        #x,y=self.__labirentImaj.hucreXY(HucreNokta.SAG_ALT,Hucre(i,j),self.__saha)
                         #Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))
                 
 
@@ -484,7 +485,7 @@ class Yarisma:
                 #y=ustY-self.__labirentImaj.guncelKenarlikKalinlik/2
                 #Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))
 
-                #x=solX+self.__labirentImaj.guncelKenarlikKalinlik+self.__labirentImaj.guncelHucreKenarUzunluk
+                #x=solX+self.__labirentImaj.guncelKenarlikKalinlik+self.__labirentImaj.guncelHucreBoyut
                 #y=ustY-self.__labirentImaj.guncelKenarlikKalinlik
                 #Line(width=(olcu),points=(x-olcu/2,y-olcu/2,x+olcu/2,y-olcu/2))
                 #Rectangle(size=(10,10),pos=(x,y))
@@ -537,20 +538,20 @@ class Yarisma:
             return
         
         self.__labirentImaj.guncelleOlculer(self.__saha)
-        
-        x,y=self.__labirentImaj.hucreXY(HucreNokta.MERKEZ,self.__gozHucre,self.__saha)
-        
-        self.__gozImaj.guncelleOlculer(x,y,self.__labirentImaj.guncelHucreKenarUzunluk,self.__labirentImaj.guncelKenarlikKalinlik)
-        self.__reseptorImaj.guncelleOlculer(self.__labirentImaj.guncelHucreKenarUzunluk)
+                
+        gozMerkezX,gozAltY=self.__labirentImaj.hucreXY(HucreNokta.MERKEZ,self.__gozHucre,self.__saha)
+        self.__gozImaj.guncelleOlculer(gozMerkezX,gozAltY,self.__labirentImaj.guncelHucreBoyut,self.__labirentImaj.guncelKenarlikKalinlik)
+
+        self.__reseptorImaj.guncelleOlculer(self.__labirentImaj.guncelHucreBoyut)
 
     def __reseptorGuncelle(self):
-               
         yonFark = self.__gozImaj.yon - Yon.baslangic()
-        gercekReseptorKonum=ReseptorKonum((self.__reseptor.konumIndis+yonFark)%len(ReseptorKonum))
-        hucreX,hucreY=self.__labirentImaj.hucreXY(HucreNokta.MERKEZ,self.__gozHucre,self.__saha)
+        reseptorGercekKonum=ReseptorKonum((self.__reseptor.konumIndis+yonFark)%len(ReseptorKonum))
+        reseptorX,reseptorY=self.__labirentImaj.hucreXY(HucreNokta(reseptorGercekKonum),self.__gozHucre,self.__saha)
+                  
 
         komsuHucreler = self.__labirent.komsuHucreler(self.__gozHucre)
-        hedefHucre = komsuHucreler.get(Yon(gercekReseptorKonum))
+        hedefHucre = komsuHucreler.get(Yon(reseptorGercekKonum))
         
         duvarDurum = DuvarDurum.KAPALI
         if hedefHucre:
@@ -560,12 +561,12 @@ class Yarisma:
         if duvarDurum==DuvarDurum.ACIK:
             if not self.__reseptorImaj.animasyonBasladi:
                 self.__reseptorImaj.animasyonTamamlandiResetle()
-                self.__reseptorImaj.konumla(gercekReseptorKonum,hucreX,hucreY,self.__labirentImaj.guncelHucreKenarUzunluk)
+                self.__reseptorImaj.konumla(reseptorX,reseptorY)
             
                 self.__reseptorImaj.duvarAcik()
-            
+
                 return ReseptorImaj.animasyonSure()
-            
+ 
             if self.__reseptorImaj.animasyonTamamlandi:
                 self.__reseptorImaj.animasyonBasladiResetle()
                 self.__reseptor.konumIndisGuncelle()

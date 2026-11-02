@@ -28,6 +28,9 @@ class ReseptorKonum(IntEnum):#sıralama SOL,ARKA,SAG,ON olmalı. Matematiksel i�
     SAG=2   #Yon.SAG'a tekabül ediyor
     ON=3    #Yon.UST'a tekabül ediyor
 
+    def __str__(self):
+        return f"ReseptörKonum : {self.name}"
+
 #Robotun önünün baktığı yön. Robotun varsayılan yönü Yon.UST 
 class Yon(IntEnum):#sıralama SOL,ALT,SAG,UST olmalı. Matematiksel işlemler yapılıyor
     SOL=0
@@ -105,14 +108,17 @@ class DikdortgenTip(IntEnum):#labirent ya da sahanın tipini belirlemek amacıyl
         else:
             return DikdortgenTip.KARE
 
-class HucreNokta(IntEnum):#hücrelerin sağ,sol,alt,üst kenarları ve merkez noktası. göz ve reseptörün hücre içinde konumlandırılabilmesinde kullanılıyor
-    MERKEZ=0
-    SOL=1
-    ALT=2
-    SAG=3
-    UST=4
-    SOL_ALT=5
-    SAG_ALT=6
+class HucreNokta(IntEnum):#hücrelerin sağ,sol,alt,üst kenarları ve merkez noktası. göz ve reseptörün hücre içinde konumlandırılabilmesinde kullanılıyor. sıralama SOL,ALT,SAG,UST... olmalı. Matematiksel işlemler yapılıyor
+    SOL=0
+    ALT=1
+    SAG=2
+    UST=3
+    SOL_ALT=4
+    SAG_ALT=5
+    MERKEZ=6
+
+    def __str__(self):
+        return f"HücreNokta : {self.name}"
     
 
 #SABİT DEĞERLERİ İÇEREN STATİK SINIFLAR
@@ -233,9 +239,8 @@ class EkranSabit(metaclass=SabitMetaClass):
     SAHA_ALT_YUKSEKLIK_ORAN=.1
 
     #labirent çizimi ile alakalı değerler
-    LABIRENT_KENARLIK_KALINLIK_ORAN=25#100
+    LABIRENT_KENARLIK_KALINLIK_ORAN=100
     LABIRENT_KENARLIK_KALINLIK_KATSAYI_1=1
-    #LABIRENT_KENARLIK_KALINLIK_KATSAYI_05=0.5
 
     #labirent görseli için : alt-üst(2+2), sol-sağ(2+2) taraflardan kenarlık kalınlığının 2 katı kadar küçültme yapılacak
     RENDER_KUCULTME_CARPAN_2_KENAR=8#2

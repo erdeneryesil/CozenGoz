@@ -142,9 +142,9 @@ class LabirentStatikImaj(StatikImaj):
         self.__labirent=labirent
         
         self.__gercekKenarlikKalinlik=-1
-        self.__gercekHucreKenarUzunluk=-1
+        self.__gercekHucreBoyut=-1
         self.__guncelKenarlikKalinlik=-1
-        self.__guncelHucreKenarUzunluk=-1
+        self.__guncelHucreBoyut=-1
 
         self._gercekDegerlerHesapla()
         self.texture=self._textureOlustur()
@@ -156,11 +156,11 @@ class LabirentStatikImaj(StatikImaj):
     def gercekKenarlikKalinlik(self):
         return self.__gercekKenarlikKalinlik
     @property
-    def gercekHucreKenarUzunluk(self):
-        return self.__gercekHucreKenarUzunluk
+    def gercekHucreBoyut(self):
+        return self.__gercekHucreBoyut
     @property
-    def guncelHucreKenarUzunluk(self):
-        return self.__guncelHucreKenarUzunluk
+    def guncelHucreBoyut(self):
+        return self.__guncelHucreBoyut
     @property
     def guncelKenarlikKalinlik(self):
         return self.__guncelKenarlikKalinlik
@@ -175,13 +175,13 @@ class LabirentStatikImaj(StatikImaj):
         match self.labirent.tip:
             case DikdortgenTip.YATAY:
                 self.__guncelKenarlikKalinlik=self.__hesaplaKenarlikKalinlik(self.guncelYukseklikCanvas)
-                self.__guncelHucreKenarUzunluk=self.__hesaplaHucreKenarUzunluk(self.guncelGenislikRender,self.labirent.sutunSayi,self.guncelKenarlikKalinlik)
+                self.__guncelHucreBoyut=self.__hesaplaHucreBoyut(self.guncelGenislikRender,self.labirent.sutunSayi,self.guncelKenarlikKalinlik)
             case DikdortgenTip.DIKEY:
                 self.__guncelKenarlikKalinlik=self.__hesaplaKenarlikKalinlik(self.guncelGenislikCanvas)
-                self.__guncelHucreKenarUzunluk=self.__hesaplaHucreKenarUzunluk(self.guncelYukseklikRender,self.labirent.satirSayi,self.guncelKenarlikKalinlik)
+                self.__guncelHucreBoyut=self.__hesaplaHucreBoyut(self.guncelYukseklikRender,self.labirent.satirSayi,self.guncelKenarlikKalinlik)
             case DikdortgenTip.KARE:
                 self.__guncelKenarlikKalinlik=self.__hesaplaKenarlikKalinlik(self.guncelGenislikCanvas)
-                self.__guncelHucreKenarUzunluk=self.__hesaplaHucreKenarUzunluk(self.guncelYukseklikRender,self.labirent.satirSayi,self.guncelKenarlikKalinlik)
+                self.__guncelHucreBoyut=self.__hesaplaHucreBoyut(self.guncelYukseklikRender,self.labirent.satirSayi,self.guncelKenarlikKalinlik)
 
     def hucreXY(self,hucreNokta,hucre,saha=None):#konumu verilen hücreye; robotu, sensörleri vs. çizebilmek için gerekli koordinatlar   
         if saha is None:#texture oluşturulur iken
@@ -190,7 +190,7 @@ class LabirentStatikImaj(StatikImaj):
             altY=self.gercekAltYRender
             genislik=self.gercekGenislikRender
             yukselik=self.gercekYukseklikRender
-            hucreKenarUzunluk=self.gercekHucreKenarUzunluk
+            hucreBoyut=self.gercekHucreBoyut
             kenarlikKalinlik=self.gercekKenarlikKalinlik
         else:        
             solX=self.guncelSolXRender(saha)
@@ -198,36 +198,36 @@ class LabirentStatikImaj(StatikImaj):
             altY=self.guncelAltYRender(saha)
             genislik=self.guncelGenislikRender
             yukselik=self.guncelYukseklikRender
-            hucreKenarUzunluk=self.guncelHucreKenarUzunluk
+            hucreBoyut=self.guncelHucreBoyut
             kenarlikKalinlik=self.guncelKenarlikKalinlik
 
         temelSolX=solX+(hucre.sutunNumara)*(genislik/self.labirent.sutunSayi)
         temelSagX=solX+(hucre.sutunNumara+1)*(genislik/self.labirent.sutunSayi)
         temelUstY=ustY-(hucre.satirNumara+1)*(yukselik/self.labirent.satirSayi)
-        temelAltY=altY+(hucre.satirNumara+1)*(yukselik/self.labirent.satirSayi)
+        temelAltY=altY+(self.labirent.satirSayi-hucre.satirNumara)*(yukselik/self.labirent.satirSayi)
 
             
         match hucreNokta:
             case HucreNokta.MERKEZ:
-                x=temelSolX+hucreKenarUzunluk/2+kenarlikKalinlik
-                y=temelUstY+hucreKenarUzunluk/2+kenarlikKalinlik
-            case HucreNokta.SOL:
-                x=temelSolX
-                y=temelUstY+hucreKenarUzunluk/2+kenarlikKalinlik
-            case HucreNokta.ALT:
-                x=temelSolX+hucreKenarUzunluk/2+kenarlikKalinlik
-                y=temelUstY
-            case HucreNokta.SAG:
-                x=temelSagX
-                y=temelUstY+hucreKenarUzunluk/2+kenarlikKalinlik
-            case HucreNokta.UST:
-                x=temelSolX+hucreKenarUzunluk/2+kenarlikKalinlik
-                y=temelAltY
+                x=temelSolX+hucreBoyut/2+kenarlikKalinlik
+                y=temelUstY+hucreBoyut/2+kenarlikKalinlik
             case HucreNokta.SOL_ALT:
                 x=temelSolX+kenarlikKalinlik
                 y=temelUstY+kenarlikKalinlik
+            case HucreNokta.SOL:
+                x=temelSolX
+                y=temelUstY+hucreBoyut/2+kenarlikKalinlik
+            case HucreNokta.ALT:
+                x=temelSolX+hucreBoyut/2+kenarlikKalinlik
+                y=temelUstY
+            case HucreNokta.SAG:
+                x=temelSagX
+                y=temelUstY+hucreBoyut/2+kenarlikKalinlik
+            case HucreNokta.UST:
+                x=temelSolX+hucreBoyut/2+kenarlikKalinlik
+                y=temelAltY
             case HucreNokta.SAG_ALT:
-                x=temelSolX-kenarlikKalinlik
+                x=temelSagX-kenarlikKalinlik
                 y=temelUstY+kenarlikKalinlik
 
         return (x,y)
@@ -249,15 +249,15 @@ class LabirentStatikImaj(StatikImaj):
         elif self.labirent.tip==DikdortgenTip.KARE:
             self.__gercekKenarlikKalinlik=self.__hesaplaKenarlikKalinlik(self.gercekGenislikCanvas)
 
-        hucreBoyutGenisligeGore=self.__hesaplaHucreKenarUzunluk(self.gercekGenislikCanvas,self.labirent.sutunSayi,self.gercekKenarlikKalinlik)
-        hucreBoyutYuksekligeGore=self.__hesaplaHucreKenarUzunluk(self.gercekYukseklikCanvas,self.labirent.satirSayi,self.gercekKenarlikKalinlik)            
+        hucreBoyutGenisligeGore=self.__hesaplaHucreBoyut(self.gercekGenislikCanvas,self.labirent.sutunSayi,self.gercekKenarlikKalinlik)
+        hucreBoyutYuksekligeGore=self.__hesaplaHucreBoyut(self.gercekYukseklikCanvas,self.labirent.satirSayi,self.gercekKenarlikKalinlik)            
 
         if hucreBoyutYuksekligeGore<hucreBoyutGenisligeGore:
-            self.__gercekHucreKenarUzunluk=hucreBoyutYuksekligeGore
+            self.__gercekHucreBoyut=hucreBoyutYuksekligeGore
             self._gercekYukseklikRender=self.gercekYukseklikCanvas-EkranSabit.RENDER_KUCULTME_CARPAN_2_KENAR*self.gercekKenarlikKalinlik
             self._gercekGenislikRender=self.gercekYukseklikRender*self.gercekGenislikCanvas/self.gercekYukseklikCanvas
         else:
-            self.__gercekHucreKenarUzunluk=hucreBoyutGenisligeGore
+            self.__gercekHucreBoyut=hucreBoyutGenisligeGore
             self._gercekGenislikRender=self.gercekGenislikCanvas-EkranSabit.RENDER_KUCULTME_CARPAN_2_KENAR*self.gercekKenarlikKalinlik
             self._gercekYukseklikRender=self.gercekGenislikRender*self.gercekYukseklikCanvas/self.gercekGenislikCanvas
 
@@ -273,64 +273,64 @@ class LabirentStatikImaj(StatikImaj):
 
         x=self.gercekSolXRender
         y=self.gercekUstYRender
-        Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))#sol-üst
+        #Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))#sol-üst
 
         x=self.gercekSolXRender
         y=self.gercekAltYRender
-        Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))#sol-alt
+        #Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))#sol-alt
 
         x=self.gercekSolXRender+self.gercekGenislikRender
         y=self.gercekAltYRender
-        Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))#sağ-alt
+        #Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))#sağ-alt
         
         x=self.gercekSolXRender+self.gercekGenislikRender
         y=self.gercekUstYRender
-        Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))#sağ-üst
+        #Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))#sağ-üst
 
         #imajın köşeleri
         x=0
         y=0
-        Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))#sol-alt
+        #Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))#sol-alt
 
         x=self.gercekGenislikCanvas
         y=0
-        Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))#sağ-alt
+        #Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))#sağ-alt
 
         x=self.gercekGenislikCanvas
         y=self.gercekYukseklikCanvas
-        Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))#sağ-üst
+        #Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))#sağ-üst
 
         x=0
         y=self.gercekYukseklikCanvas
-        Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))#sol-üst
+        #Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))#sol-üst
 
         
         
         #sütunlar
         for i in range(1,self.labirent.sutunSayi):
-            x=self.gercekSolXRender+i*self.gercekHucreKenarUzunluk
+            x=self.gercekSolXRender+i*self.gercekHucreBoyut
             yUst=self.gercekUstYRender
             yAlt=self.gercekAltYRender
             
             Color(.5,.5,.5,1)
-            Rectangle(size=(olcu,olcu),pos=(x-olcu/2,yUst-olcu/2))
-            Rectangle(size=(olcu,olcu),pos=(x-olcu/2,yAlt-olcu/2))
+            #Rectangle(size=(olcu,olcu),pos=(x-olcu/2,yUst-olcu/2))
+            #Rectangle(size=(olcu,olcu),pos=(x-olcu/2,yAlt-olcu/2))
             
             Color(.3,.3,.3,1)
-            Line(width=olcu/2,points=(x,yUst,x,yAlt))
+            #Line(width=olcu/2,points=(x,yUst,x,yAlt))
 
         #satırlar
         for i in range(1,self.labirent.satirSayi):
             xSol=self.gercekSolXRender
             xSag=self.gercekSolXRender+self.gercekGenislikRender
-            y=self.gercekAltYRender+i*self.gercekHucreKenarUzunluk
+            y=self.gercekAltYRender+i*self.gercekHucreBoyut
 
             Color(.5,.5,.5,1)          
-            Rectangle(size=(olcu,olcu),pos=(xSol-olcu/2,y-olcu/2)) 
-            Rectangle(size=(olcu,olcu),pos=(xSag-olcu/2,y-olcu/2))
+            #Rectangle(size=(olcu,olcu),pos=(xSol-olcu/2,y-olcu/2)) 
+            #Rectangle(size=(olcu,olcu),pos=(xSag-olcu/2,y-olcu/2))
 
             Color(.3,.3,.3,1)
-            Line(width=olcu/2,points=(xSol,y,xSag,y))
+            #Line(width=olcu/2,points=(xSol,y,xSag,y))
 
     def _textureOlustur(self):
         #labirent görselini, maks boyutlara göre bir kez oluşturup, sonrasında ölçekleniyor
@@ -378,10 +378,10 @@ class LabirentStatikImaj(StatikImaj):
             for sutunNumara in range(self.labirent.sutunSayi-1):
                 duvar=self.labirent.duvar(self.labirent.hucre(satirNumara,sutunNumara),self.labirent.hucre(satirNumara,sutunNumara+1))
                 if duvar.durum==DuvarDurum.KAPALI:
-                    x,y1=self.hucreXY(HucreNokta.SAG_ALT,self.labirent.hucre(satirNumara,sutunNumara))    
-                    x+=self.gercekKenarlikKalinlik           
-                    y1+=self.gercekHucreKenarUzunluk-self.gercekKenarlikKalinlik
-                    y2=y1-self.gercekHucreKenarUzunluk
+                    x,y1=self.hucreXY(HucreNokta.SOL_ALT,self.labirent.hucre(satirNumara,sutunNumara+1))    
+                    x-=self.gercekKenarlikKalinlik           
+                    y1+=self.gercekHucreBoyut-self.gercekKenarlikKalinlik
+                    y2=y1-self.gercekHucreBoyut
                     Line(width=self.gercekKenarlikKalinlik,points=(x,y1,x,y2))
 
         for sutunNumara in range(self.labirent.sutunSayi):
@@ -391,7 +391,7 @@ class LabirentStatikImaj(StatikImaj):
                     x1,y=self.hucreXY(HucreNokta.SOL_ALT,self.labirent.hucre(satirNumara,sutunNumara))
                     x1-=self.gercekKenarlikKalinlik
                     y-=self.gercekKenarlikKalinlik
-                    x2=x1+self.gercekHucreKenarUzunluk
+                    x2=x1+self.gercekHucreBoyut
                     Line(width=self.gercekKenarlikKalinlik,points=(x1,y,x2,y))
 
     def __boyaHucre(self,konum,uzunlukCarpan,renk):
@@ -400,7 +400,7 @@ class LabirentStatikImaj(StatikImaj):
         hucre=self.labirent.hucre(konum.satirNumara,konum.sutunNumara)        
         x,y=self.hucreXY(HucreNokta.SOL_ALT,hucre)
         
-        olcu=uzunlukCarpan*self.gercekHucreKenarUzunluk-2*self.gercekKenarlikKalinlik
+        olcu=uzunlukCarpan*self.gercekHucreBoyut-2*self.gercekKenarlikKalinlik
 
         Ellipse(size=(olcu,olcu),pos=(x,y))
 
@@ -415,9 +415,8 @@ class LabirentStatikImaj(StatikImaj):
             case DikdortgenTip.KARE:
                 return self.guncelGenislikRender/EkranSabit.LABIRENT_KENARLIK_KALINLIK_ORAN'''
 
-    def __hesaplaHucreKenarUzunluk(self,olcu,hucreSayi,kenarlikKalinlik):#olcu; genişlik ya da yükseklik. hucreSayi; satır ya da sütun sayısı
+    def __hesaplaHucreBoyut(self,olcu,hucreSayi,kenarlikKalinlik):#olcu; genişlik ya da yükseklik. hucreSayi; satır ya da sütun sayısı
         return (olcu-(hucreSayi+1)*2*kenarlikKalinlik)/(hucreSayi)
-        #return olcu/hucreSayi
 
 
 class AnimasyonImaj(Image):
@@ -595,20 +594,10 @@ class ReseptorImaj(AnimasyonImaj):
         self.height=self.width
         #self.konumla(hucreX,hucreY,hucreBoyut)
 
-    def konumla(self,gercekYon,hucreX,hucreY,hucreBoyut):
-        match gercekYon:
-            case Yon.SAG:
-                self.center_x=hucreX+hucreBoyut
-                self.center_y=hucreY+hucreBoyut/2
-            case Yon.ALT:
-                self.center_x=hucreX+hucreBoyut/2
-                self.center_y=hucreY
-            case Yon.SOL:
-                self.center_x=hucreX
-                self.center_y=hucreY+hucreBoyut/2
-            case Yon.UST:
-                self.center_x=hucreX+hucreBoyut/2
-                self.center_y=hucreY+hucreBoyut           
+    def konumla(self,x,y):
+        self.center_x=x
+        self.center_y=y
+      
                     
 class GozImaj(AnimasyonImaj):#animasyon ve çizim işlemlerinin yürütüleceğin sınıf
     _DIZIN=ImajSabit.DIZIN[ImajTip.GOZ_IMAJ]
@@ -734,15 +723,21 @@ class GozImaj(AnimasyonImaj):#animasyon ve çizim işlemlerinin yürütüleceği
         self.width=hucreBoyut*GozImaj.boyutOran()
         self.height=self.width
         
-        self.konumla(hucreX,hucreY,hucreBoyut,kenarlikKalinlik)
+        self.konumla(hucreX,hucreY)
+        
+        gitAdimSag=(hucreBoyut+2*kenarlikKalinlik)/(GozImaj.kareSayi(GozAksiyon.GIT,Yon.SAG)*GozImaj.animasyonTekrar(GozAksiyon.GIT))
+        gitAdimSol=(hucreBoyut+2*kenarlikKalinlik)/(GozImaj.kareSayi(GozAksiyon.GIT,Yon.SOL)*GozImaj.animasyonTekrar(GozAksiyon.GIT))
+        gitAdimUst=(hucreBoyut+2*kenarlikKalinlik)/(GozImaj.kareSayi(GozAksiyon.GIT,Yon.UST)*GozImaj.animasyonTekrar(GozAksiyon.GIT))
+        gitAdimAlt=(hucreBoyut+2*kenarlikKalinlik)/(GozImaj.kareSayi(GozAksiyon.GIT,Yon.ALT)*GozImaj.animasyonTekrar(GozAksiyon.GIT))
 
-        gitAdimSag=hucreBoyut/(GozImaj.kareSayi(GozAksiyon.GIT,Yon.SAG)*GozImaj.animasyonTekrar(GozAksiyon.GIT))
-        gitAdimSol=hucreBoyut/(GozImaj.kareSayi(GozAksiyon.GIT,Yon.SOL)*GozImaj.animasyonTekrar(GozAksiyon.GIT))
-        gitAdimUst=hucreBoyut/(GozImaj.kareSayi(GozAksiyon.GIT,Yon.UST)*GozImaj.animasyonTekrar(GozAksiyon.GIT))
-        gitAdimAlt=hucreBoyut/(GozImaj.kareSayi(GozAksiyon.GIT,Yon.ALT)*GozImaj.animasyonTekrar(GozAksiyon.GIT))
 
         self.__gitAdim={Yon.SAG: (gitAdimSag, 0),Yon.SOL: (-gitAdimSol, 0),Yon.UST: (0, gitAdimUst),Yon.ALT: (0, -gitAdimAlt)}
 
-    def konumla(self,hucreX,hucreY,hucreBoyut,kenarlikKalinlik):
-        self.center_x=hucreX+hucreBoyut/2+kenarlikKalinlik/2
-        self.center_y=hucreY+hucreBoyut/2+kenarlikKalinlik/2
+    def konumla(self,x,y):
+        self.center_x=x
+        self.center_y=y
+
+
+        
+        
+        
