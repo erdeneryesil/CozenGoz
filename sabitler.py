@@ -158,8 +158,8 @@ class ImajSabit(metaclass=SabitMetaClass):
                 ImajTip.RESEPTOR_IMAJ:1/60,
                 ImajTip.GOZ_IMAJ:{GozAksiyon.BEKLE:2/60,GozAksiyon.GIT:2/60,GozAksiyon.PATLA:2/60,GozAksiyon.SOLA_DON:2/60,GozAksiyon.SAGA_DON:2/60}#minimum değer 3/60. Bunun altında bir değer verme
             }
-    ORIJINAL_BOYUT={ImajTip.RESEPTOR_IMAJ:340,ImajTip.GOZ_IMAJ:563}#genişlik,yükseklik aynı
-    BOYUT_ORAN={ImajTip.RESEPTOR_IMAJ:1,ImajTip.GOZ_IMAJ:1.5}#hücre genişliğine oranı
+    ORIJINAL_BOYUT={ImajTip.RESEPTOR_IMAJ:340,ImajTip.GOZ_IMAJ:{'patla':563,'yaris':293}}#genişlik,yükseklik aynı
+    BOYUT_ORAN={ImajTip.RESEPTOR_IMAJ:1,ImajTip.GOZ_IMAJ:1.0}#hücre genişliğine oranı
     ANIMASYON_TEKRAR={
                 ImajTip.RESEPTOR_IMAJ:1,
                 ImajTip.GOZ_IMAJ:{GozAksiyon.BEKLE:1,GozAksiyon.GIT:3,GozAksiyon.PATLA:1,GozAksiyon.SOLA_DON:1,GozAksiyon.SAGA_DON:1}

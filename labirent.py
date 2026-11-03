@@ -539,8 +539,8 @@ class Yarisma:
         
         self.__labirentImaj.guncelleOlculer(self.__saha)
                 
-        gozMerkezX,gozAltY=self.__labirentImaj.hucreXY(HucreNokta.MERKEZ,self.__gozHucre,self.__saha)
-        self.__gozImaj.guncelleOlculer(gozMerkezX,gozAltY,self.__labirentImaj.guncelHucreBoyut,self.__labirentImaj.guncelKenarlikKalinlik)
+        gozX,gozY=self.__labirentImaj.hucreXY(HucreNokta.MERKEZ,self.__gozHucre,self.__saha)
+        self.__gozImaj.guncelleOlculer(gozX,gozY,self.__labirentImaj.guncelHucreBoyut,self.__labirentImaj.guncelKenarlikKalinlik)
 
         self.__reseptorImaj.guncelleOlculer(self.__labirentImaj.guncelHucreBoyut)
 
