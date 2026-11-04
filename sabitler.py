@@ -204,14 +204,14 @@ class HucreSabit(metaclass=SabitMetaClass):
     SAYI_ANAHTAR="sayı"
     TIP={
         TIP_BASLANGIC_ANAHTAR:{
-            TIP_RENK_ANAHTAR:{"r":245/255,"g":73/255,"b":39/255,"a":1},
-            TIP_UZUNLUK_CARPAN_ANAHTAR:1},
+            TIP_RENK_ANAHTAR:(56/255, 189/255, 248/255,1),
+            TIP_UZUNLUK_CARPAN_ANAHTAR:.7},
         TIP_BITIS_ANAHTAR:{
-            TIP_RENK_ANAHTAR:{"r":219/255,"g":88/255,"b":88/255,"a":1},
-            TIP_UZUNLUK_CARPAN_ANAHTAR:1},
+            TIP_RENK_ANAHTAR:(245/255, 158/255, 11/255,1),
+            TIP_UZUNLUK_CARPAN_ANAHTAR:.7},
         TIP_YOL_ANAHTAR:{
-            TIP_RENK_ANAHTAR:{"r":255/255,"g":247/255,"b":173/255,"a":0.5},
-            TIP_UZUNLUK_CARPAN_ANAHTAR:1.0}
+            TIP_RENK_ANAHTAR:(51/255, 65/255, 85/255,1),
+            TIP_UZUNLUK_CARPAN_ANAHTAR:.5}
         }
 
 class EkranSabit(metaclass=SabitMetaClass):
@@ -239,12 +239,10 @@ class EkranSabit(metaclass=SabitMetaClass):
     SAHA_ALT_YUKSEKLIK_ORAN=.1
 
     #labirent çizimi ile alakalı değerler
-    LABIRENT_KENARLIK_KALINLIK_ORAN=100
-    LABIRENT_KENARLIK_KALINLIK_KATSAYI_1=1
+    LABIRENT_KENARLIK_KALINLIK_ORAN=40
 
     #labirent görseli için : alt-üst(2+2), sol-sağ(2+2) taraflardan kenarlık kalınlığının 2 katı kadar küçültme yapılacak
-    RENDER_KUCULTME_CARPAN_2_KENAR=8#2
-    RENDER_KUCULTME_CARPAN_1_KENAR=1
+    RENDER_KUCULTME_CARPAN=8
 
     def maksSahaBoyut(labirentTip):#sahanın maks w-h, kenarlık kalınlık maks değerleri döndürür
         match labirentTip:
@@ -267,7 +265,7 @@ class EkranSabit(metaclass=SabitMetaClass):
     
 
 class LabirentSabit(metaclass=SabitMetaClass):
-    KENARLIK_RENK=(1,0,0,1)
+    KENARLIK_RENK=(148/255, 163/255, 184/255,1)
     MINIMUM_COZUM_UZUNLUGU_ORAN=0.5
     SATIR_ANAHTAR="SATIR"
     SUTUN_ANAHTAR="SUTUN"
@@ -285,8 +283,10 @@ class AnimasyonSabit(metaclass=SabitMetaClass):
     GERI_SAYIM_GECIKME=1
 
 class AnaPencereSabit(metaclass=SabitMetaClass):
+    RENK=(15/255, 23/255, 42/255,1)
     ACIKLAMA_GOZ_GORSEL_YUKLEME="Göz görselleri yükleniyor"
     ACIKLAMA_RESEPTOR_GORSEL_YUKLEME="Reseptör görselleri yükleniyor"
+
 
 class AcilirPencereSabit(metaclass=SabitMetaClass):
     PENCERE_GENISLIK_ORAN=.9     #Açılır pencerenin genişliğinin, ana pencerenin genişliğine oranı

@@ -249,17 +249,20 @@ class LabirentStatikImaj(StatikImaj):
         elif self.labirent.tip==DikdortgenTip.KARE:
             self.__gercekKenarlikKalinlik=self.__hesaplaKenarlikKalinlik(self.gercekGenislikCanvas)
 
+
         hucreBoyutGenisligeGore=self.__hesaplaHucreBoyut(self.gercekGenislikCanvas,self.labirent.sutunSayi,self.gercekKenarlikKalinlik)
         hucreBoyutYuksekligeGore=self.__hesaplaHucreBoyut(self.gercekYukseklikCanvas,self.labirent.satirSayi,self.gercekKenarlikKalinlik)            
 
         if hucreBoyutYuksekligeGore<hucreBoyutGenisligeGore:
-            self.__gercekHucreBoyut=hucreBoyutYuksekligeGore
-            self._gercekYukseklikRender=self.gercekYukseklikCanvas-EkranSabit.RENDER_KUCULTME_CARPAN_2_KENAR*self.gercekKenarlikKalinlik
+            self._gercekYukseklikRender=self.gercekYukseklikCanvas-EkranSabit.RENDER_KUCULTME_CARPAN*self.gercekKenarlikKalinlik
             self._gercekGenislikRender=self.gercekYukseklikRender*self.gercekGenislikCanvas/self.gercekYukseklikCanvas
+            self.__gercekHucreBoyut=self.__hesaplaHucreBoyut(self.gercekYukseklikRender,self.labirent.satirSayi,self.gercekKenarlikKalinlik)
         else:
-            self.__gercekHucreBoyut=hucreBoyutGenisligeGore
-            self._gercekGenislikRender=self.gercekGenislikCanvas-EkranSabit.RENDER_KUCULTME_CARPAN_2_KENAR*self.gercekKenarlikKalinlik
+            self._gercekGenislikRender=self.gercekGenislikCanvas-EkranSabit.RENDER_KUCULTME_CARPAN*self.gercekKenarlikKalinlik
             self._gercekYukseklikRender=self.gercekGenislikRender*self.gercekYukseklikCanvas/self.gercekGenislikCanvas
+            self.__gercekHucreBoyut=self.__hesaplaHucreBoyut(self.gercekGenislikRender,self.labirent.sutunSayi,self.gercekKenarlikKalinlik)
+
+        
 
         self._gercekSolXRender=(self.gercekGenislikCanvas-self.gercekGenislikRender)/2    #labirentin sol kenarının ortası (kenarlığın ortası)   
         self._gercekAltYRender=((self.gercekYukseklikCanvas-self.gercekYukseklikRender)/2) #labirentin alt kenarının ortası (kenarlığın ortası)
@@ -273,19 +276,19 @@ class LabirentStatikImaj(StatikImaj):
 
         x=self.gercekSolXRender
         y=self.gercekUstYRender
-        #Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))#sol-üst
+        Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))#sol-üst
 
         x=self.gercekSolXRender
         y=self.gercekAltYRender
-        #Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))#sol-alt
+        Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))#sol-alt
 
         x=self.gercekSolXRender+self.gercekGenislikRender
         y=self.gercekAltYRender
-        #Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))#sağ-alt
+        Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))#sağ-alt
         
         x=self.gercekSolXRender+self.gercekGenislikRender
         y=self.gercekUstYRender
-        #Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))#sağ-üst
+        Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))#sağ-üst
 
         #imajın köşeleri
         x=0
@@ -307,8 +310,9 @@ class LabirentStatikImaj(StatikImaj):
         
         
         #sütunlar
-        for i in range(1,self.labirent.sutunSayi):
-            x=self.gercekSolXRender+i*self.gercekHucreBoyut
+        for i in range(0,self.labirent.sutunSayi+1):
+            x=self.gercekSolXRender+i*(self.gercekHucreBoyut+2*self.gercekKenarlikKalinlik)
+
             yUst=self.gercekUstYRender
             yAlt=self.gercekAltYRender
             
@@ -317,20 +321,20 @@ class LabirentStatikImaj(StatikImaj):
             #Rectangle(size=(olcu,olcu),pos=(x-olcu/2,yAlt-olcu/2))
             
             Color(.3,.3,.3,1)
-            #Line(width=olcu/2,points=(x,yUst,x,yAlt))
+            Line(width=olcu/2,points=(x,yUst,x,yAlt))
 
         #satırlar
         for i in range(1,self.labirent.satirSayi):
             xSol=self.gercekSolXRender
             xSag=self.gercekSolXRender+self.gercekGenislikRender
-            y=self.gercekAltYRender+i*self.gercekHucreBoyut
+            y=self.gercekAltYRender+i*(self.gercekHucreBoyut+2*self.gercekKenarlikKalinlik)
 
             Color(.5,.5,.5,1)          
             #Rectangle(size=(olcu,olcu),pos=(xSol-olcu/2,y-olcu/2)) 
             #Rectangle(size=(olcu,olcu),pos=(xSag-olcu/2,y-olcu/2))
 
             Color(.3,.3,.3,1)
-            #Line(width=olcu/2,points=(xSol,y,xSag,y))
+            Line(width=olcu/2,points=(xSol,y,xSag,y))
 
     def _textureOlustur(self):
         #labirent görselini, maks boyutlara göre bir kez oluşturup, sonrasında ölçekleniyor
@@ -371,7 +375,7 @@ class LabirentStatikImaj(StatikImaj):
         return (self.labirent.sutunSayi*olcekFaktor,self.labirent.satirSayi*olcekFaktor)
 
     def __cizCerceve(self):
-        Line(close="True", width=self.gercekKenarlikKalinlik,rectangle=(self.gercekSolXRender,self.gercekAltYRender, self.gercekGenislikRender, self.gercekYukseklikRender))
+        pass#Line(close="True", width=self.gercekKenarlikKalinlik,rectangle=(self.gercekSolXRender,self.gercekAltYRender, self.gercekGenislikRender, self.gercekYukseklikRender))
 
     def __cizDuvar(self):
         for satirNumara in range(self.labirent.satirSayi):
@@ -382,7 +386,7 @@ class LabirentStatikImaj(StatikImaj):
                     x-=self.gercekKenarlikKalinlik           
                     y1+=self.gercekHucreBoyut-self.gercekKenarlikKalinlik
                     y2=y1-self.gercekHucreBoyut
-                    Line(width=self.gercekKenarlikKalinlik,points=(x,y1,x,y2))
+                    #Line(width=self.gercekKenarlikKalinlik,points=(x,y1,x,y2))
 
         for sutunNumara in range(self.labirent.sutunSayi):
             for satirNumara in range(self.labirent.satirSayi-1):
@@ -392,15 +396,16 @@ class LabirentStatikImaj(StatikImaj):
                     x1-=self.gercekKenarlikKalinlik
                     y-=self.gercekKenarlikKalinlik
                     x2=x1+self.gercekHucreBoyut
-                    Line(width=self.gercekKenarlikKalinlik,points=(x1,y,x2,y))
+                    #Line(width=self.gercekKenarlikKalinlik,points=(x1,y,x2,y))
 
     def __boyaHucre(self,konum,uzunlukCarpan,renk):
-        Color(renk["r"],renk["g"],renk["b"],renk["a"])
-        
-        hucre=self.labirent.hucre(konum.satirNumara,konum.sutunNumara)        
-        x,y=self.hucreXY(HucreNokta.SOL_ALT,hucre)
-        
+        Color(rgba=renk)        
         olcu=uzunlukCarpan*self.gercekHucreBoyut-2*self.gercekKenarlikKalinlik
+
+        hucre=self.labirent.hucre(konum.satirNumara,konum.sutunNumara)        
+        x,y=self.hucreXY(HucreNokta.MERKEZ,hucre)
+        x-=(olcu/2+1*self.gercekKenarlikKalinlik)
+        y-=(olcu/2+1*self.gercekKenarlikKalinlik)
 
         Ellipse(size=(olcu,olcu),pos=(x,y))
 
@@ -416,7 +421,7 @@ class LabirentStatikImaj(StatikImaj):
                 return self.guncelGenislikRender/EkranSabit.LABIRENT_KENARLIK_KALINLIK_ORAN'''
 
     def __hesaplaHucreBoyut(self,olcu,hucreSayi,kenarlikKalinlik):#olcu; genişlik ya da yükseklik. hucreSayi; satır ya da sütun sayısı
-        return (olcu-(hucreSayi+1)*2*kenarlikKalinlik)/(hucreSayi)
+        return (olcu+2*kenarlikKalinlik-(hucreSayi+1)*2*kenarlikKalinlik)/(hucreSayi)
 
 
 class AnimasyonImaj(Image):
