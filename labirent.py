@@ -326,7 +326,7 @@ class Yarisma:
 
         self.__saha.bind(pos=self.guncelleOlculer, size=self.guncelleOlculer)
                 
-        self.__labirent=Labirent(7,8)#Labirent(20,5)
+        self.__labirent=Labirent(3,8)#Labirent(20,5)
         self.__labirentImaj=LabirentStatikImaj(self.__labirent)
         self.__labirentImaj.texture.save("labirent_sablonu.png")
 
@@ -388,13 +388,13 @@ class Yarisma:
 
             self.__reseptorGuncellendi = False
 
-            with self.__saha.canvas:
+            '''with self.__saha.canvas:
                 from kivy.graphics import Color, Line, Ellipse,Rectangle, Fbo#, RenderContext, Scale, Translate
                 
                 Color(0,0,0,1)
 
                 #imajın-canvasın köşeleri
-                olcu=self.__labirentImaj.guncelKenarlikKalinlik
+                olcu=self.__labirentImaj.guncelKenarlikYarim
                 solXImageWidget=self.__labirentImaj.guncelSolXCanvas(self.__saha)
                 ustYImageWidget=self.__labirentImaj.guncelUstYCanvas(self.__saha)
                 altYImageWidget=self.__labirentImaj.guncelAltYCanvas(self.__saha)
@@ -413,11 +413,11 @@ class Yarisma:
                 #Rectangle(size=(olcu,olcu),pos=(x-olcu,y-2*olcu))#sağ-üst (siyah dikdörtgenin sağ-alt köşesi doğru noktayı gösteriyor)
 
                 #labirentin köşeleri
-                olcu=self.__labirentImaj.guncelKenarlikKalinlik
+                olcu=self.__labirentImaj.guncelKenarlikYarim
                 solXRender=self.__labirentImaj.guncelSolXRender(self.__saha)
                 ustYRender=self.__labirentImaj.guncelUstYRender(self.__saha)
                 altYRender=self.__labirentImaj.guncelAltYRender(self.__saha)
-                kenarlikKalinlik=self.__labirentImaj.guncelKenarlikKalinlik
+                kenarlikYarim=self.__labirentImaj.guncelKenarlikYarim
 
                 x=solXRender
                 y=ustYRender
@@ -443,7 +443,7 @@ class Yarisma:
                 for i in range(self.__labirent.satirSayi):
                     for j in range(self.__labirent.sutunSayi):
                         
-                        olcu=self.__labirentImaj.guncelKenarlikKalinlik
+                        olcu=self.__labirentImaj.guncelKenarlikYarim
 
                         Color(1,0,0,1)
                         #x,y=self.__labirentImaj.hucreXY(HucreNokta.MERKEZ,Hucre(i,j),self.__saha)
@@ -461,7 +461,7 @@ class Yarisma:
                         #x,y=self.__labirentImaj.hucreXY(HucreNokta.SOL_ALT,Hucre(i,j),self.__saha)
                         #Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))
 
-                        olcu=self.__labirentImaj.guncelKenarlikKalinlik*1.25
+                        olcu=self.__labirentImaj.guncelKenarlikYarim*1.25
 
 
 
@@ -481,14 +481,14 @@ class Yarisma:
                 
 
 
-                #x=solX+self.__labirentImaj.guncelKenarlikKalinlik/2
-                #y=ustY-self.__labirentImaj.guncelKenarlikKalinlik/2
+                #x=solX+self.__labirentImaj.guncelKenarlikYarim/2
+                #y=ustY-self.__labirentImaj.guncelKenarlikYarim/2
                 #Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))
 
-                #x=solX+self.__labirentImaj.guncelKenarlikKalinlik+self.__labirentImaj.guncelHucreBoyut
-                #y=ustY-self.__labirentImaj.guncelKenarlikKalinlik
+                #x=solX+self.__labirentImaj.guncelKenarlikYarim+self.__labirentImaj.guncelHucreBoyut
+                #y=ustY-self.__labirentImaj.guncelKenarlikYarim
                 #Line(width=(olcu),points=(x-olcu/2,y-olcu/2,x+olcu/2,y-olcu/2))
-                #Rectangle(size=(10,10),pos=(x,y))
+                #Rectangle(size=(10,10),pos=(x,y))'''
 
 
 
@@ -540,7 +540,7 @@ class Yarisma:
         self.__labirentImaj.guncelleOlculer(self.__saha)
                 
         gozX,gozY=self.__labirentImaj.hucreXY(HucreNokta.MERKEZ,self.__gozHucre,self.__saha)
-        self.__gozImaj.guncelleOlculer(gozX,gozY,self.__labirentImaj.guncelHucreBoyut,self.__labirentImaj.guncelKenarlikKalinlik)
+        self.__gozImaj.guncelleOlculer(gozX,gozY,self.__labirentImaj.guncelHucreBoyut,self.__labirentImaj.guncelKenarlikTam)
 
         self.__reseptorImaj.guncelleOlculer(self.__labirentImaj.guncelHucreBoyut)
 
