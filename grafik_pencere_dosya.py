@@ -221,9 +221,11 @@ class LabirentStatikImaj(StatikImaj):
         if hucreBoyutYuksekligeGore<hucreBoyutGenisligeGore:
             self._gercekYukseklikRender=self._gercekYukseklikCanvas-EkranSabit.RENDER_KUCULTME_CARPAN*self._gercekKenarlikTam
             self._gercekGenislikRender=self._gercekYukseklikRender*self._gercekGenislikCanvas/self._gercekYukseklikCanvas
+
         else:
             self._gercekGenislikRender=self._gercekGenislikCanvas-EkranSabit.RENDER_KUCULTME_CARPAN*self._gercekKenarlikTam
             self._gercekYukseklikRender=self._gercekGenislikRender*self._gercekYukseklikCanvas/self._gercekGenislikCanvas
+
 
         self._gercekHucreBoyut=self.__hesaplaHucreBoyut(self._gercekGenislikRender,self.__labirent.sutunSayi,self._gercekKenarlikTam)
 
