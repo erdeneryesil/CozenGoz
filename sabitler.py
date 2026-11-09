@@ -159,7 +159,7 @@ class ImajSabit(metaclass=SabitMetaClass):
                 ImajTip.GOZ_IMAJ:{GozAksiyon.BEKLE:2/60,GozAksiyon.GIT:2/60,GozAksiyon.PATLA:2/60,GozAksiyon.SOLA_DON:2/60,GozAksiyon.SAGA_DON:2/60}#minimum değer 3/60. Bunun altında bir değer verme
             }
     ORIJINAL_BOYUT={ImajTip.RESEPTOR_IMAJ:340,ImajTip.GOZ_IMAJ:{'patla':563,'yaris':293}}#genişlik,yükseklik aynı
-    BOYUT_ORAN={ImajTip.RESEPTOR_IMAJ:1,ImajTip.GOZ_IMAJ:.8}#hücre genişliğine oranı
+    BOYUT_ORAN={ImajTip.RESEPTOR_IMAJ:1,ImajTip.GOZ_IMAJ:1}#hücre genişliğine oranı
     ANIMASYON_TEKRAR={
                 ImajTip.RESEPTOR_IMAJ:1,
                 ImajTip.GOZ_IMAJ:{GozAksiyon.BEKLE:1,GozAksiyon.GIT:3,GozAksiyon.PATLA:1,GozAksiyon.SOLA_DON:1,GozAksiyon.SAGA_DON:1}
@@ -205,13 +205,13 @@ class HucreSabit(metaclass=SabitMetaClass):
     TIP={
         TIP_BASLANGIC_ANAHTAR:{
             TIP_RENK_ANAHTAR:(56/255, 189/255, 248/255,1),
-            TIP_UZUNLUK_CARPAN_ANAHTAR:.5},
+            TIP_UZUNLUK_CARPAN_ANAHTAR:.15},
         TIP_BITIS_ANAHTAR:{
             TIP_RENK_ANAHTAR:(245/255, 158/255, 11/255,1),
-            TIP_UZUNLUK_CARPAN_ANAHTAR:.5},
+            TIP_UZUNLUK_CARPAN_ANAHTAR:.15},
         TIP_YOL_ANAHTAR:{
             TIP_RENK_ANAHTAR:(51/255, 65/255, 85/255,1),
-            TIP_UZUNLUK_CARPAN_ANAHTAR:.3}
+            TIP_UZUNLUK_CARPAN_ANAHTAR:.1}
         }
 
 class EkranSabit(metaclass=SabitMetaClass):
@@ -239,10 +239,10 @@ class EkranSabit(metaclass=SabitMetaClass):
     SAHA_ALT_YUKSEKLIK_ORAN=.1
 
     #labirent çizimi ile alakalı değerler
-    LABIRENT_KENARLIK_YARIM_ORAN=40
+    LABIRENT_KENARLIK_YARIM_ORAN=10
 
     #labirent görseli için : alt-üst(2+2), sol-sağ(2+2) taraflardan kenarlık kalınlığının 2 katı kadar küçültme yapılacak
-    RENDER_KUCULTME_CARPAN=.95
+    RENDER_KUCULTME_CARPAN=2
 
     def maksSahaBoyut(labirentTip):#sahanın maks w-h, kenarlık kalınlık maks değerleri döndürür
         match labirentTip:

@@ -145,9 +145,9 @@ class LabirentStatikImaj(StatikImaj):
         self.pos=(self._guncelSolXCanvas(saha),self._guncelUstYCanvas(saha)-yukseklik)
         
         if self.__labirent.tip==DikdortgenTip.YATAY:
-            self._guncelKenarlikYarim=self.__hesaplaKenarlikYarim(self._guncelGenislikCanvas)
+            self._guncelKenarlikYarim=self.__hesaplaKenarlikYarim(self._guncelGenislikCanvas,self.__labirent.sutunSayi)
         else:
-            self._guncelKenarlikYarim=self.__hesaplaKenarlikYarim(self._guncelYukseklikCanvas)
+            self._guncelKenarlikYarim=self.__hesaplaKenarlikYarim(self._guncelYukseklikCanvas,self.__labirent.satirSayi)
 
         self._guncelHucreBoyut=self.__hesaplaHucreBoyut(self._guncelGenislikRender,self.__labirent.sutunSayi,self.guncelKenarlikTam)
 
@@ -209,24 +209,23 @@ class LabirentStatikImaj(StatikImaj):
         self._gercekGenislikCanvas,self._gercekYukseklikCanvas=self.__olcekle(maksSahaGenislik,maksSahaYukseklik)#labirentin çizileceği alanın genişlik ve yükseklik
         
         if self.__labirent.tip==DikdortgenTip.YATAY:
-            self._gercekKenarlikYarim=self.__hesaplaKenarlikYarim(self._gercekGenislikCanvas)
+            self._gercekKenarlikYarim=self.__hesaplaKenarlikYarim(self._gercekGenislikCanvas,self.__labirent.sutunSayi)
+            print(self._gercekYukseklikCanvas,self._gercekKenarlikYarim)
         else:
-            self._gercekKenarlikYarim=self.__hesaplaKenarlikYarim(self._gercekYukseklikCanvas)
-
+            self._gercekKenarlikYarim=self.__hesaplaKenarlikYarim(self._gercekYukseklikCanvas,self.__labirent.satirSayi)
+            print(self._gercekGenislikCanvas,self._gercekKenarlikYarim)
 
         hucreBoyutGenisligeGore=self.__hesaplaHucreBoyut(self._gercekGenislikCanvas,self.__labirent.sutunSayi,self._gercekKenarlikTam)
         hucreBoyutYuksekligeGore=self.__hesaplaHucreBoyut(self._gercekYukseklikCanvas,self.__labirent.satirSayi,self._gercekKenarlikTam)            
 
         if hucreBoyutYuksekligeGore<hucreBoyutGenisligeGore:
-            self._gercekYukseklikRender=self._gercekYukseklikCanvas*EkranSabit.RENDER_KUCULTME_CARPAN
+            self._gercekYukseklikRender=self._gercekYukseklikCanvas-EkranSabit.RENDER_KUCULTME_CARPAN*self._gercekKenarlikTam
             self._gercekGenislikRender=self._gercekYukseklikRender*self._gercekGenislikCanvas/self._gercekYukseklikCanvas
         else:
-            self._gercekGenislikRender=self._gercekGenislikCanvas*EkranSabit.RENDER_KUCULTME_CARPAN
+            self._gercekGenislikRender=self._gercekGenislikCanvas-EkranSabit.RENDER_KUCULTME_CARPAN*self._gercekKenarlikTam
             self._gercekYukseklikRender=self._gercekGenislikRender*self._gercekYukseklikCanvas/self._gercekGenislikCanvas
-        
+
         self._gercekHucreBoyut=self.__hesaplaHucreBoyut(self._gercekGenislikRender,self.__labirent.sutunSayi,self._gercekKenarlikTam)
-
-
 
         self._gercekSolXRender=(self._gercekGenislikCanvas-self._gercekGenislikRender)/2    #labirentin sol kenarının ortası (kenarlığın ortası)   
         self._gercekAltYRender=((self._gercekYukseklikCanvas-self._gercekYukseklikRender)/2) #labirentin alt kenarının ortası (kenarlığın ortası)
@@ -373,16 +372,9 @@ class LabirentStatikImaj(StatikImaj):
 
         Ellipse(size=(olcu,olcu),pos=(x,y))
 
-    def __hesaplaKenarlikYarim(self,olcu):#olcu; genişlik ya da yükseklik olacaktır
-        return olcu/EkranSabit.LABIRENT_KENARLIK_YARIM_ORAN
+    def __hesaplaKenarlikYarim(self,olcu,hucreSayi):#olcu; genişlik ya da yükseklik. hucreSayi; satır ya da sütun sayısı
+        return (olcu/EkranSabit.LABIRENT_KENARLIK_YARIM_ORAN)/hucreSayi
             
-        '''match self.__labirent.tip:
-            case DikdortgenTip.YATAY:
-                return self._guncelYukseklikRender/EkranSabit.LABIRENT_KENARLIK_YARIM_ORAN
-            case DikdortgenTip.DIKEY:
-                return self._guncelGenislikRender/EkranSabit.LABIRENT_KENARLIK_YARIM_ORAN
-            case DikdortgenTip.KARE:
-                return self._guncelGenislikRender/EkranSabit.LABIRENT_KENARLIK_YARIM_ORAN'''
 
     def __hesaplaHucreBoyut(self,olcu,hucreSayi,kenarlikTam):#olcu; genişlik ya da yükseklik. hucreSayi; satır ya da sütun sayısı
         return (olcu+kenarlikTam-(hucreSayi+1)*kenarlikTam)/(hucreSayi)
