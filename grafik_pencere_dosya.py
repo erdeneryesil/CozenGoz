@@ -221,13 +221,18 @@ class LabirentStatikImaj(StatikImaj):
         if hucreBoyutYuksekligeGore<hucreBoyutGenisligeGore:
             self._gercekYukseklikRender=self._gercekYukseklikCanvas-EkranSabit.RENDER_KUCULTME_CARPAN*self._gercekKenarlikTam
             self._gercekGenislikRender=self._gercekYukseklikRender*self._gercekGenislikCanvas/self._gercekYukseklikCanvas
-
         else:
             self._gercekGenislikRender=self._gercekGenislikCanvas-EkranSabit.RENDER_KUCULTME_CARPAN*self._gercekKenarlikTam
             self._gercekYukseklikRender=self._gercekGenislikRender*self._gercekYukseklikCanvas/self._gercekGenislikCanvas
 
 
         self._gercekHucreBoyut=self.__hesaplaHucreBoyut(self._gercekGenislikRender,self.__labirent.sutunSayi,self._gercekKenarlikTam)
+
+        #self._gercekGenislikRender+=self._gercekKenarlikTam
+        #self._gercekYukseklikRender+=self._gercekKenarlikTam
+
+        #print(self.__labirent.sutunSayi*self._gercekHucreBoyut+self._gercekKenarlikTam*(self.__labirent.sutunSayi+1),self._gercekGenislikRender)
+        #print(self.__labirent.satirSayi*self._gercekHucreBoyut+self._gercekKenarlikTam*(self.__labirent.satirSayi+1),self._gercekYukseklikRender)
 
         self._gercekSolXRender=(self._gercekGenislikCanvas-self._gercekGenislikRender)/2    #labirentin sol kenarının ortası (kenarlığın ortası)   
         self._gercekAltYRender=((self._gercekYukseklikCanvas-self._gercekYukseklikRender)/2) #labirentin alt kenarının ortası (kenarlığın ortası)
@@ -240,7 +245,7 @@ class LabirentStatikImaj(StatikImaj):
         olcu=self._gercekKenarlikTam
 
         x=self._gercekSolXRender
-        y=self._gercekUstYRender
+        y=self._gercekUstYRender-100
         Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))#sol-üst
 
         x=self._gercekSolXRender
@@ -380,7 +385,7 @@ class LabirentStatikImaj(StatikImaj):
 
     def __hesaplaHucreBoyut(self,olcu,hucreSayi,kenarlikTam):#olcu; genişlik ya da yükseklik. hucreSayi; satır ya da sütun sayısı
         return (olcu+kenarlikTam-(hucreSayi+1)*kenarlikTam)/(hucreSayi)
-        
+    
 class AnimasyonImaj(Image):
     #SABİTLER
     _DIZIN = None

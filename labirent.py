@@ -326,7 +326,7 @@ class Yarisma:
 
         self.__saha.bind(pos=self.guncelleOlculer, size=self.guncelleOlculer)
                 
-        self.__labirent=Labirent(20,15)#Labirent(20,5)
+        self.__labirent=Labirent(10,15)#Labirent(20,5)
         self.__labirentImaj=LabirentStatikImaj(self.__labirent)
         self.__labirentImaj.texture.save("labirent_sablonu.png")
     
@@ -390,47 +390,46 @@ class Yarisma:
             '''with self.__saha.canvas:
                 from kivy.graphics import Color, Line, Ellipse,Rectangle, Fbo#, RenderContext, Scale, Translate
                 
-                Color(0,0,0,1)
+                Color(1,0,0,1)
 
                 #imajın-canvasın köşeleri
-                olcu=self.__labirentImaj.guncelKenarlikYarim
-                solXImageWidget=self.__labirentImaj.guncelSolXCanvas(self.__saha)
-                ustYImageWidget=self.__labirentImaj.guncelUstYCanvas(self.__saha)
-                altYImageWidget=self.__labirentImaj.guncelAltYCanvas(self.__saha)
+                #olcu=self.__labirentImaj.guncelKenarlikYarim
+                #solXImageWidget=self.__labirentImaj.guncelSolXCanvas(self.__saha)
+                #ustYImageWidget=self.__labirentImaj.guncelUstYCanvas(self.__saha)
+                #altYImageWidget=self.__labirentImaj.guncelAltYCanvas(self.__saha)
                 
-                x=solXImageWidget
-                y=ustYImageWidget
+                 #x=solXImageWidget
+                #y=ustYImageWidget
                 #Rectangle(size=(olcu,olcu),pos=(x,y-2*olcu))#sol-üst (siyah dikdörtgenin sol-üst köşesi doğru noktayı gösteriyor)
 
-                y=altYImageWidget
+                #y=altYImageWidget
                 #Rectangle(size=(olcu,olcu),pos=(x,y+olcu))#sol-alt (siyah dikdörtgenin sol-alt köşesi doğru noktayı gösteriyor)
 
-                x=solXImageWidget+self.__labirentImaj.guncelGenislikCanvas
+                #x=solXImageWidget+self.__labirentImaj.guncelGenislikCanvas
                 #Rectangle(size=(olcu,olcu),pos=(x-olcu,y+olcu))#sağ-alt (siyah dikdörtgenin sağ-alt köşesi doğru noktayı gösteriyor)
 
-                y=ustYImageWidget
+                #y=ustYImageWidget
                 #Rectangle(size=(olcu,olcu),pos=(x-olcu,y-2*olcu))#sağ-üst (siyah dikdörtgenin sağ-alt köşesi doğru noktayı gösteriyor)
 
                 #labirentin köşeleri
-                olcu=self.__labirentImaj.guncelKenarlikYarim
-                solXRender=self.__labirentImaj.guncelSolXRender(self.__saha)
-                ustYRender=self.__labirentImaj.guncelUstYRender(self.__saha)
-                altYRender=self.__labirentImaj.guncelAltYRender(self.__saha)
-                kenarlikYarim=self.__labirentImaj.guncelKenarlikYarim
+                olcu=self.__labirentImaj._guncelKenarlikYarim*2
+                solXRender=self.__labirentImaj._guncelSolXRender(self.__saha)
+                ustYRender=self.__labirentImaj._guncelUstYRender(self.__saha)
+                altYRender=self.__labirentImaj._guncelAltYRender(self.__saha)
 
                 x=solXRender
                 y=ustYRender
-                #Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))#sol-üst
+                Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))#sol-üst
 
                 x=solXRender
                 y=altYRender
                 #Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))#sol-alt
 
-                x=solXRender+self.__labirentImaj.guncelGenislikRender
+                x=solXRender+self.__labirentImaj._guncelGenislikRender
                 y=altYRender
                 #Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))#sağ-alt
 
-                x=solXRender+self.__labirentImaj.guncelGenislikRender
+                x=solXRender+self.__labirentImaj._guncelGenislikRender
                 y=ustYRender
                 #Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))#sağ-üst
                 
@@ -442,7 +441,7 @@ class Yarisma:
                 for i in range(self.__labirent.satirSayi):
                     for j in range(self.__labirent.sutunSayi):
                         
-                        olcu=self.__labirentImaj.guncelKenarlikYarim
+                        olcu=self.__labirentImaj._guncelKenarlikYarim
 
                         Color(1,0,0,1)
                         #x,y=self.__labirentImaj.hucreXY(HucreNokta.MERKEZ,Hucre(i,j),self.__saha)
@@ -460,7 +459,7 @@ class Yarisma:
                         #x,y=self.__labirentImaj.hucreXY(HucreNokta.SOL_ALT,Hucre(i,j),self.__saha)
                         #Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))
 
-                        olcu=self.__labirentImaj.guncelKenarlikYarim*1.25
+                        olcu=self.__labirentImaj._guncelKenarlikYarim*1.25
 
 
 
