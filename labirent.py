@@ -326,7 +326,7 @@ class Yarisma:
 
         self.__saha.bind(pos=self.guncelleOlculer, size=self.guncelleOlculer)
                 
-        self.__labirent=Labirent(10,15)#Labirent(20,5)
+        self.__labirent=Labirent(30,30)#Labirent(20,5)
         self.__labirentImaj=LabirentStatikImaj(self.__labirent)
         self.__labirentImaj.texture.save("labirent_sablonu.png")
     

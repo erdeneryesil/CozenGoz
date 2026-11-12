@@ -210,27 +210,33 @@ class LabirentStatikImaj(StatikImaj):
         
         if self.__labirent.tip==DikdortgenTip.YATAY:
             self._gercekKenarlikYarim=self.__hesaplaKenarlikYarim(self._gercekGenislikCanvas,self.__labirent.sutunSayi)
-            print(self._gercekYukseklikCanvas,self._gercekKenarlikYarim)
-        else:
-            self._gercekKenarlikYarim=self.__hesaplaKenarlikYarim(self._gercekYukseklikCanvas,self.__labirent.satirSayi)
-            print(self._gercekGenislikCanvas,self._gercekKenarlikYarim)
-
-        hucreBoyutGenisligeGore=self.__hesaplaHucreBoyut(self._gercekGenislikCanvas,self.__labirent.sutunSayi,self._gercekKenarlikTam)
-        hucreBoyutYuksekligeGore=self.__hesaplaHucreBoyut(self._gercekYukseklikCanvas,self.__labirent.satirSayi,self._gercekKenarlikTam)            
-
-        if hucreBoyutYuksekligeGore<hucreBoyutGenisligeGore:
             self._gercekYukseklikRender=self._gercekYukseklikCanvas-EkranSabit.RENDER_KUCULTME_CARPAN*self._gercekKenarlikTam
             self._gercekGenislikRender=self._gercekYukseklikRender*self._gercekGenislikCanvas/self._gercekYukseklikCanvas
         else:
+            self._gercekKenarlikYarim=self.__hesaplaKenarlikYarim(self._gercekYukseklikCanvas,self.__labirent.satirSayi)
             self._gercekGenislikRender=self._gercekGenislikCanvas-EkranSabit.RENDER_KUCULTME_CARPAN*self._gercekKenarlikTam
             self._gercekYukseklikRender=self._gercekGenislikRender*self._gercekYukseklikCanvas/self._gercekGenislikCanvas
 
+        
 
-        self._gercekHucreBoyut=self.__hesaplaHucreBoyut(self._gercekGenislikRender,self.__labirent.sutunSayi,self._gercekKenarlikTam)
+        #hucreBoyutGenisligeGore=self.__hesaplaHucreBoyut(self._gercekGenislikCanvas,self.__labirent.sutunSayi,self._gercekKenarlikTam)
+        #hucreBoyutYuksekligeGore=self.__hesaplaHucreBoyut(self._gercekYukseklikCanvas,self.__labirent.satirSayi,self._gercekKenarlikTam)            
+
+        '''if hucreBoyutYuksekligeGore<hucreBoyutGenisligeGore:
+            print("asd")
+            self._gercekYukseklikRender=self._gercekYukseklikCanvas-EkranSabit.RENDER_KUCULTME_CARPAN*self._gercekKenarlikTam
+            self._gercekGenislikRender=self._gercekYukseklikRender*self._gercekGenislikCanvas/self._gercekYukseklikCanvas
+        else:
+            print("99")
+            self._gercekGenislikRender=self._gercekGenislikCanvas-EkranSabit.RENDER_KUCULTME_CARPAN*self._gercekKenarlikTam
+            self._gercekYukseklikRender=self._gercekGenislikRender*self._gercekYukseklikCanvas/self._gercekGenislikCanvas
+        '''
+
 
         #self._gercekGenislikRender+=self._gercekKenarlikTam
         #self._gercekYukseklikRender+=self._gercekKenarlikTam
 
+        self._gercekHucreBoyut=self.__hesaplaHucreBoyut(self._gercekGenislikRender,self.__labirent.sutunSayi,self._gercekKenarlikTam)
         #print(self.__labirent.sutunSayi*self._gercekHucreBoyut+self._gercekKenarlikTam*(self.__labirent.sutunSayi+1),self._gercekGenislikRender)
         #print(self.__labirent.satirSayi*self._gercekHucreBoyut+self._gercekKenarlikTam*(self.__labirent.satirSayi+1),self._gercekYukseklikRender)
 

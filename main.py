@@ -1,6 +1,6 @@
 from kivy.config import Config
-#Config.set('graphics', 'width', '800')
-#Config.set('graphics', 'height', '400')
+Config.set('graphics', 'width', '1080')
+Config.set('graphics', 'height', '1920')
 
 # Manuel konumlandırmayı aktif et
 #Config.set('graphics', 'position', 'custom')
@@ -11,7 +11,7 @@ from kivy.config import Config
 #Config.set('graphics', 'top', '0')
 #Config.set('graphics', 'left', '2180') 
 #Config.set('graphics', 'top', '1')
-Config.set('graphics', 'window_state', 'maximized') 
+#Config.set('graphics', 'window_state', 'maximized') 
 #Config.set('graphics', 'fullscreen', 'auto')
 import time
 
