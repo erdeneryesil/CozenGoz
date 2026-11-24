@@ -33,8 +33,12 @@ class Uygulama(App):
         self.title="ÇözenGöz"
         #self.roboLabirent=CozenGoz()
         #return self.roboLabirent
-        self.pencere_yonetici=PencereYonetici()
-        return self.pencere_yonetici
+        self.pencereYonetici=PencereYonetici()
+        return self.pencereYonetici
+
+    
+
+
 
 if __name__=="__main__":    
     Uygulama().run()
