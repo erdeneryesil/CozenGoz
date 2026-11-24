@@ -46,15 +46,15 @@ class Yon(IntEnum):#sıralama SOL,ALT,SAG,UST olmalı. Matematiksel işlemler ya
         return Yon.__BASLANGIC
     
     @staticmethod
-    def donusAci():
+    def donus_aci():
         return Yon.__DONUS_ACI
     
     @staticmethod
-    def solaDon(yon):
+    def sola_don(yon):
         return Yon((yon+1)%len(Yon))
     
     @staticmethod
-    def sagaDon(yon):
+    def saga_don(yon):
         return Yon((yon-1)%len(Yon))
     
     def __str__(self):
@@ -145,7 +145,7 @@ class ImajSabit(metaclass=SabitMetaClass):
                     Yon.UST:{GozAksiyon.BEKLE:"ust-bekle-",GozAksiyon.GIT:"ust-git-",GozAksiyon.PATLA:"ust-patla-",GozAksiyon.SOLA_DON:"ust-sola-don-",GozAksiyon.SAGA_DON:"ust-saga-don-"},
                 }
             }
-    KARE_SAYI={
+    KARE_SAYISI={
                 ImajTip.RESEPTOR_IMAJ:8,
                 ImajTip.GOZ_IMAJ:{#animasyonların içerdiği resim sayısı.
                     Yon.SOL:{GozAksiyon.BEKLE:20,GozAksiyon.GIT:6,GozAksiyon.PATLA:11,GozAksiyon.SOLA_DON:11,GozAksiyon.SAGA_DON:11},
@@ -167,7 +167,7 @@ class ImajSabit(metaclass=SabitMetaClass):
     
     BOS_KARE={
                 ImajTip.RESEPTOR_IMAJ:[],
-                ImajTip.GOZ_IMAJ:{#animasyonların içerdiği görseller. Yukle.AtlasDosya fonksiyonunda yüklenecek
+                ImajTip.GOZ_IMAJ:{#animasyonların içerdiği görseller. Yukle.atlas_dosya metodunda yüklenecek
                     GozTip.GOZ1:{
                         Yon.SOL:{GozAksiyon.BEKLE:[],GozAksiyon.GIT:[],GozAksiyon.PATLA:[],GozAksiyon.SOLA_DON:[],GozAksiyon.SAGA_DON:[]},
                         Yon.ALT:{GozAksiyon.BEKLE:[],GozAksiyon.GIT:[],GozAksiyon.PATLA:[],GozAksiyon.SOLA_DON:[],GozAksiyon.SAGA_DON:[]},
@@ -200,8 +200,8 @@ class HucreSabit(metaclass=SabitMetaClass):
     TIP_BITIS_ANAHTAR="bitis"
     TIP_YOL_ANAHTAR="yol"
     TIP_RENK_ANAHTAR="renk"
-    TIP_UZUNLUK_CARPAN_ANAHTAR="uzunlukCarpan"
-    SAYI_ANAHTAR="sayı"
+    TIP_UZUNLUK_CARPAN_ANAHTAR="uzunluk_carpan"
+    SAYI_ANAHTAR="sayi"
     TIP={
         TIP_BASLANGIC_ANAHTAR:{
             TIP_RENK_ANAHTAR:(56/255, 189/255, 248/255,1),
@@ -244,24 +244,25 @@ class EkranSabit(metaclass=SabitMetaClass):
     #labirent görseli için : alt-üst(2+2), sol-sağ(2+2) taraflardan kenarlık kalınlığının 2 katı kadar küçültme yapılacak
     RENDER_KUCULTME_CARPAN=2
 
-    def maksSahaBoyut(labirentTip):#sahanın maks w-h, kenarlık kalınlık maks değerleri döndürür
-        match labirentTip:
+    @staticmethod
+    def maks_saha_boyut(labirent_tip):#sahanın maks w-h, kenarlık kalınlık maks değerleri döndürür
+        match labirent_tip:
             case DikdortgenTip.YATAY:
-                maksEkranGenislik=EkranSabit.MAKS_EKRAN_GENISLIK_YATAY
-                maksEkranYukseklik=EkranSabit.MAKS_EKRAN_YUKSEKLIK_YATAY
+                maks_ekran_genislik=EkranSabit.MAKS_EKRAN_GENISLIK_YATAY
+                maks_ekran_yukseklik=EkranSabit.MAKS_EKRAN_YUKSEKLIK_YATAY
             case DikdortgenTip.DIKEY:
-                maksEkranGenislik=EkranSabit.MAKS_EKRAN_GENISLIK_DIKEY
-                maksEkranYukseklik=EkranSabit.MAKS_EKRAN_YUKSEKLIK_DIKEY
+                maks_ekran_genislik=EkranSabit.MAKS_EKRAN_GENISLIK_DIKEY
+                maks_ekran_yukseklik=EkranSabit.MAKS_EKRAN_YUKSEKLIK_DIKEY
             case DikdortgenTip.KARE:
-                maksEkranGenislik=EkranSabit.MAKS_EKRAN_GENISLIK_KARE
-                maksEkranYukseklik=EkranSabit.MAKS_EKRAN_YUKSEKLIK_KARE
+                maks_ekran_genislik=EkranSabit.MAKS_EKRAN_GENISLIK_KARE
+                maks_ekran_yukseklik=EkranSabit.MAKS_EKRAN_YUKSEKLIK_KARE
 
         
-        maksSahaGenislik=maksEkranGenislik*EkranSabit.SAHA_GENISLIK_ORAN
-        maksSahaYukseklik=maksEkranYukseklik*EkranSabit.SAHA_YUKSEKLIK_ORAN
+        maks_saha_genislik=maks_ekran_genislik*EkranSabit.SAHA_GENISLIK_ORAN
+        maks_saha_yukseklik=maks_ekran_yukseklik*EkranSabit.SAHA_YUKSEKLIK_ORAN
 
-        return {EkranSabit.MAKS_SAHA_GENISLIK_ANAHTAR:maksSahaGenislik,
-            EkranSabit.MAKS_SAHA_YUKSEKLIK_ANAHTAR:maksSahaYukseklik}
+        return {EkranSabit.MAKS_SAHA_GENISLIK_ANAHTAR:maks_saha_genislik,
+            EkranSabit.MAKS_SAHA_YUKSEKLIK_ANAHTAR:maks_saha_yukseklik}
     
 
 class LabirentSabit(metaclass=SabitMetaClass):
@@ -294,4 +295,3 @@ class AcilirPencereSabit(metaclass=SabitMetaClass):
     ETIKET_BOYUT_ORAN=.03         #Etiket yazı boyutunun, açılır pencerenin genişliğine oranı
     ETIKET_RENK=[.694,.157,.157,1]       #etiketin yazı rengi
     ARKAPLAN_RENK=[.8,.8,.8,.7]
-

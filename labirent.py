@@ -10,35 +10,35 @@ from kivy.graphics import Color, Line, Ellipse, Fbo
 
 
 from temel import Konum#,Denetle
-from sabitler import HucreSabit,HucreNokta,LabirentSabit,AnimasyonSabit,DikdortgenTip,DuvarDurum,Yon,GozTip,GozAksiyon,Hareket,Yon,DuvarDurum,ReseptorKonum
+from sabitler import HucreSabit,HucreNokta,LabirentSabit,AnimasyonSabit,DikdortgenTip,DuvarDurum,Yon,GozTip,GozAksiyon,Hareket,Yon,ReseptorKonum
 from yarismaci import BenimGozum
 from goz import Reseptor
 
-from grafik_pencere_dosya import LabirentStatikImaj,GozImaj,ReseptorImaj
+from grafik_dosya import LabirentStatikImaj,GozImaj,ReseptorImaj
 
 class Hucre(Konum):
-    def __init__(self,satirNumara,sutunNumara):
-        super().__init__(satirNumara,sutunNumara)
+    def __init__(self,satir_numarasi,sutun_numarasi):
+        super().__init__(satir_numarasi,sutun_numarasi)
 
-    def __eq__(self, digerHucre):# == operatörü ile iki Hucre nesnesinin eşit olup olmadığı sorgulanıyor
-        return True if self.satirNumara==digerHucre.satirNumara and self.sutunNumara==digerHucre.sutunNumara else False
+    def __eq__(self, diger_hucre):# == operatörü ile iki Hucre nesnesinin eşit olup olmadığı sorgulanıyor
+        return True if self.satir_numarasi==diger_hucre.satir_numarasi and self.sutun_numarasi==diger_hucre.sutun_numarasi else False
     
-    def __ne__(self,digerHucre): # != operatörü ile iki Hucre nesnesinin farklı olup olmadığı sorgulanıyor
-        return True if self.satirNumara!=digerHucre.satirNumara or self.sutunNumara!=digerHucre.sutunNumara else False
+    def __ne__(self,diger_hucre): # != operatörü ile iki Hucre nesnesinin farklı olup olmadığı sorgulanıyor
+        return True if self.satir_numarasi!=diger_hucre.satir_numarasi or self.sutun_numarasi!=diger_hucre.sutun_numarasi else False
 
-class OnHucre(Hucre):
-    def __init__(self,satirNumara,sutunNumara):
-        super().__init__(satirNumara,sutunNumara)
+class TaslakHucre(Hucre):
+    def __init__(self,satir_numarasi,sutun_numarasi):
+        super().__init__(satir_numarasi,sutun_numarasi)
         self.__isaret=False
     
     @property
     def isaret(self):
         return self.__isaret
     
-    def isaretKoy(self):
+    def isaret_koy(self):
         self.__isaret=True
     
-    def isaretKaldir(self):
+    def isaret_kaldir(self):
         self.__isaret=False
 
 class Duvar:        
@@ -55,255 +55,245 @@ class Duvar:
         self.__durum=DuvarDurum.KAPALI
 
 class Labirent:
-    def __init__(self,satirSayi,sutunSayi):
-        self.__satirSayi=satirSayi
-        self.__sutunSayi=sutunSayi
+    def __init__(self,satir_sayisi,sutun_sayisi):
+        self.__satir_sayisi=satir_sayisi
+        self.__sutun_sayisi=sutun_sayisi
 
-        self.__minimumCozumUzunlugu=self.__satirSayi*self.__sutunSayi*LabirentSabit.MINIMUM_COZUM_UZUNLUGU_ORAN
-        self.__tip=DikdortgenTip.belirle(self.__sutunSayi,self.__satirSayi)
+        self.__minimum_cozum_uzunlugu=self.__satir_sayisi*self.__sutun_sayisi*LabirentSabit.MINIMUM_COZUM_UZUNLUGU_ORAN
+        self.__tip=DikdortgenTip.belirle(self.__sutun_sayisi,self.__satir_sayisi)
 
-        self.__baslangicSatirNumara=-1
-        self.__baslangicSutunNumara=-1
-        self.__bitisSatirNumara=-1
-        self.__bitisSutunNumara=-1
+        self.__baslangic_satir_numara=-1
+        self.__baslangic_sutun_numara=-1
+        self.__bitis_satir_numara=-1
+        self.__bitis_sutun_numara=-1
 
-        self.__onHucreler=[]        #labirent oluşturulduktan sonra bu nesne silinecek (del)
-        self.__onHucreDuvarlar=[]   #labirent oluşturulduktan sonra bu nesne silinecek (del)
+        self.__taslak_hucreler=[]        #labirent oluşturulduktan sonra bu nesne silinecek (del)
+        self.__taslak_hucre_duvarlar=[]   #labirent oluşturulduktan sonra bu nesne silinecek (del)
         
         self.__hucreler=[]
         self.__duvarlar=[]
-        self.__cozumYolu=[]
+        self.__cozum_yolu=[]
 
-        rastgeleDeger=self.__rastgeleBaslangicBitisBelirle()
-        self.__baslangicSatirNumara=rastgeleDeger[LabirentSabit.BASLANGIC_SATIR_NUMARA_ANAHTAR]
-        self.__baslangicSutunNumara=rastgeleDeger[LabirentSabit.BASLANGIC_SUTUN_NUMARA_ANAHTAR]
-        self.__bitisSatirNumara=rastgeleDeger[LabirentSabit.BITIS_SATIR_NUMARA_ANAHTAR]
-        self.__bitisSutunNumara=rastgeleDeger[LabirentSabit.BITIS_SUTUN_NUMARA_ANAHTAR]
+        rastgele_deger=self.__rastgele_baslangic_bitis_belirle()
+        self.__baslangic_satir_numara=rastgele_deger[LabirentSabit.BASLANGIC_SATIR_NUMARA_ANAHTAR]
+        self.__baslangic_sutun_numara=rastgele_deger[LabirentSabit.BASLANGIC_SUTUN_NUMARA_ANAHTAR]
+        self.__bitis_satir_numara=rastgele_deger[LabirentSabit.BITIS_SATIR_NUMARA_ANAHTAR]
+        self.__bitis_sutun_numara=rastgele_deger[LabirentSabit.BITIS_SUTUN_NUMARA_ANAHTAR]
         
-        self.__cozumYolu=self.__olusturCozumYolu()
-        self.__hucreler=self.__olusturHucreler()
-        self.__duvarlar=self.__olusturDuvarlar()
+        self.__cozum_yolu=self.__olustur_cozum_yolu()
+        self.__hucreler=self.__olustur_hucreler()
+        self.__duvarlar=self.__olustur_duvarlar()
 
-        del self.__onHucreDuvarlar
-        del self.__onHucreler
-
-
+        del self.__taslak_hucre_duvarlar
+        del self.__taslak_hucreler
 
     @property
-    def satirSayi(self):
-        return self.__satirSayi
+    def satir_sayisi(self):
+        return self.__satir_sayisi
     @property
-    def sutunSayi(self):
-        return self.__sutunSayi
+    def sutun_sayisi(self):
+        return self.__sutun_sayisi
     @property
-    def baslangicSatirNumara(self):
-        return self.__baslangicSatirNumara
+    def baslangic_satir_numarasi(self):
+        return self.__baslangic_satir_numara
     @property
-    def baslangicSutunNumara(self):
-        return self.__baslangicSutunNumara
+    def baslangic_sutun_numarasi(self):
+        return self.__baslangic_sutun_numara
     @property
-    def bitisSatirNumara(self):
-        return self.__bitisSatirNumara
+    def bitis_satir_numara(self):
+        return self.__bitis_satir_numara
     @property
-    def bitisSutunNumara(self):
-        return self.__bitisSutunNumara
+    def bitis_sutun_numara(self):
+        return self.__bitis_sutun_numara
     
     @property
-    def baslangicHucre(self):
-        return self.__hucreler[self.__baslangicSatirNumara][self.__baslangicSutunNumara]
+    def baslangic_hucre(self):
+        return self.__hucreler[self.__baslangic_satir_numara][self.__baslangic_sutun_numara]
     @property
-    def bitisHucre(self):
-        return self.__hucreler[self.__bitisSatirNumara][self.__bitisSutunNumara]
+    def bitis_hucre(self):
+        return self.__hucreler[self.__bitis_satir_numara][self.__bitis_sutun_numara]
     @property
-    def cozumYoluUzunluk(self):#çözüm yolu kaç tane Hücre içeriyor
-        return len(self.__cozumYolu)
+    def cozum_yolu_uzunlugu(self):#çözüm yolu kaç tane Hücre içeriyor
+        return len(self.__cozum_yolu)
     @property
     def tip(self):
         return self.__tip
     
-    def cozumYoluHucre(self,numara):
-        return self.__cozumYolu[numara]
+    def cozum_yolu_hucre(self,numara):
+        return self.__cozum_yolu[numara]
 
-    def hucre(self,satirNumara,sutunNumara):
-        if satirNumara<0 or satirNumara>=self.__satirSayi or sutunNumara<0 or sutunNumara>=self.__sutunSayi:
+    def hucre(self,satir_numarasi,sutun_numarasi):
+        if satir_numarasi<0 or satir_numarasi>=self.__satir_sayisi or sutun_numarasi<0 or sutun_numarasi>=self.__sutun_sayisi:
             return None
-        return self.__hucreler[satirNumara][sutunNumara]
+        return self.__hucreler[satir_numarasi][sutun_numarasi]
     
-    def komsuHucreler(self,hucre,onHucreMi=False):#onHucreMi=ön hücre mi(self.__onHucre) yoksa, oluşturulmuş labirentin hücreleri mi(self.__hucre)
-        hucreler=self.__onHucreler if onHucreMi else self.__hucreler
+    def komsu_hucreler(self,hucre,taslak_hucre_mi=False):#taslak_hucre_mi=ön hücre mi(self.__taslak_hucreler) yoksa, oluşturulmuş labirentin hücreleri mi(self.__hucre)
+        hucreler=self.__taslak_hucreler if taslak_hucre_mi else self.__hucreler
 
-        komsuHucreler={Yon.SOL:None,Yon.ALT:None,Yon.SAG:None,Yon.UST:None,HucreSabit.SAYI_ANAHTAR:0}
-        if hucre.satirNumara+1<self.__satirSayi:#altında komşu var mı
-            komsuHucreler[Yon.ALT]=hucreler[hucre.satirNumara+1][hucre.sutunNumara]
-            komsuHucreler[HucreSabit.SAYI_ANAHTAR]+=1
+        komsu_hucreler={Yon.SOL:None,Yon.ALT:None,Yon.SAG:None,Yon.UST:None,HucreSabit.SAYI_ANAHTAR:0}
+        if hucre.satir_numarasi+1<self.__satir_sayisi:#altında komşu var mı
+            komsu_hucreler[Yon.ALT]=hucreler[hucre.satir_numarasi+1][hucre.sutun_numarasi]
+            komsu_hucreler[HucreSabit.SAYI_ANAHTAR]+=1
         
-        if hucre.satirNumara-1>=0:#üstünde satir var mı
-            komsuHucreler[Yon.UST]=hucreler[hucre.satirNumara-1][hucre.sutunNumara]
-            komsuHucreler[HucreSabit.SAYI_ANAHTAR]+=1
+        if hucre.satir_numarasi-1>=0:#üstünde satir var mı
+            komsu_hucreler[Yon.UST]=hucreler[hucre.satir_numarasi-1][hucre.sutun_numarasi]
+            komsu_hucreler[HucreSabit.SAYI_ANAHTAR]+=1
         
-        if hucre.sutunNumara+1<self.__sutunSayi:#sağında komşu var mı
-            komsuHucreler[Yon.SAG]=hucreler[hucre.satirNumara][hucre.sutunNumara+1]
-            komsuHucreler[HucreSabit.SAYI_ANAHTAR]+=1
+        if hucre.sutun_numarasi+1<self.__sutun_sayisi:#sağında komşu var mı
+            komsu_hucreler[Yon.SAG]=hucreler[hucre.satir_numarasi][hucre.sutun_numarasi+1]
+            komsu_hucreler[HucreSabit.SAYI_ANAHTAR]+=1
 
-        if hucre.sutunNumara-1>=0:#solunda komşu var mı
-            komsuHucreler[Yon.SOL]=hucreler[hucre.satirNumara][hucre.sutunNumara-1]
-            komsuHucreler[HucreSabit.SAYI_ANAHTAR]+=1
-        return komsuHucreler
+        if hucre.sutun_numarasi-1>=0:#solunda komşu var mı
+            komsu_hucreler[Yon.SOL]=hucreler[hucre.satir_numarasi][hucre.sutun_numarasi-1]
+            komsu_hucreler[HucreSabit.SAYI_ANAHTAR]+=1
+        return komsu_hucreler
 
-    def duvar(self,hucre1,hucre2,onHucreDuvarMi=False):#onHucreDuvarMi=ön hücrenin duvarı mı(self.__onHucreDuvarlar) yoksa, oluşturulmuş labirentin hücrelerinin duvarları mı(self.__duvarlar)
-        duvarlar=self.__onHucreDuvarlar if onHucreDuvarMi else self.__duvarlar
+    def duvar(self,hucre1,hucre2,taslak_hucre_duvar_mi=False):#taslak_hucre_duvar_mi=ön hücrenin duvarı mı(self.__taslak_hucre_duvarlar) yoksa, oluşturulmuş labirentin hücrelerinin duvarları mı(self.__duvarlar)
+        duvarlar=self.__taslak_hucre_duvarlar if taslak_hucre_duvar_mi else self.__duvarlar
             
         if hucre1 is None or hucre2 is None:#Eğer satır ya da sutun numarası labirentin sınırları dışındaysa, KAPALI bir duvar dönsün 
             return Duvar()   
                 
-        if hucre1.satirNumara==hucre2.satirNumara:#aynı satırdaki hücreler arasındaki bir duvar ise
-            if hucre2.sutunNumara<hucre1.sutunNumara:#hücre2 küçük indisli ise
-                return duvarlar[LabirentSabit.SATIR_ANAHTAR][hucre2.satirNumara][hucre2.sutunNumara]
-            return duvarlar[LabirentSabit.SATIR_ANAHTAR][hucre1.satirNumara][hucre1.sutunNumara]#hücre1 küçük indisli ise
+        if hucre1.satir_numarasi==hucre2.satir_numarasi:#aynı satırdaki hücreler arasındaki bir duvar ise
+            if hucre2.sutun_numarasi<hucre1.sutun_numarasi:#hücre2 küçük indisli ise
+                return duvarlar[LabirentSabit.SATIR_ANAHTAR][hucre2.satir_numarasi][hucre2.sutun_numarasi]
+            return duvarlar[LabirentSabit.SATIR_ANAHTAR][hucre1.satir_numarasi][hucre1.sutun_numarasi]#hücre1 küçük indisli ise
         else:#aynı sütundaki hücreler arasındaki bir duvar ise
-            if hucre2.satirNumara<hucre1.satirNumara:#hücre2 küçük indisli ise
-                return duvarlar[LabirentSabit.SUTUN_ANAHTAR][hucre2.sutunNumara][hucre2.satirNumara]    
-            return duvarlar[LabirentSabit.SUTUN_ANAHTAR][hucre1.sutunNumara][hucre1.satirNumara]#hücre1 küçük indisli ise
+            if hucre2.satir_numarasi<hucre1.satir_numarasi:#hücre2 küçük indisli ise
+                return duvarlar[LabirentSabit.SUTUN_ANAHTAR][hucre2.sutun_numarasi][hucre2.satir_numarasi]    
+            return duvarlar[LabirentSabit.SUTUN_ANAHTAR][hucre1.sutun_numarasi][hucre1.satir_numarasi]#hücre1 küçük indisli ise
 
-          
-    def __olusturCozumYolu(self):
-        cozumYolu=[]
-        hucreYigin=[]
-        while(len(cozumYolu)<self.__minimumCozumUzunlugu):
+    def __olustur_cozum_yolu(self):
+        cozum_yolu=[]
+        hucre_yigin=[]
+        while(len(cozum_yolu)<self.__minimum_cozum_uzunlugu):
 
-            self.__onHucreler=self.__olusturOnHucreler()
-            self.__onHucreDuvarlar=self.__olusturOnHucreDuvarlar()
+            self.__taslak_hucreler=self.__olustur_taslak_hucreler()
+            self.__taslak_hucre_duvarlar=self.__olustur_taslak_hucre_duvarlar()
             
-            cozumYolu=[]
-            hucreYigin=[]
-            hucreYigin.append(self.__onHucreler[self.__baslangicSatirNumara][self.__baslangicSutunNumara])#ilk hücreyi yığına ekle
+            cozum_yolu=[]
+            hucre_yigin=[]
+            hucre_yigin.append(self.__taslak_hucreler[self.__baslangic_satir_numara][self.__baslangic_sutun_numara])#ilk hücreyi yığına ekle
 
-            while(not self.__onHucrelerIsaretlendi()):
-                hucre=hucreYigin[-1]#stack'in en üstündeki hücre
-                hucre.isaretKoy()
-                rastgeleKomsuHucre=self.__secRastgeleKomsuHucre(hucre)
-                if rastgeleKomsuHucre:
-                    rastgeleKomsuHucre.isaretKoy()
-                    self.__acDuvar(hucre,rastgeleKomsuHucre)
-                    hucreYigin.append(rastgeleKomsuHucre)
+            while(not self.__taslak_hucreler_isaretlendi()):
+                hucre=hucre_yigin[-1]#stack'in en üstündeki hücre
+                hucre.isaret_koy()
+                rastgele_komsu_hucre=self.__sec_rastgele_komsu_hucre(hucre)
+                if rastgele_komsu_hucre:
+                    rastgele_komsu_hucre.isaret_koy()
+                    self.__ac_duvar(hucre,rastgele_komsu_hucre)
+                    hucre_yigin.append(rastgele_komsu_hucre)
 
-                    if rastgeleKomsuHucre.satirNumara==self.__bitisSatirNumara and rastgeleKomsuHucre.sutunNumara==self.__bitisSutunNumara:
-                        for hucre in hucreYigin:
-                            cozumYolu.append(Hucre(hucre.satirNumara,hucre.sutunNumara))
+                    if rastgele_komsu_hucre.satir_numarasi==self.__bitis_satir_numara and rastgele_komsu_hucre.sutun_numarasi==self.__bitis_sutun_numara:
+                        for hucre in hucre_yigin:
+                            cozum_yolu.append(Hucre(hucre.satir_numarasi,hucre.sutun_numarasi))
                 else:
-                    hucreYigin.pop()
+                    hucre_yigin.pop()
         
-        return cozumYolu
+        return cozum_yolu
     
-    def __secRastgeleKomsuHucre(self,hucre):
-        komsuHucreler=self.komsuHucreler(hucre,True)
+    def __sec_rastgele_komsu_hucre(self,hucre):
+        komsu_hucreler=self.komsu_hucreler(hucre,True)
         
-        if komsuHucreler[HucreSabit.SAYI_ANAHTAR]==0:
+        if komsu_hucreler[HucreSabit.SAYI_ANAHTAR]==0:
             return None
         
-        tumKomsuHucrelerIsaretli=True
+        tum_komsu_hucreler_isaretli=True
         for yon in Yon:
-            if komsuHucreler[yon]:
-                if not komsuHucreler[yon].isaret:
-                    tumKomsuHucrelerIsaretli=False
+            if komsu_hucreler[yon]:
+                if not komsu_hucreler[yon].isaret:
+                    tum_komsu_hucreler_isaretli=False
                     break
         
-        if tumKomsuHucrelerIsaretli:
+        if tum_komsu_hucreler_isaretli:
             return None
     
         while(True):
-            rastgeleYon=random.choice(list(Yon))
-            rastgeleKomsuHucre=komsuHucreler[rastgeleYon]
-            if rastgeleKomsuHucre:
-                if not rastgeleKomsuHucre.isaret:
-                    return rastgeleKomsuHucre
+            rastgele_yon=random.choice(list(Yon))
+            rastgele_komsu_hucre=komsu_hucreler[rastgele_yon]
+            if rastgele_komsu_hucre:
+                if not rastgele_komsu_hucre.isaret:
+                    return rastgele_komsu_hucre
         
-    def __onHucrelerIsaretlendi(self):
-        for satirNumara in range(self.__satirSayi):
-            for sutunNumara in range(self.__sutunSayi):
-                if not self.__onHucreler[satirNumara][sutunNumara].isaret:
+    def __taslak_hucreler_isaretlendi(self):
+        for satir_numarasi in range(self.__satir_sayisi):
+            for sutun_numarasi in range(self.__sutun_sayisi):
+                if not self.__taslak_hucreler[satir_numarasi][sutun_numarasi].isaret:
                     return False
         return True
-    def __butunOnHucrelerIsaretKaldir(self):
-        for satirNumara in range(self.__satirSayi):
-            for sutunNumara in range(self.__sutunSayi):
-                self.__hucreler[satirNumara][sutunNumara].isaretKaldir()
     
-    def __olusturOnHucreler(self):
-        onHucreler=[]
-        for satirNumara in range(self.__satirSayi):
+    def __olustur_taslak_hucreler(self):
+        taslak_hucreler=[]
+        for satir_numarasi in range(self.__satir_sayisi):
             satir=[]
-            for sutunNumara in range(self.__sutunSayi):
-                hucre=OnHucre(satirNumara,sutunNumara)
+            for sutun_numarasi in range(self.__sutun_sayisi):
+                hucre=TaslakHucre(satir_numarasi,sutun_numarasi)
                 satir.append(hucre)
-            onHucreler.append(satir)
-        return onHucreler
+            taslak_hucreler.append(satir)
+        return taslak_hucreler
     
-    def __olusturHucreler(self):#self.__onHucreler nesnesindeki ön hücreleri, self.__hucreler nesnesine aktar 
-        return self.__onHucreler
+    def __olustur_hucreler(self):#self.__taslak_hucreler nesnesindeki ön hücreleri, self.__hucreler nesnesine aktar 
+        return self.__taslak_hucreler
 
-    def __olusturOnHucreDuvarlar(self):
+    def __olustur_taslak_hucre_duvarlar(self):
         duvarlar={LabirentSabit.SATIR_ANAHTAR:[],LabirentSabit.SUTUN_ANAHTAR:[]}
         #satırlarda bulunan duvarlar oluşturuluyor
-        for satirNumara in range(self.__satirSayi):
-            satirDuvarlar=[]
-            for sutunNumara in range(self.__sutunSayi-1):
+        for satir_numarasi in range(self.__satir_sayisi):
+            satir_duvarlar=[]
+            for sutun_numarasi in range(self.__sutun_sayisi-1):
                 duvar=Duvar()
-                satirDuvarlar.append(duvar)
-            duvarlar[LabirentSabit.SATIR_ANAHTAR].append(satirDuvarlar)
+                satir_duvarlar.append(duvar)
+            duvarlar[LabirentSabit.SATIR_ANAHTAR].append(satir_duvarlar)
 
-                
         #sutunlarda bulunan duvarlar oluşturuluyor
-        for sutunNumara in range(self.__sutunSayi):
-            sutunDuvarlar=[]
-            for satirNumara in range(self.__satirSayi-1):
+        for sutun_numarasi in range(self.__sutun_sayisi):
+            sutun_duvarlar=[]
+            for satir_numarasi in range(self.__satir_sayisi-1):
                 duvar=Duvar()
-                sutunDuvarlar.append(duvar)
-            duvarlar[LabirentSabit.SUTUN_ANAHTAR].append(sutunDuvarlar)
+                sutun_duvarlar.append(duvar)
+            duvarlar[LabirentSabit.SUTUN_ANAHTAR].append(sutun_duvarlar)
 
         return duvarlar
     
-    def __olusturDuvarlar(self):#self.__onHucreDuvarlar nesnesindeki duvarları self.__duvarlar içerisine aktar
-        return self.__onHucreDuvarlar
+    def __olustur_duvarlar(self):#self.__taslak_hucre_duvarlar nesnesindeki duvarları self.__duvarlar içerisine aktar
+        return self.__taslak_hucre_duvarlar
 
-    def __acDuvar(self,hucre1,hucre2):
+    def __ac_duvar(self,hucre1,hucre2):
         self.duvar(hucre1,hucre2,True).ac()
 
-    def __butunDuvarlariKapat(self):
+    def __butun_duvarlari_kapat(self):
         #satırlarda bulunan duvarlar kapatılıyor
-        for satirNumara in range(self.__satirSayi):
-            for sutunNumara in range(self.__sutunSayi-1):
-                self.__duvarlar[self.__satirAnahtar][satirNumara][sutunNumara].kapat()
+        for satir_numarasi in range(self.__satir_sayisi):
+            for sutun_numarasi in range(self.__sutun_sayisi-1):
+                self.__duvarlar[LabirentSabit.SATIR_ANAHTAR][satir_numarasi][sutun_numarasi].kapat()
                 
-        for sutunNumara in range(self.__sutunSayi):
-            for satirNumara in range(self.__satirSayi-1):
-                self.__duvarlar[LabirentSabit.SUTUN_ANAHTAR][sutunNumara][satirNumara].kapat()
+        for sutun_numarasi in range(self.__sutun_sayisi):
+            for satir_numarasi in range(self.__satir_sayisi-1):
+                self.__duvarlar[LabirentSabit.SUTUN_ANAHTAR][sutun_numarasi][satir_numarasi].kapat()
     
-    def __rastgeleBaslangicBitisBelirle(self):#labirentin başlangıç ve bitiş hücreleri rastgele belirleniyor
+    def __rastgele_baslangic_bitis_belirle(self):#labirentin başlangıç ve bitiş hücreleri rastgele belirleniyor
 
         if self.__tip==DikdortgenTip.YATAY:
-            baslangicSutunNumara=0
-            bitisSutunNumara=self.__sutunSayi-1
-            baslangicSatirNumara=random.randint(0,self.__satirSayi-1)
-            bitisSatirNumara=random.randint(0,self.__satirSayi-1)
+            baslangic_sutun_numarasi=0
+            bitis_sutun_numara=self.__sutun_sayisi-1
+            baslangic_satir_numarasi=random.randint(0,self.__satir_sayisi-1)
+            bitis_satir_numara=random.randint(0,self.__satir_sayisi-1)
         else:
-            baslangicSatirNumara=0
-            bitisSatirNumara=self.__satirSayi-1
-            baslangicSutunNumara=random.randint(0,self.__sutunSayi-1)
-            bitisSutunNumara=random.randint(0,self.__sutunSayi-1)
+            baslangic_satir_numarasi=0
+            bitis_satir_numara=self.__satir_sayisi-1
+            baslangic_sutun_numarasi=random.randint(0,self.__sutun_sayisi-1)
+            bitis_sutun_numara=random.randint(0,self.__sutun_sayisi-1)
 
-        return {LabirentSabit.BASLANGIC_SATIR_NUMARA_ANAHTAR:baslangicSatirNumara,
-            LabirentSabit.BASLANGIC_SUTUN_NUMARA_ANAHTAR:baslangicSutunNumara,
-            LabirentSabit.BITIS_SATIR_NUMARA_ANAHTAR:bitisSatirNumara,
-            LabirentSabit.BITIS_SUTUN_NUMARA_ANAHTAR:bitisSutunNumara}
-    
-
+        return {LabirentSabit.BASLANGIC_SATIR_NUMARA_ANAHTAR:baslangic_satir_numarasi,
+            LabirentSabit.BASLANGIC_SUTUN_NUMARA_ANAHTAR:baslangic_sutun_numarasi,
+            LabirentSabit.BITIS_SATIR_NUMARA_ANAHTAR:bitis_satir_numara,
+            LabirentSabit.BITIS_SUTUN_NUMARA_ANAHTAR:bitis_sutun_numara}
         
-    #def __maksimumMesafe(self):#labirentin birbirlerine en uzak olan hücrelerin arasındaki mesafe
-        #return self.__satirSayi-1+self.__sutunSayi-1
+    #def __maksimum_mesafe(self):#labirentin birbirlerine en uzak olan hücrelerin arasındaki mesafe
+        #return self.__satir_sayisi-1+self.__sutun_sayisi-1
     
-    #def __mesafeHesapla(self,satirNumara1,sutunNumara1,satirNumara2,sutunNumara2):
-        #return abs(satirNumara1-satirNumara2)+abs(sutunNumara1-sutunNumara2)
+    #def __mesafe_hesapla(self,satir_numara1,sutun_numara1,satir_numara2,sutun_numara2):
+        #return abs(satir_numara1-satir_numara2)+abs(sutun_numara1-sutun_numara2)
 
 class Saha(Widget):
     def __init__(self, **kwargs):
@@ -313,270 +303,162 @@ class Yarisma:
     def __init__(self,saha):
         self.__saha=saha # yarışmanın yapılacağı Widget nesnesi
         
-        self.__yarismaSaat=None
+        self.__yarisma_saat=None
+        self.__oyun_bitti=None
         self.__labirent=None
-        self.__gozHucre=None
+        self.__labirent_imaj=None
+        self.__goz_hucre=None
         self.__goz=None
-        self.__gozImaj=None
+        self.__goz_imaj=None
         self.__reseptor=None
-        self.__reseptorImaj=None
-        self.__reseptorGuncellendi=None
+        self.__reseptor_imaj=None
+        self.__reseptor_guncellendi=None
         
-    def __baslangicIslemleri(self):
+    def __baslangic_islemleri(self):
 
-        self.__saha.bind(pos=self.guncelleOlculer, size=self.guncelleOlculer)
+        self.__saha.bind(pos=self.guncelle_olculer, size=self.guncelle_olculer)
                 
         self.__labirent=Labirent(30,30)#Labirent(20,5)
         self.__labirentImaj=LabirentStatikImaj(self.__labirent)
         self.__labirentImaj.texture.save("labirent_sablonu.png")
+        self.__labirent=Labirent(10,15)#Labirent(20,5)
+        self.__labirent_imaj=LabirentStatikImaj(self.__labirent)
+        self.__labirent_imaj.texture.save("labirent_sablonu.png")
     
         goz1=BenimGozum("ROBOT1")
         self.__goz=goz1
-        self.__gozImaj=GozImaj(GozTip.GOZ1,Yon.baslangic())
+        self.__goz_imaj=GozImaj(GozTip.GOZ1,Yon.baslangic())
 
-        self.__gozHucre=self.__labirent.baslangicHucre
+        self.__goz_hucre=self.__labirent.baslangic_hucre
         
         self.__reseptor=Reseptor()
-        self.__reseptorImaj=ReseptorImaj()
+        self.__reseptor_imaj=ReseptorImaj()
 
+        self.__saha.add_widget(self.__labirent_imaj)
+        self.__saha.add_widget(self.__goz_imaj)
+        self.__saha.add_widget(self.__reseptor_imaj)
 
-        self.__saha.add_widget(self.__labirentImaj)
-        self.__saha.add_widget(self.__gozImaj)
-        self.__saha.add_widget(self.__reseptorImaj)
-        
-
-        Clock.schedule_once(lambda dt: self.guncelleOlculer(self.__saha), 0) #pencere açılması tamamlandığında, boyutların güncellenmesi için
+        Clock.schedule_once(lambda dt: self.guncelle_olculer(self.__saha), 0) #pencere açılması tamamlandığında, boyutların güncellenmesi için
     
     def baslat(self):
-        self.__baslangicIslemleri()
+        self.__baslangic_islemleri()
 
-        self.__reseptorGuncellendi=False
-        self.oyunBitti=False
-        self.__gozHucre=self.__labirent.baslangicHucre
-        self.__gozImaj.bekle()
+        self.__reseptor_guncellendi=False
+        self.__oyun_bitti=False
+        self.__goz_hucre=self.__labirent.baslangic_hucre
+        self.__goz_imaj.bekle()
 
-        #animasyonSure=GozImaj.animasyonSure(GozAksiyon.BEKLE, self.__gozImaj.yon)
-        self.__yarismaSaat=Clock.schedule_once(self.geriSayim,AnimasyonSabit.GERI_SAYIM_GECIKME)
+        self.__yarisma_saat=Clock.schedule_once(self.geri_sayim,AnimasyonSabit.GERI_SAYIM_GECIKME)
 
 
-    def geriSayim(self,dt):
-        self.__yarismaSaat=Clock.schedule_once(self.yarisTikTak,AnimasyonSabit.ANIMASYON_GECIKME)
+    def geri_sayim(self,dt):
+        self.__yarisma_saat=Clock.schedule_once(self.yaris_tik_tak,AnimasyonSabit.ANIMASYON_GECIKME)
 
-    def yarisTikTak(self,dt):   
-               
-        if self.__gozImaj.aksiyon!=GozAksiyon.BEKLE:
-            self.__yarismaSaat=Clock.schedule_once(self.yarisTikTak,AnimasyonSabit.ANIMASYON_GECIKME)
+    def yaris_tik_tak(self,dt):   
+        if self.__goz_imaj.aksiyon!=GozAksiyon.BEKLE:
+            self.__yarisma_saat=Clock.schedule_once(self.yaris_tik_tak,AnimasyonSabit.ANIMASYON_GECIKME)
             return
         
-        if self.__gozHucre==self.__labirent.bitisHucre:           
+        if self.__goz_hucre==self.__labirent.bitis_hucre:           
             print("bitti")
             return
-                    
         
-        if not self.__reseptorGuncellendi:
-            animasyonSure=self.__reseptorGuncelle()
-            self.__yarismaSaat=Clock.schedule_once(self.yarisTikTak, animasyonSure+AnimasyonSabit.EPSILON if animasyonSure > 0 else AnimasyonSabit.ANIMASYON_GECIKME)
+        if not self.__reseptor_guncellendi:
+            animasyon_suresi=self.__reseptor_guncelle()
+            self.__yarisma_saat=Clock.schedule_once(self.yaris_tik_tak, animasyon_suresi+AnimasyonSabit.EPSILON if animasyon_suresi > 0 else AnimasyonSabit.ANIMASYON_GECIKME)
             return
-
         
-        if self.__gozImaj.animasyonTamamlandi:
-            self.__gozImaj.animasyonBasladiResetle()
-            self.__gozImaj.animasyonTamamlandiResetle()
-            gozX, gozY = self.__labirentImaj.hucreXY(HucreNokta.MERKEZ,self.__gozHucre,self.__saha)
-            self.__gozImaj.konumla(gozX, gozY)
+        if self.__goz_imaj.animasyon_tamamlandi:
+            self.__goz_imaj.animasyon_basladi_resetle()
+            self.__goz_imaj.animasyon_tamamlandi_resetle()
+            goz_x, goz_y = self.__labirent_imaj.hucre_x_y(HucreNokta.MERKEZ,self.__goz_hucre,self.__saha)
+            self.__goz_imaj.konumla(goz_x, goz_y)
 
-            self.__reseptorGuncellendi = False
-
-            '''with self.__saha.canvas:
-                from kivy.graphics import Color, Line, Ellipse,Rectangle, Fbo#, RenderContext, Scale, Translate
+            self.__reseptor_guncellendi = False
                 
-                Color(1,0,0,1)
-
-                #imajın-canvasın köşeleri
-                #olcu=self.__labirentImaj.guncelKenarlikYarim
-                #solXImageWidget=self.__labirentImaj.guncelSolXCanvas(self.__saha)
-                #ustYImageWidget=self.__labirentImaj.guncelUstYCanvas(self.__saha)
-                #altYImageWidget=self.__labirentImaj.guncelAltYCanvas(self.__saha)
-                
-                 #x=solXImageWidget
-                #y=ustYImageWidget
-                #Rectangle(size=(olcu,olcu),pos=(x,y-2*olcu))#sol-üst (siyah dikdörtgenin sol-üst köşesi doğru noktayı gösteriyor)
-
-                #y=altYImageWidget
-                #Rectangle(size=(olcu,olcu),pos=(x,y+olcu))#sol-alt (siyah dikdörtgenin sol-alt köşesi doğru noktayı gösteriyor)
-
-                #x=solXImageWidget+self.__labirentImaj.guncelGenislikCanvas
-                #Rectangle(size=(olcu,olcu),pos=(x-olcu,y+olcu))#sağ-alt (siyah dikdörtgenin sağ-alt köşesi doğru noktayı gösteriyor)
-
-                #y=ustYImageWidget
-                #Rectangle(size=(olcu,olcu),pos=(x-olcu,y-2*olcu))#sağ-üst (siyah dikdörtgenin sağ-alt köşesi doğru noktayı gösteriyor)
-
-                #labirentin köşeleri
-                olcu=self.__labirentImaj._guncelKenarlikYarim*2
-                solXRender=self.__labirentImaj._guncelSolXRender(self.__saha)
-                ustYRender=self.__labirentImaj._guncelUstYRender(self.__saha)
-                altYRender=self.__labirentImaj._guncelAltYRender(self.__saha)
-
-                x=solXRender
-                y=ustYRender
-                Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))#sol-üst
-
-                x=solXRender
-                y=altYRender
-                #Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))#sol-alt
-
-                x=solXRender+self.__labirentImaj._guncelGenislikRender
-                y=altYRender
-                #Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))#sağ-alt
-
-                x=solXRender+self.__labirentImaj._guncelGenislikRender
-                y=ustYRender
-                #Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))#sağ-üst
-                
-
-                
-
-
-                Color(0,1,0,1)
-                for i in range(self.__labirent.satirSayi):
-                    for j in range(self.__labirent.sutunSayi):
-                        
-                        olcu=self.__labirentImaj._guncelKenarlikYarim
-
-                        Color(1,0,0,1)
-                        #x,y=self.__labirentImaj.hucreXY(HucreNokta.MERKEZ,Hucre(i,j),self.__saha)
-                        #Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))
-
-                        Color(0,1,0,1)
-                        #x,y=self.__labirentImaj.hucreXY(HucreNokta.SOL,Hucre(i,j),self.__saha)
-                        #Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))
-
-                        Color(0,0,1,1)
-                        #x,y=self.__labirentImaj.hucreXY(HucreNokta.ALT,Hucre(i,j),self.__saha)
-                        #Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))
-
-                        Color(.5,.5,0,1)
-                        #x,y=self.__labirentImaj.hucreXY(HucreNokta.SOL_ALT,Hucre(i,j),self.__saha)
-                        #Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))
-
-                        olcu=self.__labirentImaj._guncelKenarlikYarim*1.25
-
-
-
-                        Color(1,0,1,1)
-                        x,y=self.__labirentImaj.hucreXY(HucreNokta.UST,Hucre(i,j),self.__saha)
-                        #Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))
-
-                        Color(1,1,0,1)
-                        #x,y=self.__labirentImaj.hucreXY(HucreNokta.SAG,Hucre(i,j),self.__saha)
-                        #Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))
-
-
-
-                        Color(.75,.75,0,1)
-                        #x,y=self.__labirentImaj.hucreXY(HucreNokta.SAG_ALT,Hucre(i,j),self.__saha)
-                        #Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))
-                
-
-
-                #x=solX+self.__labirentImaj.guncelKenarlikYarim/2
-                #y=ustY-self.__labirentImaj.guncelKenarlikYarim/2
-                #Rectangle(size=(olcu,olcu),pos=(x-olcu/2,y-olcu/2))
-
-                #x=solX+self.__labirentImaj.guncelKenarlikYarim+self.__labirentImaj.guncelHucreBoyut
-                #y=ustY-self.__labirentImaj.guncelKenarlikYarim
-                #Line(width=(olcu),points=(x-olcu/2,y-olcu/2,x+olcu/2,y-olcu/2))
-                #Rectangle(size=(10,10),pos=(x,y))'''
-
-
-
-                
-            gozHareket = self.__goz.kararVer(self.__reseptor)
-            animasyonSure=self.__gozHareketUygula(gozHareket)
+            goz_hareket = self.__goz.karar_ver(self.__reseptor)
+            animasyon_suresi=self.__goz_hareket_uygula(goz_hareket)
             
-            self.__yarismaSaat=Clock.schedule_once(self.yarisTikTak, animasyonSure+AnimasyonSabit.EPSILON)
+            self.__yarisma_saat=Clock.schedule_once(self.yaris_tik_tak, animasyon_suresi+AnimasyonSabit.EPSILON)
             return
         
-        self.__yarismaSaat=Clock.schedule_once(self.yarisTikTak, AnimasyonSabit.ANIMASYON_GECIKME)
+        self.__yarisma_saat=Clock.schedule_once(self.yaris_tik_tak, AnimasyonSabit.ANIMASYON_GECIKME)
         
-    def __gozHareketUygula(self,hareket):
+    def __goz_hareket_uygula(self,hareket):
         match hareket:
             case Hareket.SOLA_DON:
-                self.__gozImaj.solaDon()#.yon=Yon((self.__gozImaj.yon+1)%len(Yon))
+                self.__goz_imaj.sola_don()#.yon=Yon((self.__goz_imaj.yon+1)%len(Yon))
                 #print("sola döndü")
             case Hareket.SAGA_DON:
-                self.__gozImaj.sagaDon()#.yon=Yon((self.__gozImaj.yon-1)%len(Yon))
+                self.__goz_imaj.saga_don()#.yon=Yon((self.__goz_imaj.yon-1)%len(Yon))
                 #print("sağa döndü")
             case Hareket.ILERI:
-                hucreSatirNumara=self.__gozHucre.satirNumara
-                hucreSutunNumara=self.__gozHucre.sutunNumara
-                match self.__gozImaj.yon:
+                hucre_satir_numarasi=self.__goz_hucre.satir_numarasi
+                hucre_sutun_numarasi=self.__goz_hucre.sutun_numarasi
+                match self.__goz_imaj.yon:
                     case Yon.SAG:
-                        hucreSutunNumara+=1
+                        hucre_sutun_numarasi+=1
                     case Yon.SOL:
-                        hucreSutunNumara-=1
+                        hucre_sutun_numarasi-=1
                     case Yon.ALT:
-                        hucreSatirNumara+=1
+                        hucre_satir_numarasi+=1
                     case Yon.UST:
-                        hucreSatirNumara-=1
+                        hucre_satir_numarasi-=1
                 
-                duvar=self.__labirent.duvar(self.__gozHucre,self.__labirent.hucre(hucreSatirNumara,hucreSutunNumara))
+                duvar=self.__labirent.duvar(self.__goz_hucre,self.__labirent.hucre(hucre_satir_numarasi,hucre_sutun_numarasi))
                 
                 if duvar.durum==DuvarDurum.ACIK:   
-                    self.__gozHucre=self.__labirent.hucre(hucreSatirNumara,hucreSutunNumara)
-                    self.__gozImaj.git()
+                    self.__goz_hucre=self.__labirent.hucre(hucre_satir_numarasi,hucre_sutun_numarasi)
+                    self.__goz_imaj.git()
                 else:
                     print("HÖSTT")
-                    #self.__gozImaj.bekle()
+                    #self.__goz_imaj.bekle()
         
-        return GozImaj.animasyonSure(self.__gozImaj.aksiyon, self.__gozImaj.yon)
+        return GozImaj.animasyon_suresi(self.__goz_imaj.aksiyon, self.__goz_imaj.yon)
 
-    def guncelleOlculer(self,*args):
+    def guncelle_olculer(self,*args):
         if self.__labirent is None:
             return
         
-        self.__labirentImaj.guncelleOlculer(self.__saha)
+        self.__labirent_imaj.guncelle_olculer(self.__saha)
                 
-        gozX,gozY=self.__labirentImaj.hucreXY(HucreNokta.MERKEZ,self.__gozHucre,self.__saha)
-        self.__gozImaj.guncelleOlculer(gozX,gozY,self.__labirentImaj.guncelHucreBoyut,self.__labirentImaj.guncelKenarlikTam)
+        goz_x,goz_y=self.__labirent_imaj.hucre_x_y(HucreNokta.MERKEZ,self.__goz_hucre,self.__saha)
+        self.__goz_imaj.guncelle_olculer(goz_x,goz_y,self.__labirent_imaj.guncel_hucre_boyut,self.__labirent_imaj.guncel_kenarlik_tam)
 
-        self.__reseptorImaj.guncelleOlculer(self.__labirentImaj.guncelHucreBoyut)
+        self.__reseptor_imaj.guncelle_olculer(self.__labirent_imaj.guncel_hucre_boyut)
 
-    def __reseptorGuncelle(self):
-        yonFark = self.__gozImaj.yon - Yon.baslangic()
-        reseptorGercekKonum=ReseptorKonum((self.__reseptor.konumIndis+yonFark)%len(ReseptorKonum))
-        reseptorX,reseptorY=self.__labirentImaj.hucreXY(HucreNokta(reseptorGercekKonum),self.__gozHucre,self.__saha)
-                  
+    def __reseptor_guncelle(self):
+        yon_fark = self.__goz_imaj.yon - Yon.baslangic()
+        reseptor_gercek_konum=ReseptorKonum((self.__reseptor.konum_indis+yon_fark)%len(ReseptorKonum))
+        reseptor_x,reseptor_y=self.__labirent_imaj.hucre_x_y(HucreNokta(reseptor_gercek_konum),self.__goz_hucre,self.__saha)
 
-        komsuHucreler = self.__labirent.komsuHucreler(self.__gozHucre)
-        hedefHucre = komsuHucreler.get(Yon(reseptorGercekKonum))
+        komsu_hucreler = self.__labirent.komsu_hucreler(self.__goz_hucre)
+        hedef_hucre = komsu_hucreler.get(Yon(reseptor_gercek_konum))
         
-        duvarDurum = DuvarDurum.KAPALI
-        if hedefHucre:
-            duvarDurum = self.__labirent.duvar(self.__gozHucre, hedefHucre).durum
-        self.__reseptor.degerGuncelle(self.__reseptor.konumIndis, duvarDurum)
+        duvar_durum = DuvarDurum.KAPALI
+        if hedef_hucre:
+            duvar_durum = self.__labirent.duvar(self.__goz_hucre, hedef_hucre).durum
+        self.__reseptor.deger_guncelle(self.__reseptor.konum_indis, duvar_durum)
 
-        if duvarDurum==DuvarDurum.ACIK:
-            if not self.__reseptorImaj.animasyonBasladi:
-                self.__reseptorImaj.animasyonTamamlandiResetle()
-                self.__reseptorImaj.konumla(reseptorX,reseptorY)
+        if duvar_durum==DuvarDurum.ACIK:
+            if not self.__reseptor_imaj.animasyon_basladi:
+                self.__reseptor_imaj.animasyon_tamamlandi_resetle()
+                self.__reseptor_imaj.konumla(reseptor_x,reseptor_y)
             
-                self.__reseptorImaj.duvarAcik()
+                self.__reseptor_imaj.duvar_acik()
 
-                return ReseptorImaj.animasyonSure()
+                return ReseptorImaj.animasyon_suresi()
  
-            if self.__reseptorImaj.animasyonTamamlandi:
-                self.__reseptorImaj.animasyonBasladiResetle()
-                self.__reseptor.konumIndisGuncelle()
+            if self.__reseptor_imaj.animasyon_tamamlandi:
+                self.__reseptor_imaj.animasyon_basladi_resetle()
+                self.__reseptor.konum_indis_guncelle()
 
-                if self.__reseptor.konumIndis == 0:
-                    self.__reseptorGuncellendi = True
-
+                if self.__reseptor.konum_indis == 0:
+                    self.__reseptor_guncellendi = True
         else:
-            self.__reseptor.konumIndisGuncelle()
+            self.__reseptor.konum_indis_guncelle()
 
-            if self.__reseptor.konumIndis == 0:
-                self.__reseptorGuncellendi = True
+            if self.__reseptor.konum_indis == 0:
+                self.__reseptor_guncellendi = True
 
         return 0
-

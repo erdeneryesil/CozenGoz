@@ -6,7 +6,7 @@
     AnaPencere:
     
 <DenemePencere>:
-    name:"denemePencere"
+    name:"deneme_pencere"
     Label:
         text:"Burası Deneme Penceresi"
 
@@ -18,14 +18,14 @@
         Rectangle:
             size:self.size
             pos:self.pos
-    id:anaPencere
-    name:"anaPencere"
+    id:ana_pencere
+    name:"ana_pencere"
     BoxLayout:
         orientation:'horizontal'
         size_hint:1,1
 
         BoxLayout:
-            id:solPanel
+            id:sol_panel
             orientation:'vertical'
             size_hint_x:EkranSabit.SOL_PANEL_GENISLIK_ORAN
             canvas.before:
@@ -40,7 +40,7 @@
             
         BoxLayout:
             orientation:'vertical'
-            id:yarismaPanel
+            id:yarisma_panel
             size_hint_x:EkranSabit.SAHA_GENISLIK_ORAN
 
             BoxLayout:
@@ -83,13 +83,13 @@
                 
                 Button:
                     text:"Başlat"
-                    on_press:root.yarisBaslatClick()
+                    on_press:root.yaris_baslat_tiklama()
                     
 
 
         BoxLayout:
             orientation:'vertical'
-            id:sagPanel
+            id:sag_panel
             size_hint_x:EkranSabit.SAG_PANEL_GENISLIK_ORAN
             canvas.before:
                 Color:
