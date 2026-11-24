@@ -8,15 +8,13 @@ from kivy.clock import mainthread, Clock
 from kivy.uix.boxlayout import BoxLayout
 from kivy.core.window import Window
 
-from grafik_pencere_dosya import Yukle,GozImaj,ReseptorImaj
+from grafik_dosya import KaynakYukleyici,GozImaj,ReseptorImaj
 from sabitler import AnaPencereSabit, AcilirPencereSabit, AtlasYuklemeBilgi,AcilirPencereTip,AcilirPencereDurum,DosyaTip,GozTip,GozAksiyon,Yon
 from labirent import Yarisma
 
 class PencereYonetici(ScreenManager):
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
-        
-
        
 class AcilirPencere(ModalView):
     #logo='assets/sahne/logo.png'
@@ -36,38 +34,37 @@ class AcilirPencere(ModalView):
         self.__tip=None
         self.__durum=None
         self.__saat=None
-        self.__dosyaTip=None
-        self.__dosyaBilgiler=None
-        self.__dosyaYuklemeIndis=0
+        self.__dosya_tip=None
+        self.__dosya_yukleme_bilgileri=None
+        self.__dosya_yukleme_indis=0
         self.auto_dismiss=False
         self.__etiket=Label()
         self.__etiket.color=AcilirPencereSabit.ETIKET_RENK
         #self.__etiket.text="DENEME"
 
-
         #self.__etiket.font_name=Oyun.acilirPencereYaziTipiIsim
         #self.__etiket.color=AcilirPencere.etiketRenk
         #self.__etiket.text=AcilirPencere.etiketYazi[self.__tip]
         
-        self.bind(pos=self.boyutAyarla, size=self.boyutAyarla)    
+        self.bind(pos=self.boyut_ayarla, size=self.boyut_ayarla)    
             
-    def dosyaYuklemeBaslat(self,dosyaTip,dosyaYuklemeBilgiler):
-        self.__dosyaYuklemeIndis = 0
+    def dosya_yukleme_baslat(self,dosya_tip,dosya_yukleme_bilgileri):
+        self.__dosya_yukleme_indis = 0
         self.__tip=AcilirPencereTip.DOSYA_YUKLEME
-        self.__dosyaTip=dosyaTip
-        self.__dosyaYuklemeBilgiler=dosyaYuklemeBilgiler
-        self.__dosyaYuklemeIcinAyarla()
-        self.__saat=Clock.schedule_interval(self.dosyaYuklemeTikTak,1/60)
+        self.__dosya_tip=dosya_tip
+        self.__dosya_yukleme_bilgileri=dosya_yukleme_bilgileri
+        self.__dosya_yukleme_icin_ayarla()
+        self.__saat=Clock.schedule_interval(self.dosya_yukleme_tik_tak,1/60)
 
-    def dosyaYuklemeTikTak(self, dt):
+    def dosya_yukleme_tik_tak(self, dt):
         if self.__durum==AcilirPencereDurum.ACILMAYA_HAZIR:
             self.open()
         elif self.__durum==AcilirPencereDurum.ACIK:
             self.__durum=AcilirPencereDurum.ETIKET_ACIKLAMA_GUNCELLE
         elif self.__durum==AcilirPencereDurum.ETIKET_ACIKLAMA_GUNCELLE:
-            if self.__dosyaYuklemeIndis<len(self.__dosyaYuklemeBilgiler):
+            if self.__dosya_yukleme_indis<len(self.__dosya_yukleme_bilgileri):
                 # AŞAMA 1: Sadece etiketi güncelle ve DUR
-                bilgi=self.__dosyaYuklemeBilgiler[self.__dosyaYuklemeIndis]
+                bilgi=self.__dosya_yukleme_bilgileri[self.__dosya_yukleme_indis]
                 self.__etiket.text = bilgi.get(AtlasYuklemeBilgi.ACIKLAMA)
                 # Durumu değiştiriyoruz ki bir sonraki 'tiktak'ta yükleme yapılsın
                 self.__durum=AcilirPencereDurum.ISLEM_DEVAM_EDIYOR
@@ -75,16 +72,16 @@ class AcilirPencere(ModalView):
                 self.__durum=AcilirPencereDurum.ISLEM_BITTI
         elif self.__durum==AcilirPencereDurum.ISLEM_DEVAM_EDIYOR:
             # AŞAMA 2: Ağır olan yükleme işlemini yap
-            bilgi = self.__dosyaYuklemeBilgiler[self.__dosyaYuklemeIndis]
-            imajSinif = bilgi.get(AtlasYuklemeBilgi.IMAJ_SINIF)
-            aksiyonSinif = bilgi.get(AtlasYuklemeBilgi.AKSIYON_SINIF)
-            tipSinif = bilgi.get(AtlasYuklemeBilgi.TIP_SINIF)
-            yonSinif = bilgi.get(AtlasYuklemeBilgi.YON_SINIF)
+            bilgi = self.__dosya_yukleme_bilgileri[self.__dosya_yukleme_indis]
+            imaj_sinif = bilgi.get(AtlasYuklemeBilgi.IMAJ_SINIF)
+            aksiyon_sinif = bilgi.get(AtlasYuklemeBilgi.AKSIYON_SINIF)
+            tip_sinif = bilgi.get(AtlasYuklemeBilgi.TIP_SINIF)
+            yon_sinif = bilgi.get(AtlasYuklemeBilgi.YON_SINIF)
             
-            Yukle.AtlasDosya(imajSinif, aksiyonSinif, tipSinif, yonSinif)
+            KaynakYukleyici.atlas_dosya(imaj_sinif, aksiyon_sinif, tip_sinif, yon_sinif)
             
             # Yükleme bitti, indisi artır ve tekrar etiket güncelleme moduna dön
-            self.__dosyaYuklemeIndis+= 1
+            self.__dosya_yukleme_indis+= 1
             self.__durum=AcilirPencereDurum.ETIKET_ACIKLAMA_GUNCELLE
 
         elif self.__durum==AcilirPencereDurum.ISLEM_BITTI:
@@ -93,51 +90,45 @@ class AcilirPencere(ModalView):
         elif self.__durum==AcilirPencereDurum.KAPALI:
             self.__saat.cancel()
 
-
-    def __tekliAtlasYukle(self,bilgi):
+    def __tekli_atlas_yukle(self,bilgi):
         aciklama = bilgi.get(AtlasYuklemeBilgi.ACIKLAMA)
         print(aciklama)
         self.__etiket.text = aciklama # Bu artık her dosyada güncellenecek
         
-        imajSinif = bilgi.get(AtlasYuklemeBilgi.IMAJ_SINIF)
-        aksiyonSinif = bilgi.get(AtlasYuklemeBilgi.AKSIYON_SINIF)
-        tipSinif = bilgi.get(AtlasYuklemeBilgi.TIP_SINIF)
-        yonSinif = bilgi.get(AtlasYuklemeBilgi.YON_SINIF)
+        imaj_sinif = bilgi.get(AtlasYuklemeBilgi.IMAJ_SINIF)
+        aksiyon_sinif = bilgi.get(AtlasYuklemeBilgi.AKSIYON_SINIF)
+        tip_sinif = bilgi.get(AtlasYuklemeBilgi.TIP_SINIF)
+        yon_sinif = bilgi.get(AtlasYuklemeBilgi.YON_SINIF)
         
         # Gerçek yükleme işlemi
-        Yukle.AtlasDosya(imajSinif, aksiyonSinif, tipSinif, yonSinif)
-
-
-
+        KaynakYukleyici.atlas_dosya(imaj_sinif, aksiyon_sinif, tip_sinif, yon_sinif)
 
     @mainthread #ayrı bir thread içerisinde nesne oluşturabilmek için fonksiyonun mainthread olması gerekiyor
-    def __dosyaYuklemeIcinAyarla(self):
+    def __dosya_yukleme_icin_ayarla(self):
         self.__durum=AcilirPencereDurum.YUKLENIYOR
         yerlesim=BoxLayout(orientation='vertical')
-
 
         #self.logo=Image(source=AcilirPencere.logo,allow_stretch=False,keep_ratio=True)
         #self.logo.size_hint=None,None
         #self.logoBoyutAyarla()
 
-        self.__etiketBoyutAyarla()
+        self.__etiket_boyut_ayarla()
 
         #yerlesim.add_widget(self.logo)
         yerlesim.add_widget(self.__etiket)
         self.add_widget(yerlesim)
         self.__durum=AcilirPencereDurum.ACILMAYA_HAZIR
 
-    def __etiketBoyutAyarla(self):
+    def __etiket_boyut_ayarla(self):
         self.__etiket.font_size=self.width*AcilirPencereSabit.ETIKET_BOYUT_ORAN
                           
-    def boyutAyarla(self,*args):
+    def boyut_ayarla(self,*args):
         self.size_hint=None,None
         self.width=Window.width*AcilirPencereSabit.PENCERE_GENISLIK_ORAN
         self.height=Window.height*AcilirPencereSabit.PENCERE_YUKSEKLIK_ORAN
 
-        self.__etiketBoyutAyarla()
+        self.__etiket_boyut_ayarla()
     
-
     def on_pre_open(self):
         self.__durum=AcilirPencereDurum.ACIK
         return super().on_pre_open()
@@ -156,19 +147,19 @@ class AnaPencere(Screen):
 
         self.__yarisma=Yarisma(self.ids.saha)
 
-    def yarisBaslatClick(self):
+    def yaris_baslat_tiklama(self):
         self.__yarisma.baslat() 
 
     def on_enter(self, *args):
-        self.__dosyaYuklemeBaslat()
+        self.__dosya_yukleme_baslat()
         
-    def __dosyaYuklemeBaslat(self):
+    def __dosya_yukleme_baslat(self):
         #önce dosyalar yüklensin
-        gozAtlasYuklemeBilgi={AtlasYuklemeBilgi.ACIKLAMA:AnaPencereSabit.ACIKLAMA_GOZ_GORSEL_YUKLEME,AtlasYuklemeBilgi.IMAJ_SINIF:GozImaj,AtlasYuklemeBilgi.AKSIYON_SINIF:GozAksiyon,AtlasYuklemeBilgi.TIP_SINIF:GozTip,AtlasYuklemeBilgi.YON_SINIF:Yon}
-        reseptorAtlasYuklemeBilgi={AtlasYuklemeBilgi.ACIKLAMA:AnaPencereSabit.ACIKLAMA_RESEPTOR_GORSEL_YUKLEME,AtlasYuklemeBilgi.IMAJ_SINIF:ReseptorImaj}
-        atlasDosyaBilgiler=[gozAtlasYuklemeBilgi,reseptorAtlasYuklemeBilgi]
+        goz_atlas_yukleme_bilgi={AtlasYuklemeBilgi.ACIKLAMA:AnaPencereSabit.ACIKLAMA_GOZ_GORSEL_YUKLEME,AtlasYuklemeBilgi.IMAJ_SINIF:GozImaj,AtlasYuklemeBilgi.AKSIYON_SINIF:GozAksiyon,AtlasYuklemeBilgi.TIP_SINIF:GozTip,AtlasYuklemeBilgi.YON_SINIF:Yon}
+        reseptor_atlas_yukleme_bilgi={AtlasYuklemeBilgi.ACIKLAMA:AnaPencereSabit.ACIKLAMA_RESEPTOR_GORSEL_YUKLEME,AtlasYuklemeBilgi.IMAJ_SINIF:ReseptorImaj}
+        atlas_dosya_bilgileri=[goz_atlas_yukleme_bilgi,reseptor_atlas_yukleme_bilgi]
 
-        dosyaYuklemePencere=AcilirPencere()
+        dosya_yukleme_pencere=AcilirPencere()
 
         #dosya yükleme penceresi kapandığında, diğer işlemler başlasın
-        dosyaYuklemePencere.dosyaYuklemeBaslat(DosyaTip.ATLAS,atlasDosyaBilgiler)
+        dosya_yukleme_pencere.dosya_yukleme_baslat(DosyaTip.ATLAS,atlas_dosya_bilgileri)
