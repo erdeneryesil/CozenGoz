@@ -238,6 +238,9 @@ class EkranSabit(metaclass=SabitMetaClass):
     SAHA_UST_YUKSEKLIK_ORAN=.1
     SAHA_ALT_YUKSEKLIK_ORAN=.1
 
+    BOSLUK_ORAN=100
+
+
     #labirent çizimi ile alakalı değerler
     LABIRENT_KENARLIK_YARIM_ORAN=10
 

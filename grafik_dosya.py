@@ -137,7 +137,7 @@ class LabirentStatikImaj(StatikImaj):
         self.size=(genislik,yukseklik)
         self.pos=(self._guncel_sol_x_canvas(saha),self._guncel_ust_y_canvas(saha)-yukseklik)
         
-        if self.__labirent.tip==DikdortgenTip.YATAY:
+        if self.__labirent.dikdortgen_tip==DikdortgenTip.YATAY:
             self._guncel_kenarlik_yarim=self.__hesapla_kenarlik_yarim(self._guncel_genislik_canvas,self.__labirent.sutun_sayisi)
         else:
             self._guncel_kenarlik_yarim=self.__hesapla_kenarlik_yarim(self._guncel_yukseklik_canvas,self.__labirent.satir_sayisi)
@@ -193,13 +193,13 @@ class LabirentStatikImaj(StatikImaj):
         return (x,y)
         
     def _gercek_degerler_hesapla(self):#niteliklerin değerleri hesaplanıyor
-        maks=EkranSabit.maks_saha_boyut(self.__labirent.tip)
+        maks=EkranSabit.maks_saha_boyut(self.__labirent.dikdortgen_tip)
         maks_saha_genislik=maks[EkranSabit.MAKS_SAHA_GENISLIK_ANAHTAR]
         maks_saha_yukseklik=maks[EkranSabit.MAKS_SAHA_YUKSEKLIK_ANAHTAR]       
 
         self._gercek_genislik_canvas,self._gercek_yukseklik_canvas=self.__olcekle(maks_saha_genislik,maks_saha_yukseklik)#labirentin çizileceği alanın genişlik ve yükseklik
         
-        if self.__labirent.tip==DikdortgenTip.YATAY:
+        if self.__labirent.dikdortgen_tip==DikdortgenTip.YATAY:
             self._gercek_kenarlik_yarim=self.__hesapla_kenarlik_yarim(self._gercek_genislik_canvas,self.__labirent.sutun_sayisi)
             print(self._gercek_yukseklik_canvas,self._gercek_kenarlik_yarim)
         else:
@@ -231,7 +231,7 @@ class LabirentStatikImaj(StatikImaj):
 
         with fbo:
             #self.__izgara_ciz()
-
+            #Color(0.07, 0.09, 0.12, 1)
             Color(rgba=LabirentSabit.KENARLIK_RENK)
             self.__ciz_cerceve()
 
@@ -492,7 +492,7 @@ class GozImaj(AnimasyonImaj):#animasyon ve çizim işlemlerinin yürütüleceği
 
     def __init__(self,tip,yon,**kwargs):
         super().__init__(**kwargs)
-        self.__tip=(GozTip)(tip)
+        self.__dikdortgen_tip=(GozTip)(tip)
         self.__yon=(Yon)(yon)
         self.__aksiyon=None
         self.__yeni_yon=None#yön değiştirilirken, animasyon yeni yöne değil, mevcut olana(self.__yon) göre çalıştırılıyor. Animasyon bittikten sonra self.__yon=self.__yeni_yon olarak güncellenecek 
@@ -534,8 +534,8 @@ class GozImaj(AnimasyonImaj):#animasyon ve çizim işlemlerinin yürütüleceği
         return n * r * delay
 
     @property
-    def tip(self):
-        return self.__tip
+    def dikdortgen_tip(self):
+        return self.__dikdortgen_tip
     @property
     def yon(self):
         return self.__yon
@@ -567,7 +567,7 @@ class GozImaj(AnimasyonImaj):#animasyon ve çizim işlemlerinin yürütüleceği
         self._animasyon_hazirlik()
     
     def _animasyon_hazirlik(self):
-        self.texture=GozImaj.kare(0,self.__aksiyon,self.__tip,self.__yon).texture#yeni aksiyonun, ilk karesi alınıyor. Aksiyon geçişinde, önceki durumun karesi kalmasın diye 
+        self.texture=GozImaj.kare(0,self.__aksiyon,self.__dikdortgen_tip,self.__yon).texture#yeni aksiyonun, ilk karesi alınıyor. Aksiyon geçişinde, önceki durumun karesi kalmasın diye 
         self._kare_sayac=0    
         self._animasyon_basladi=True    
         if self._animasyon_saat:
@@ -575,7 +575,7 @@ class GozImaj(AnimasyonImaj):#animasyon ve çizim işlemlerinin yürütüleceği
         self._animasyon_saat=Clock.schedule_interval(self._animasyon_tik_tak,GozImaj.gecikme(self.__aksiyon))
 
     def _animasyon_tik_tak(self,dt):
-        self.texture=GozImaj.kare(self._kare_sayac%(GozImaj.kare_sayisi(self.__aksiyon,self.__yon)),self.__aksiyon,self.__tip,self.__yon).texture
+        self.texture=GozImaj.kare(self._kare_sayac%(GozImaj.kare_sayisi(self.__aksiyon,self.__yon)),self.__aksiyon,self.__dikdortgen_tip,self.__yon).texture
         self._kare_sayac+=1
 
         if self.__aksiyon==GozAksiyon.GIT:

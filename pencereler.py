@@ -8,8 +8,10 @@ from kivy.clock import mainthread, Clock
 from kivy.uix.boxlayout import BoxLayout
 from kivy.core.window import Window
 
+from kivy.properties import ObjectProperty
+
 from grafik_dosya import KaynakYukleyici,GozImaj,ReseptorImaj
-from sabitler import AnaPencereSabit, AcilirPencereSabit, AtlasYuklemeBilgi,AcilirPencereTip,AcilirPencereDurum,DosyaTip,GozTip,GozAksiyon,Yon
+from sabitler import AnaPencereSabit, AcilirPencereSabit, AtlasYuklemeBilgi,AcilirPencereTip,AcilirPencereDurum,DosyaTip,GozTip,GozAksiyon,Yon, DikdortgenTip
 from labirent import Yarisma
 
 class PencereYonetici(ScreenManager):
@@ -144,9 +146,8 @@ class AcilirPencere(ModalView):
 class AnaPencere(Screen):
     def __init__(self,**kwargs):
         super().__init__()
-
         self.__yarisma=Yarisma(self.ids.saha)
-
+    
     def yaris_baslat_tiklama(self):
         self.__yarisma.baslat() 
 

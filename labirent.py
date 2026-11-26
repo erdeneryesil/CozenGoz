@@ -60,7 +60,7 @@ class Labirent:
         self.__sutun_sayisi=sutun_sayisi
 
         self.__minimum_cozum_uzunlugu=self.__satir_sayisi*self.__sutun_sayisi*LabirentSabit.MINIMUM_COZUM_UZUNLUGU_ORAN
-        self.__tip=DikdortgenTip.belirle(self.__sutun_sayisi,self.__satir_sayisi)
+        self.__dikdortgen_tip=DikdortgenTip.belirle(self.__sutun_sayisi,self.__satir_sayisi)
 
         self.__baslangic_satir_numara=-1
         self.__baslangic_sutun_numara=-1
@@ -116,8 +116,8 @@ class Labirent:
     def cozum_yolu_uzunlugu(self):#çözüm yolu kaç tane Hücre içeriyor
         return len(self.__cozum_yolu)
     @property
-    def tip(self):
-        return self.__tip
+    def dikdortgen_tip(self):
+        return self.__dikdortgen_tip
     
     def cozum_yolu_hucre(self,numara):
         return self.__cozum_yolu[numara]
@@ -273,7 +273,7 @@ class Labirent:
     
     def __rastgele_baslangic_bitis_belirle(self):#labirentin başlangıç ve bitiş hücreleri rastgele belirleniyor
 
-        if self.__tip==DikdortgenTip.YATAY:
+        if self.__dikdortgen_tip==DikdortgenTip.YATAY:
             baslangic_sutun_numarasi=0
             bitis_sutun_numara=self.__sutun_sayisi-1
             baslangic_satir_numarasi=random.randint(0,self.__satir_sayisi-1)
@@ -298,7 +298,7 @@ class Labirent:
 class Saha(Widget):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-
+        
 class Yarisma:
     def __init__(self,saha):
         self.__saha=saha # yarışmanın yapılacağı Widget nesnesi
